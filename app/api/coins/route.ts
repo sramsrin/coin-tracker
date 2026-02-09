@@ -9,6 +9,7 @@ interface Coin {
   index: string;
   section: string;
   subsection: string;
+  subsubsection: string;
   issuer: string;
   faceValue: string;
   currency: string;
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest) {
       index: body.index,
       section: body.section || '',
       subsection: body.subsection || '',
+      subsubsection: body.subsubsection || '',
       issuer: body.issuer,
       faceValue: body.faceValue,
       currency: body.currency,

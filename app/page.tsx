@@ -7,6 +7,7 @@ interface Coin {
   index: string;
   section: string;
   subsection: string;
+  subsubsection: string;
   issuer: string;
   faceValue: string;
   currency: string;
@@ -29,10 +30,12 @@ export default function Home() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [groupBySection, setGroupBySection] = useState(true);
   const [showTOC, setShowTOC] = useState(true);
+  const [expandedAgencies, setExpandedAgencies] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     index: '',
     section: '',
     subsection: '',
+    subsubsection: '',
     issuer: '',
     faceValue: '',
     currency: '',
@@ -80,6 +83,9 @@ export default function Home() {
 
       const subsectionCompare = a.subsection.localeCompare(b.subsection);
       if (subsectionCompare !== 0) return subsectionCompare;
+
+      const subsubsectionCompare = (a.subsubsection || '').localeCompare(b.subsubsection || '');
+      if (subsubsectionCompare !== 0) return subsubsectionCompare;
     }
 
     // Then sort by the selected field
@@ -100,17 +106,31 @@ export default function Home() {
       : bValue.localeCompare(aValue);
   });
 
-  // Group coins by section and subsection
-  const groupedCoins: { [section: string]: { [subsection: string]: Coin[] } } = {};
+  // Group coins by section, subsection, and subsubsection
+  const groupedCoins: { [section: string]: { [subsection: string]: { [subsubsection: string]: Coin[] } } } = {};
   sortedCoins.forEach(coin => {
     if (!groupedCoins[coin.section]) {
       groupedCoins[coin.section] = {};
     }
     if (!groupedCoins[coin.section][coin.subsection]) {
-      groupedCoins[coin.section][coin.subsection] = [];
+      groupedCoins[coin.section][coin.subsection] = {};
     }
-    groupedCoins[coin.section][coin.subsection].push(coin);
+    const subsubsection = coin.subsubsection || 'Other';
+    if (!groupedCoins[coin.section][coin.subsection][subsubsection]) {
+      groupedCoins[coin.section][coin.subsection][subsubsection] = [];
+    }
+    groupedCoins[coin.section][coin.subsection][subsubsection].push(coin);
   });
+
+  const toggleAgency = (agencyKey: string) => {
+    const newExpanded = new Set(expandedAgencies);
+    if (newExpanded.has(agencyKey)) {
+      newExpanded.delete(agencyKey);
+    } else {
+      newExpanded.add(agencyKey);
+    }
+    setExpandedAgencies(newExpanded);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +150,7 @@ export default function Home() {
           index: '',
           section: '',
           subsection: '',
+          subsubsection: '',
           issuer: '',
           faceValue: '',
           currency: '',
@@ -371,35 +392,82 @@ export default function Home() {
             </div>
             {showTOC && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.keys(groupedCoins).sort().map((section) => (
-                  <div key={section} className="border border-pink-200 rounded-lg p-4 hover:shadow-md transition">
-                    <a
-                      href={`#section-${section.replace(/\s+/g, '-').toLowerCase()}`}
-                      className="text-lg font-bold text-pink-700 hover:text-pink-900 block mb-3"
-                    >
-                      {section}
-                      <span className="text-sm font-normal text-gray-600 ml-2">
-                        ({Object.values(groupedCoins[section]).reduce((sum, coins) => sum + coins.length, 0)})
-                      </span>
-                    </a>
-                    <ul className="space-y-1">
-                      {Object.keys(groupedCoins[section]).sort().map((subsection) => (
-                        <li key={subsection}>
-                          <a
-                            href={`#subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
-                            className="text-sm text-gray-700 hover:text-pink-700 hover:underline flex items-center"
-                          >
-                            <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
-                            {subsection}
-                            <span className="text-xs text-gray-500 ml-auto">
-                              ({groupedCoins[section][subsection].length})
-                            </span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                {Object.keys(groupedCoins).sort().map((section) => {
+                  const totalCoins = Object.values(groupedCoins[section]).reduce(
+                    (sum, subsectionData) => sum + Object.values(subsectionData).reduce((s, coins) => s + coins.length, 0),
+                    0
+                  );
+                  return (
+                    <div key={section} className="border border-pink-200 rounded-lg p-4 hover:shadow-md transition">
+                      <a
+                        href={`#section-${section.replace(/\s+/g, '-').toLowerCase()}`}
+                        className="text-lg font-bold text-pink-700 hover:text-pink-900 block mb-3"
+                      >
+                        {section}
+                        <span className="text-sm font-normal text-gray-600 ml-2">
+                          ({totalCoins})
+                        </span>
+                      </a>
+                      <ul className="space-y-2">
+                        {Object.keys(groupedCoins[section]).sort().map((subsection) => {
+                          const agencyKey = `${section}-${subsection}`;
+                          const isExpanded = expandedAgencies.has(agencyKey);
+                          const isPrincelyStates = section === 'Indian Princely States';
+                          const subsubsections = Object.keys(groupedCoins[section][subsection]);
+                          const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
+                          const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
+
+                          return (
+                            <li key={subsection}>
+                              <div className="flex items-center">
+                                {isPrincelyStates && hasMultipleStates && (
+                                  <button
+                                    onClick={() => toggleAgency(agencyKey)}
+                                    className="mr-1 text-pink-600 hover:text-pink-800 focus:outline-none"
+                                  >
+                                    {isExpanded ? '▼' : '▶'}
+                                  </button>
+                                )}
+                                <a
+                                  href={`#subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
+                                  className="text-sm text-gray-700 hover:text-pink-700 hover:underline flex items-center flex-1"
+                                >
+                                  <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
+                                  {subsection}
+                                  <span className="text-xs text-gray-500 ml-auto">
+                                    ({agencyCoins})
+                                  </span>
+                                </a>
+                              </div>
+                              {isPrincelyStates && hasMultipleStates && isExpanded && (
+                                <ul className="ml-6 mt-1 space-y-1">
+                                  {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
+                                    if (subsubsection === 'Other') return null;
+                                    const stateCoins = groupedCoins[section][subsection][subsubsection].length;
+                                    return (
+                                      <li key={subsubsection}>
+                                        <a
+                                          href={`#subsubsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}-${subsubsection.replace(/\s+/g, '-').toLowerCase()}`}
+                                          className="text-xs text-gray-600 hover:text-pink-600 hover:underline flex items-center"
+                                        >
+                                          <span className="w-1 h-1 bg-pink-300 rounded-full mr-2"></span>
+                                          {subsubsection}
+                                          <span className="text-xs text-gray-400 ml-auto">
+                                            ({stateCoins})
+                                          </span>
+                                        </a>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -429,65 +497,88 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-pink-300">
                     {section}
                   </h3>
-                  {Object.keys(groupedCoins[section]).sort().map((subsection) => (
-                    <div
-                      key={subsection}
-                      id={`subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
-                      className="mb-6 ml-4 scroll-mt-4"
-                    >
-                      <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
-                        <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
-                        {subsection} ({groupedCoins[section][subsection].length} coins)
-                      </h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-200 rounded">
-                          <thead className="bg-pink-50">
-                            <tr>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Index</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Issuer</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Value</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Currency</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">KM#</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Numista#</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Link</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Weight</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {groupedCoins[section][subsection].map((coin) => (
-                              <tr key={coin.id} className="border-t border-gray-200 hover:bg-pink-25">
-                                <td className="px-3 py-2 text-xs text-gray-800 font-medium">{coin.index}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.issuer}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.numistaNumber}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800">
-                                  {coin.numistaLink ? (
-                                    <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
-                                      Link
-                                    </a>
-                                  ) : '-'}
-                                </td>
-                                <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
-                                <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
-                                <td className="px-3 py-2 text-xs">
-                                  <button
-                                    onClick={() => handleDelete(coin.id)}
-                                    className="text-red-600 hover:text-red-800 font-medium"
-                                  >
-                                    Del
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                  {Object.keys(groupedCoins[section]).sort().map((subsection) => {
+                    const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
+                    return (
+                      <div
+                        key={subsection}
+                        id={`subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
+                        className="mb-6 ml-4 scroll-mt-4"
+                      >
+                        <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
+                          {subsection} ({agencyCoins} coins)
+                        </h4>
+                        {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
+                          const stateCoins = groupedCoins[section][subsection][subsubsection];
+                          const isPrincelyStates = section === 'Indian Princely States';
+                          const showStateHeader = isPrincelyStates && subsubsection !== 'Other';
+
+                          return (
+                            <div
+                              key={subsubsection}
+                              id={showStateHeader ? `subsubsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}-${subsubsection.replace(/\s+/g, '-').toLowerCase()}` : undefined}
+                              className={showStateHeader ? "mb-4 ml-6 scroll-mt-4" : "mb-4"}
+                            >
+                              {showStateHeader && (
+                                <h5 className="text-md font-medium text-gray-600 mb-2 flex items-center">
+                                  <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
+                                  {subsubsection} ({stateCoins.length} coins)
+                                </h5>
+                              )}
+                              <div className="overflow-x-auto">
+                                <table className="w-full border border-gray-200 rounded">
+                                  <thead className="bg-pink-50">
+                                    <tr>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Index</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Issuer</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Value</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Currency</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">KM#</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Numista#</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Link</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Weight</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {stateCoins.map((coin) => (
+                                      <tr key={coin.id} className="border-t border-gray-200 hover:bg-pink-25">
+                                        <td className="px-3 py-2 text-xs text-gray-800 font-medium">{coin.index}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.issuer}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.numistaNumber}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">
+                                          {coin.numistaLink ? (
+                                            <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
+                                              Link
+                                            </a>
+                                          ) : '-'}
+                                        </td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
+                                        <td className="px-3 py-2 text-xs">
+                                          <button
+                                            onClick={() => handleDelete(coin.id)}
+                                            className="text-red-600 hover:text-red-800 font-medium"
+                                          >
+                                            Del
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ))}
             </div>
