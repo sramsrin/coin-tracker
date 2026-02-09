@@ -7,6 +7,8 @@ const DATA_FILE = path.join(process.cwd(), 'coins-data.json');
 interface Coin {
   id: string;
   index: string;
+  section: string;
+  subsection: string;
   issuer: string;
   faceValue: string;
   currency: string;
@@ -58,6 +60,8 @@ export async function POST(request: NextRequest) {
     const newCoin: Coin = {
       id: Date.now().toString(),
       index: body.index,
+      section: body.section || '',
+      subsection: body.subsection || '',
       issuer: body.issuer,
       faceValue: body.faceValue,
       currency: body.currency,

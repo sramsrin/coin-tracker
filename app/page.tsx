@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 interface Coin {
   id: string;
   index: string;
+  section: string;
+  subsection: string;
   issuer: string;
   faceValue: string;
   currency: string;
@@ -25,8 +27,12 @@ export default function Home() {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [sortField, setSortField] = useState<SortField>('index');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [groupBySection, setGroupBySection] = useState(true);
+  const [showTOC, setShowTOC] = useState(true);
   const [formData, setFormData] = useState({
     index: '',
+    section: '',
+    subsection: '',
     issuer: '',
     faceValue: '',
     currency: '',
@@ -67,6 +73,16 @@ export default function Home() {
   };
 
   const sortedCoins = [...coins].sort((a, b) => {
+    // First sort by section and subsection if grouping is enabled
+    if (groupBySection) {
+      const sectionCompare = a.section.localeCompare(b.section);
+      if (sectionCompare !== 0) return sectionCompare;
+
+      const subsectionCompare = a.subsection.localeCompare(b.subsection);
+      if (subsectionCompare !== 0) return subsectionCompare;
+    }
+
+    // Then sort by the selected field
     const aValue = a[sortField] || '';
     const bValue = b[sortField] || '';
 
@@ -82,6 +98,18 @@ export default function Home() {
     return sortDirection === 'asc'
       ? aValue.localeCompare(bValue)
       : bValue.localeCompare(aValue);
+  });
+
+  // Group coins by section and subsection
+  const groupedCoins: { [section: string]: { [subsection: string]: Coin[] } } = {};
+  sortedCoins.forEach(coin => {
+    if (!groupedCoins[coin.section]) {
+      groupedCoins[coin.section] = {};
+    }
+    if (!groupedCoins[coin.section][coin.subsection]) {
+      groupedCoins[coin.section][coin.subsection] = [];
+    }
+    groupedCoins[coin.section][coin.subsection].push(coin);
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,6 +128,8 @@ export default function Home() {
         // Clear form
         setFormData({
           index: '',
+          section: '',
+          subsection: '',
           issuer: '',
           faceValue: '',
           currency: '',
@@ -135,7 +165,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
           💰 Lavender Coin Collection
@@ -153,8 +183,32 @@ export default function Home() {
                 type="text"
                 value={formData.index}
                 onChange={(e) => setFormData({ ...formData, index: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., 1.100"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Section
+              </label>
+              <input
+                type="text"
+                value={formData.section}
+                onChange={(e) => setFormData({ ...formData, section: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g., British India"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Subsection
+              </label>
+              <input
+                type="text"
+                value={formData.subsection}
+                onChange={(e) => setFormData({ ...formData, subsection: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g., George VI"
               />
             </div>
             <div>
@@ -166,7 +220,7 @@ export default function Home() {
                 required
                 value={formData.issuer}
                 onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., United States"
               />
             </div>
@@ -179,7 +233,7 @@ export default function Home() {
                 required
                 value={formData.faceValue}
                 onChange={(e) => setFormData({ ...formData, faceValue: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., 1 Cent"
               />
             </div>
@@ -192,7 +246,7 @@ export default function Home() {
                 required
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., USD"
               />
             </div>
@@ -204,7 +258,7 @@ export default function Home() {
                 type="text"
                 value={formData.kmNumber}
                 onChange={(e) => setFormData({ ...formData, kmNumber: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., KM# 132"
               />
             </div>
@@ -216,7 +270,7 @@ export default function Home() {
                 type="text"
                 value={formData.numistaNumber}
                 onChange={(e) => setFormData({ ...formData, numistaNumber: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., 12345"
               />
             </div>
@@ -228,7 +282,7 @@ export default function Home() {
                 type="url"
                 value={formData.numistaLink}
                 onChange={(e) => setFormData({ ...formData, numistaLink: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="https://en.numista.com/..."
               />
             </div>
@@ -240,7 +294,7 @@ export default function Home() {
                 type="text"
                 value={formData.weight}
                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., 3.11g"
               />
             </div>
@@ -252,7 +306,7 @@ export default function Home() {
                 type="text"
                 value={formData.book}
                 onChange={(e) => setFormData({ ...formData, book: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="e.g., Red Book"
               />
             </div>
@@ -264,7 +318,7 @@ export default function Home() {
                 type="text"
                 value={formData.numberAndNotes}
                 onChange={(e) => setFormData({ ...formData, numberAndNotes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="Notes..."
               />
             </div>
@@ -275,7 +329,7 @@ export default function Home() {
               <textarea
                 value={formData.obverse}
                 onChange={(e) => setFormData({ ...formData, obverse: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="Description of obverse side..."
                 rows={2}
               />
@@ -287,7 +341,7 @@ export default function Home() {
               <textarea
                 value={formData.reverse}
                 onChange={(e) => setFormData({ ...formData, reverse: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="Description of reverse side..."
                 rows={2}
               />
@@ -295,7 +349,7 @@ export default function Home() {
             <div className="md:col-span-3">
               <button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
               >
                 Add Coin
               </button>
@@ -303,48 +357,177 @@ export default function Home() {
           </form>
         </div>
 
+        {/* Table of Contents */}
+        {groupBySection && coins.length > 0 && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold text-gray-700">Table of Contents</h2>
+              <button
+                onClick={() => setShowTOC(!showTOC)}
+                className="px-3 py-1 bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-md text-sm font-medium transition"
+              >
+                {showTOC ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            {showTOC && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Object.keys(groupedCoins).sort().map((section) => (
+                  <div key={section} className="border border-pink-200 rounded-lg p-4 hover:shadow-md transition">
+                    <a
+                      href={`#section-${section.replace(/\s+/g, '-').toLowerCase()}`}
+                      className="text-lg font-bold text-pink-700 hover:text-pink-900 block mb-3"
+                    >
+                      {section}
+                      <span className="text-sm font-normal text-gray-600 ml-2">
+                        ({Object.values(groupedCoins[section]).reduce((sum, coins) => sum + coins.length, 0)})
+                      </span>
+                    </a>
+                    <ul className="space-y-1">
+                      {Object.keys(groupedCoins[section]).sort().map((subsection) => (
+                        <li key={subsection}>
+                          <a
+                            href={`#subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
+                            className="text-sm text-gray-700 hover:text-pink-700 hover:underline flex items-center"
+                          >
+                            <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
+                            {subsection}
+                            <span className="text-xs text-gray-500 ml-auto">
+                              ({groupedCoins[section][subsection].length})
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Coins Table */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <h2 className="text-2xl font-semibold text-gray-700 p-6 pb-4">Your Collection</h2>
+          <div className="flex justify-between items-center p-6 pb-4">
+            <h2 className="text-2xl font-semibold text-gray-700">Your Collection ({coins.length} coins)</h2>
+            <button
+              onClick={() => setGroupBySection(!groupBySection)}
+              className="px-4 py-2 bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-md text-sm font-medium transition"
+            >
+              {groupBySection ? 'Show All' : 'Group by Section'}
+            </button>
+          </div>
           {coins.length === 0 ? (
             <p className="text-gray-500 text-center py-8">No coins in your collection yet. Add one above!</p>
+          ) : groupBySection ? (
+            <div className="p-6 pt-0">
+              {Object.keys(groupedCoins).sort().map((section) => (
+                <div
+                  key={section}
+                  id={`section-${section.replace(/\s+/g, '-').toLowerCase()}`}
+                  className="mb-8 scroll-mt-4"
+                >
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-pink-300">
+                    {section}
+                  </h3>
+                  {Object.keys(groupedCoins[section]).sort().map((subsection) => (
+                    <div
+                      key={subsection}
+                      id={`subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
+                      className="mb-6 ml-4 scroll-mt-4"
+                    >
+                      <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                        <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
+                        {subsection} ({groupedCoins[section][subsection].length} coins)
+                      </h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border border-gray-200 rounded">
+                          <thead className="bg-pink-50">
+                            <tr>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Index</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Issuer</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Value</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Currency</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">KM#</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Numista#</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Link</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Weight</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {groupedCoins[section][subsection].map((coin) => (
+                              <tr key={coin.id} className="border-t border-gray-200 hover:bg-pink-25">
+                                <td className="px-3 py-2 text-xs text-gray-800 font-medium">{coin.index}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.issuer}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.numistaNumber}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800">
+                                  {coin.numistaLink ? (
+                                    <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
+                                      Link
+                                    </a>
+                                  ) : '-'}
+                                </td>
+                                <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
+                                <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
+                                <td className="px-3 py-2 text-xs">
+                                  <button
+                                    onClick={() => handleDelete(coin.id)}
+                                    className="text-red-600 hover:text-red-800 font-medium"
+                                  >
+                                    Del
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-purple-100">
+                <thead className="bg-pink-100">
                   <tr>
-                    <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Index {sortField === 'index' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('issuer')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('issuer')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Issuer {sortField === 'issuer' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('faceValue')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('faceValue')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Face Value {sortField === 'faceValue' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Currency {sortField === 'currency' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Numista # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Numista Link</th>
-                    <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Weight {sortField === 'weight' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-purple-200">
+                    <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Actions</th>
@@ -361,7 +544,7 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.numistaNumber}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         {coin.numistaLink ? (
-                          <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-800 underline">
+                          <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
                             Link
                           </a>
                         ) : (

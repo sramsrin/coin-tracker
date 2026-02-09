@@ -7,7 +7,8 @@
       "WebFetch(domain:docs.google.com)",
       "WebFetch(domain:doc-14-10-sheets.googleusercontent.com)",
       "Bash(curl:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "WebSearch"
     ]
   }
 }
