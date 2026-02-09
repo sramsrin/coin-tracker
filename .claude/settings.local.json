@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:docs.google.com)",
+      "WebFetch(domain:doc-14-10-sheets.googleusercontent.com)",
+      "Bash(curl:*)",
+      "Bash(node:*)"
+    ]
+  }
+}
