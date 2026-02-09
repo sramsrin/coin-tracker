@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { kv } from '@vercel/kv';
 
-const DATA_FILE = path.join(process.cwd(), 'coins-data.json');
+const COINS_KEY = 'coins';
 
 interface Coin {
   id: string;
@@ -23,20 +22,20 @@ interface Coin {
   reverse: string;
 }
 
-// Helper function to read coins from file
+// Helper function to read coins from KV
 async function readCoins(): Promise<Coin[]> {
   try {
-    const data = await fs.readFile(DATA_FILE, 'utf-8');
-    return JSON.parse(data);
+    const coins = await kv.get<Coin[]>(COINS_KEY);
+    return coins || [];
   } catch (error) {
-    // If file doesn't exist, return empty array
+    console.error('Error reading from KV:', error);
     return [];
   }
 }
 
-// Helper function to write coins to file
+// Helper function to write coins to KV
 async function writeCoins(coins: Coin[]): Promise<void> {
-  await fs.writeFile(DATA_FILE, JSON.stringify(coins, null, 2), 'utf-8');
+  await kv.set(COINS_KEY, coins);
 }
 
 // GET - Retrieve all coins
