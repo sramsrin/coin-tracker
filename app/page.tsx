@@ -209,6 +209,20 @@ export default function Home() {
     groupedCoins[coin.section][coin.subsection][subsubsection].push(coin);
   });
 
+  // Helper function to extract start year from subsection name (e.g., "William IV (1830-1837)" -> 1830)
+  const extractYear = (subsection: string): number => {
+    const match = subsection.match(/\((\d{4})/);
+    return match ? parseInt(match[1]) : 9999; // Return high number if no year found
+  };
+
+  // Helper function to sort subsections (by date for British India, alphabetically for others)
+  const sortSubsections = (section: string, subsections: string[]): string[] => {
+    if (section === 'British India') {
+      return subsections.sort((a, b) => extractYear(a) - extractYear(b));
+    }
+    return subsections.sort();
+  };
+
   const toggleAgency = (agencyKey: string) => {
     const newExpanded = new Set(expandedAgencies);
     if (newExpanded.has(agencyKey)) {
@@ -655,7 +669,7 @@ export default function Home() {
                         </span>
                       </a>
                       <ul className="space-y-2">
-                        {Object.keys(groupedCoins[section]).sort().map((subsection) => {
+                        {sortSubsections(section, Object.keys(groupedCoins[section])).map((subsection) => {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'Indian Princely States';
@@ -740,10 +754,10 @@ export default function Home() {
                   id={`section-${section.replace(/\s+/g, '-').toLowerCase()}`}
                   className="mb-8 scroll-mt-4"
                 >
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-pink-300">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-pink-300">
                     {section}
                   </h3>
-                  {Object.keys(groupedCoins[section]).sort().map((subsection) => {
+                  {sortSubsections(section, Object.keys(groupedCoins[section])).map((subsection) => {
                     const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
                     return (
                       <div
@@ -776,13 +790,12 @@ export default function Home() {
                                 <table className="w-full border border-gray-200 rounded">
                                   <thead className="bg-pink-50">
                                     <tr>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Index</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Issuer</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Value</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Currency</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">KM#</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Numista#</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Weight</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Index</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Value</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Currency</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
                                     </tr>
                                   </thead>
@@ -795,7 +808,6 @@ export default function Home() {
                                         >
                                           {coin.index}
                                         </td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.issuer}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
@@ -829,28 +841,25 @@ export default function Home() {
               <table className="w-full">
                 <thead className="bg-pink-100">
                   <tr>
-                    <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Index {sortField === 'index' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('issuer')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Issuer {sortField === 'issuer' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th onClick={() => handleSort('faceValue')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('faceValue')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Face Value {sortField === 'faceValue' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Currency {sortField === 'currency' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Numista # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Weight {sortField === 'weight' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
@@ -873,7 +882,6 @@ export default function Home() {
                       >
                         {coin.index}
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.issuer}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
