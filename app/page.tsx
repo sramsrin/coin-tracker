@@ -31,6 +31,9 @@ export default function Home() {
   const [groupBySection, setGroupBySection] = useState(true);
   const [showTOC, setShowTOC] = useState(true);
   const [expandedAgencies, setExpandedAgencies] = useState<Set<string>>(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPasswordError, setShowPasswordError] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -132,6 +135,25 @@ export default function Home() {
     setExpandedAgencies(newExpanded);
   };
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simple password check - in production, this should be done server-side
+    if (password === 'SRMPv7006@') {
+      setIsAuthenticated(true);
+      setPassword('');
+      setShowPasswordError(false);
+    } else {
+      setShowPasswordError(true);
+      setPassword('');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPassword('');
+    setShowPasswordError(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -188,12 +210,52 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          💰 Ram & Dhruvan Coin Collection
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800">
+            💰 Ram & Dhruvan Coin Collection
+          </h1>
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm font-medium transition"
+            >
+              Logout
+            </button>
+          )}
+        </div>
 
-        {/* Add Coin Form */}
+        {/* Password Protection / Add Coin Form */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          {!isAuthenticated ? (
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">Admin Access Required</h2>
+              <p className="text-gray-600 mb-4">Enter password to add or delete coins from the collection.</p>
+              <form onSubmit={handlePasswordSubmit} className="max-w-md">
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setShowPasswordError(false);
+                    }}
+                    placeholder="Enter password"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  />
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200"
+                  >
+                    Login
+                  </button>
+                </div>
+                {showPasswordError && (
+                  <p className="text-red-600 text-sm mt-2">Incorrect password. Please try again.</p>
+                )}
+              </form>
+            </div>
+          ) : (
+            <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Add New Coin</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -376,6 +438,8 @@ export default function Home() {
               </button>
             </div>
           </form>
+            </div>
+          )}
         </div>
 
         {/* Table of Contents */}
@@ -561,12 +625,14 @@ export default function Home() {
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
                                         <td className="px-3 py-2 text-xs">
-                                          <button
-                                            onClick={() => handleDelete(coin.id)}
-                                            className="text-red-600 hover:text-red-800 font-medium"
-                                          >
-                                            Del
-                                          </button>
+                                          {isAuthenticated && (
+                                            <button
+                                              onClick={() => handleDelete(coin.id)}
+                                              className="text-red-600 hover:text-red-800 font-medium"
+                                            >
+                                              Del
+                                            </button>
+                                          )}
                                         </td>
                                       </tr>
                                     ))}
