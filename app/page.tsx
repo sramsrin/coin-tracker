@@ -168,7 +168,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          💰 Lavender Coin Collection
+          💰 Ram & Dhruvan Coin Collection
         </h1>
 
         {/* Add Coin Form */}

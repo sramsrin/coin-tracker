@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lavender Coin Collection",
+  title: "Ram & Dhruvan Coin Collection",
   description: "Track your coin collection",
 };
 
