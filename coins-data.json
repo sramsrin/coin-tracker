@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "index": "0.100",
+    "index": "0.1",
     "issuer": "Dutch - Nagapattanam",
     "faceValue": "1",
     "currency": "Fanam",
@@ -19,7 +19,7 @@
   },
   {
     "id": "2",
-    "index": "0.200",
+    "index": "0.2",
     "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
@@ -37,7 +37,7 @@
   },
   {
     "id": "3",
-    "index": "0.300",
+    "index": "0.3",
     "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Fanam",
@@ -55,7 +55,7 @@
   },
   {
     "id": "4",
-    "index": "1.100",
+    "index": "1.1",
     "issuer": "Travancore",
     "faceValue": "1",
     "currency": "Chuckram",
@@ -73,7 +73,7 @@
   },
   {
     "id": "5",
-    "index": "1.200",
+    "index": "1.2",
     "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Chuckram",
@@ -91,7 +91,7 @@
   },
   {
     "id": "6",
-    "index": "1.300",
+    "index": "1.3",
     "issuer": "Travancore - BRV2",
     "faceValue": "4",
     "currency": "Cash",
@@ -109,7 +109,7 @@
   },
   {
     "id": "7",
-    "index": "1.400",
+    "index": "1.4",
     "issuer": "Travancore - BRV2",
     "faceValue": "8",
     "currency": "Cash",
@@ -127,7 +127,7 @@
   },
   {
     "id": "8",
-    "index": "1.500",
+    "index": "1.5",
     "issuer": "Pudukottai",
     "faceValue": "1",
     "currency": "Amman Cash",
@@ -145,7 +145,7 @@
   },
   {
     "id": "9",
-    "index": "1.600",
+    "index": "1.6",
     "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Cash",
@@ -163,7 +163,7 @@
   },
   {
     "id": "10",
-    "index": "1.700",
+    "index": "1.7",
     "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Cash",
@@ -181,7 +181,7 @@
   },
   {
     "id": "11",
-    "index": "1.800",
+    "index": "1.8",
     "issuer": "Chola",
     "faceValue": "1",
     "currency": "Massa",
@@ -199,7 +199,7 @@
   },
   {
     "id": "12",
-    "index": "1.900",
+    "index": "1.9",
     "issuer": "Mysore",
     "faceValue": "20",
     "currency": "Cash",
@@ -217,7 +217,7 @@
   },
   {
     "id": "13",
-    "index": "1.910",
+    "index": "1.10",
     "issuer": "Mysore",
     "faceValue": "25",
     "currency": "Cash",
@@ -235,7 +235,7 @@
   },
   {
     "id": "14",
-    "index": "1.911",
+    "index": "1.11",
     "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
@@ -253,7 +253,7 @@
   },
   {
     "id": "15",
-    "index": "1.912",
+    "index": "1.12",
     "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
@@ -271,7 +271,7 @@
   },
   {
     "id": "16",
-    "index": "2.100",
+    "index": "2.1",
     "issuer": "Hyderabad - Mir Mahbub Ali Khan",
     "faceValue": "2",
     "currency": "Pai",
@@ -289,7 +289,7 @@
   },
   {
     "id": "17",
-    "index": "2.200",
+    "index": "2.2",
     "issuer": "Junagadh",
     "faceValue": "1",
     "currency": "Dokda",
@@ -307,7 +307,7 @@
   },
   {
     "id": "18",
-    "index": "2.300",
+    "index": "2.3",
     "issuer": "Nawanagar",
     "faceValue": "1",
     "currency": "Dokda",
@@ -325,7 +325,7 @@
   },
   {
     "id": "19",
-    "index": "2.400",
+    "index": "2.4",
     "issuer": "Travancore - BRV2",
     "faceValue": "1",
     "currency": "Fanam",
@@ -343,7 +343,7 @@
   },
   {
     "id": "20",
-    "index": "2.500",
+    "index": "2.5",
     "issuer": "Hyderabad - Mir Usman Ali Khan",
     "faceValue": "2",
     "currency": "Annas",
@@ -361,7 +361,7 @@
   },
   {
     "id": "21",
-    "index": "2.600",
+    "index": "2.6",
     "issuer": "Travancore - MRV",
     "faceValue": "4",
     "currency": "Cash",
@@ -379,7 +379,7 @@
   },
   {
     "id": "22",
-    "index": "2.700",
+    "index": "2.7",
     "issuer": "Travancore - MRV",
     "faceValue": "8",
     "currency": "Cash",
@@ -397,7 +397,7 @@
   },
   {
     "id": "23",
-    "index": "2.800",
+    "index": "2.8",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Paisa",
@@ -415,7 +415,7 @@
   },
   {
     "id": "24",
-    "index": "2.900",
+    "index": "2.9",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Paisa",
@@ -433,7 +433,7 @@
   },
   {
     "id": "25",
-    "index": "2.910",
+    "index": "2.10",
     "issuer": "Arcot",
     "faceValue": "1/2",
     "currency": "Paisa",
@@ -451,7 +451,7 @@
   },
   {
     "id": "26",
-    "index": "2.911",
+    "index": "2.11",
     "issuer": "Travancore - Rani Gouri Laksmi Bayi",
     "faceValue": "1",
     "currency": "Chuckram",
@@ -469,7 +469,7 @@
   },
   {
     "id": "27",
-    "index": "2.912",
+    "index": "2.12",
     "issuer": "Travancore - BRV2",
     "faceValue": "1",
     "currency": "Chuckram",
@@ -487,7 +487,7 @@
   },
   {
     "id": "28",
-    "index": "3.100",
+    "index": "3.1",
     "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
@@ -505,7 +505,7 @@
   },
   {
     "id": "29",
-    "index": "3.200",
+    "index": "3.2",
     "issuer": "King Edward",
     "faceValue": "1",
     "currency": "Rupee",
@@ -523,7 +523,7 @@
   },
   {
     "id": "30",
-    "index": "3.300",
+    "index": "3.3",
     "issuer": "George V",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -541,7 +541,7 @@
   },
   {
     "id": "31",
-    "index": "3.400",
+    "index": "3.4",
     "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -559,7 +559,7 @@
   },
   {
     "id": "32",
-    "index": "3.500",
+    "index": "3.5",
     "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -577,7 +577,7 @@
   },
   {
     "id": "33",
-    "index": "3.600",
+    "index": "3.6",
     "issuer": "George VI",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -595,7 +595,7 @@
   },
   {
     "id": "34",
-    "index": "3.700",
+    "index": "3.7",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
@@ -613,7 +613,7 @@
   },
   {
     "id": "35",
-    "index": "3.800",
+    "index": "3.8",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
@@ -631,7 +631,7 @@
   },
   {
     "id": "36",
-    "index": "3.900",
+    "index": "3.9",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
@@ -649,7 +649,7 @@
   },
   {
     "id": "37",
-    "index": "3.910",
+    "index": "3.10",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
@@ -667,7 +667,7 @@
   },
   {
     "id": "38",
-    "index": "3.911",
+    "index": "3.11",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
@@ -685,7 +685,7 @@
   },
   {
     "id": "39",
-    "index": "3.912",
+    "index": "3.12",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
@@ -703,7 +703,7 @@
   },
   {
     "id": "40",
-    "index": "4.100",
+    "index": "4.1",
     "issuer": "Dutch - Pondycherry",
     "faceValue": "1",
     "currency": "Cash",
@@ -721,7 +721,7 @@
   },
   {
     "id": "41",
-    "index": "4.200",
+    "index": "4.2",
     "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
@@ -739,7 +739,7 @@
   },
   {
     "id": "42",
-    "index": "4.300",
+    "index": "4.3",
     "issuer": "East India Company - Unknown",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -757,7 +757,7 @@
   },
   {
     "id": "43",
-    "index": "4.400",
+    "index": "4.4",
     "issuer": "William IV",
     "faceValue": "1/2",
     "currency": "Annas",
@@ -775,7 +775,7 @@
   },
   {
     "id": "44",
-    "index": "4.500",
+    "index": "4.5",
     "issuer": "Victoria - Divided Legend",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -793,7 +793,7 @@
   },
   {
     "id": "45",
-    "index": "4.600",
+    "index": "4.6",
     "issuer": "Victoria - Empress",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -811,7 +811,7 @@
   },
   {
     "id": "46",
-    "index": "4.700",
+    "index": "4.7",
     "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -829,7 +829,7 @@
   },
   {
     "id": "47",
-    "index": "4.800",
+    "index": "4.8",
     "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -847,7 +847,7 @@
   },
   {
     "id": "48",
-    "index": "4.900",
+    "index": "4.9",
     "issuer": "Victoria - Crowned",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -865,7 +865,7 @@
   },
   {
     "id": "49",
-    "index": "4.910",
+    "index": "4.10",
     "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -883,7 +883,7 @@
   },
   {
     "id": "50",
-    "index": "4.911",
+    "index": "4.11",
     "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -901,7 +901,7 @@
   },
   {
     "id": "51",
-    "index": "4.912",
+    "index": "4.12",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -919,7 +919,7 @@
   },
   {
     "id": "52",
-    "index": "5.100",
+    "index": "5.1",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -937,7 +937,7 @@
   },
   {
     "id": "53",
-    "index": "5.200",
+    "index": "5.2",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -955,7 +955,7 @@
   },
   {
     "id": "54",
-    "index": "5.300",
+    "index": "5.3",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -973,7 +973,7 @@
   },
   {
     "id": "55",
-    "index": "5.400",
+    "index": "5.4",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Rupee",
@@ -991,7 +991,7 @@
   },
   {
     "id": "56",
-    "index": "5.500",
+    "index": "5.5",
     "issuer": "George V",
     "faceValue": "2",
     "currency": "Annas",
@@ -1009,7 +1009,7 @@
   },
   {
     "id": "57",
-    "index": "5.600",
+    "index": "5.6",
     "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1027,7 +1027,7 @@
   },
   {
     "id": "58",
-    "index": "5.700",
+    "index": "5.7",
     "issuer": "George VI",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -1045,7 +1045,7 @@
   },
   {
     "id": "59",
-    "index": "5.800",
+    "index": "5.8",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
@@ -1063,7 +1063,7 @@
   },
   {
     "id": "60",
-    "index": "5.900",
+    "index": "5.9",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
@@ -1081,7 +1081,7 @@
   },
   {
     "id": "61",
-    "index": "5.910",
+    "index": "5.10",
     "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Annas",
@@ -1099,7 +1099,7 @@
   },
   {
     "id": "62",
-    "index": "5.911",
+    "index": "5.11",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
@@ -1117,7 +1117,7 @@
   },
   {
     "id": "63",
-    "index": "5.912",
+    "index": "5.12",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
@@ -1135,7 +1135,7 @@
   },
   {
     "id": "64",
-    "index": "6.100",
+    "index": "6.1",
     "issuer": "William IV",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1153,7 +1153,7 @@
   },
   {
     "id": "65",
-    "index": "6.200",
+    "index": "6.2",
     "issuer": "Victoria - Empress",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -1171,7 +1171,7 @@
   },
   {
     "id": "66",
-    "index": "6.300",
+    "index": "6.3",
     "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1189,7 +1189,7 @@
   },
   {
     "id": "67",
-    "index": "6.400",
+    "index": "6.4",
     "issuer": "Bombay Presidency",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1207,7 +1207,7 @@
   },
   {
     "id": "68",
-    "index": "6.500",
+    "index": "6.5",
     "issuer": "George V",
     "faceValue": "1",
     "currency": "Annas",
@@ -1225,7 +1225,7 @@
   },
   {
     "id": "69",
-    "index": "6.600",
+    "index": "6.6",
     "issuer": "Bombay Presidency",
     "faceValue": "1",
     "currency": "Pie",
@@ -1243,7 +1243,7 @@
   },
   {
     "id": "70",
-    "index": "6.700",
+    "index": "6.7",
     "issuer": "George V",
     "faceValue": "4",
     "currency": "Annas",
@@ -1261,7 +1261,7 @@
   },
   {
     "id": "71",
-    "index": "6.800",
+    "index": "6.8",
     "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1279,7 +1279,7 @@
   },
   {
     "id": "72",
-    "index": "6.900",
+    "index": "6.9",
     "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Pice",
@@ -1297,7 +1297,7 @@
   },
   {
     "id": "73",
-    "index": "6.910",
+    "index": "6.10",
     "issuer": "Madras Presidency",
     "faceValue": "1/2",
     "currency": "Dub",
@@ -1315,7 +1315,7 @@
   },
   {
     "id": "74",
-    "index": "6.911",
+    "index": "6.11",
     "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Pies",
@@ -1333,7 +1333,7 @@
   },
   {
     "id": "75",
-    "index": "6.912",
+    "index": "6.12",
     "issuer": "Madras Presidency",
     "faceValue": "5",
     "currency": "Cash",
@@ -1351,7 +1351,7 @@
   },
   {
     "id": "76",
-    "index": "7.012",
+    "index": "7.12",
     "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Pie",
@@ -1369,7 +1369,7 @@
   },
   {
     "id": "77",
-    "index": "7.100",
+    "index": "7.1",
     "issuer": "Victoria - Divided Legend",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1387,7 +1387,7 @@
   },
   {
     "id": "78",
-    "index": "7.200",
+    "index": "7.2",
     "issuer": "Madras Presidency",
     "faceValue": "4",
     "currency": "Pies",
@@ -1405,7 +1405,7 @@
   },
   {
     "id": "79",
-    "index": "7.300",
+    "index": "7.3",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Pies",
@@ -1423,7 +1423,7 @@
   },
   {
     "id": "80",
-    "index": "7.400",
+    "index": "7.4",
     "issuer": "Madras Presidency",
     "faceValue": "20",
     "currency": "Cash",
@@ -1441,7 +1441,7 @@
   },
   {
     "id": "81",
-    "index": "7.500",
+    "index": "7.5",
     "issuer": "Madras Presidency",
     "faceValue": "1/16",
     "currency": "Rupee",
@@ -1459,7 +1459,7 @@
   },
   {
     "id": "82",
-    "index": "7.600",
+    "index": "7.6",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
@@ -1477,7 +1477,7 @@
   },
   {
     "id": "83",
-    "index": "7.700",
+    "index": "7.7",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Rupee",
@@ -1495,7 +1495,7 @@
   },
   {
     "id": "84",
-    "index": "7.800",
+    "index": "7.8",
     "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Annas",
@@ -1513,7 +1513,7 @@
   },
   {
     "id": "85",
-    "index": "7.900",
+    "index": "7.9",
     "issuer": "Bengal Presidency",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1531,7 +1531,7 @@
   },
   {
     "id": "86",
-    "index": "7.910",
+    "index": "7.10",
     "issuer": "King Edward",
     "faceValue": "1",
     "currency": "Annas",
@@ -1549,7 +1549,7 @@
   },
   {
     "id": "87",
-    "index": "7.911",
+    "index": "7.11",
     "issuer": "Victoria - Crowned",
     "faceValue": "1/2",
     "currency": "Annas",
@@ -1567,7 +1567,7 @@
   },
   {
     "id": "88",
-    "index": "7.912",
+    "index": "7.12",
     "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1585,7 +1585,7 @@
   },
   {
     "id": "89",
-    "index": "8.100",
+    "index": "8.1",
     "issuer": "King Edward",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -1603,7 +1603,7 @@
   },
   {
     "id": "90",
-    "index": "8.200",
+    "index": "8.2",
     "issuer": "Victoria - Empress",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -1621,7 +1621,7 @@
   },
   {
     "id": "91",
-    "index": "8.300",
+    "index": "8.3",
     "issuer": "Victoria - Divided Legend",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -1639,7 +1639,7 @@
   },
   {
     "id": "92",
-    "index": "8.400",
+    "index": "8.4",
     "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Rupee",
@@ -1657,7 +1657,7 @@
   },
   {
     "id": "93",
-    "index": "8.500",
+    "index": "8.5",
     "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1675,7 +1675,7 @@
   },
   {
     "id": "94",
-    "index": "8.600",
+    "index": "8.6",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1693,7 +1693,7 @@
   },
   {
     "id": "95",
-    "index": "8.700",
+    "index": "8.7",
     "issuer": "Victoria - Empress",
     "faceValue": "1",
     "currency": "Rupee",
@@ -1711,7 +1711,7 @@
   },
   {
     "id": "96",
-    "index": "8.800",
+    "index": "8.8",
     "issuer": "Madras Presidency",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1729,7 +1729,7 @@
   },
   {
     "id": "97",
-    "index": "8.900",
+    "index": "8.9",
     "issuer": "King Edward",
     "faceValue": "2",
     "currency": "Annas",
@@ -1747,7 +1747,7 @@
   },
   {
     "id": "98",
-    "index": "8.910",
+    "index": "8.10",
     "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1765,7 +1765,7 @@
   },
   {
     "id": "99",
-    "index": "8.911",
+    "index": "8.11",
     "issuer": "Victoria - Empress",
     "faceValue": "2",
     "currency": "Annas",
@@ -1783,7 +1783,7 @@
   },
   {
     "id": "100",
-    "index": "8.912",
+    "index": "8.12",
     "issuer": "Victoria - Divided Legend",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1801,7 +1801,7 @@
   },
   {
     "id": "101",
-    "index": "9.100",
+    "index": "9.1",
     "issuer": "William IV",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -1819,7 +1819,7 @@
   },
   {
     "id": "102",
-    "index": "9.200",
+    "index": "9.2",
     "issuer": "William IV",
     "faceValue": "1",
     "currency": "Rupee",
@@ -1837,7 +1837,7 @@
   },
   {
     "id": "103",
-    "index": "9.300",
+    "index": "9.3",
     "issuer": "George V",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -1855,7 +1855,7 @@
   },
   {
     "id": "104",
-    "index": "9.400",
+    "index": "9.4",
     "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Rupee",
@@ -1873,7 +1873,7 @@
   },
   {
     "id": "105",
-    "index": "9.500",
+    "index": "9.5",
     "issuer": "King Edward",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -1891,7 +1891,7 @@
   },
   {
     "id": "106",
-    "index": "9.600",
+    "index": "9.6",
     "issuer": "Victoria - Empress",
     "faceValue": "1/2",
     "currency": "Annas",
@@ -1909,7 +1909,7 @@
   },
   {
     "id": "107",
-    "index": "9.700",
+    "index": "9.7",
     "issuer": "Bombay Presidency",
     "faceValue": "1",
     "currency": "Pice",
@@ -1927,7 +1927,7 @@
   },
   {
     "id": "108",
-    "index": "9.900",
+    "index": "9.9",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Cash",
@@ -1945,7 +1945,7 @@
   },
   {
     "id": "109",
-    "index": "9.910",
+    "index": "9.10",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Cash",
@@ -1963,7 +1963,7 @@
   },
   {
     "id": "110",
-    "index": "9.911",
+    "index": "9.11",
     "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
@@ -1981,7 +1981,7 @@
   },
   {
     "id": "111",
-    "index": "9.912",
+    "index": "9.12",
     "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
@@ -1999,7 +1999,7 @@
   },
   {
     "id": "112",
-    "index": "10.100",
+    "index": "10.1",
     "issuer": "Dutch East Indies",
     "faceValue": "1",
     "currency": "Duit",
@@ -2017,7 +2017,7 @@
   },
   {
     "id": "113",
-    "index": "10.200",
+    "index": "10.2",
     "issuer": "Canada, King Edward",
     "faceValue": "25",
     "currency": "Cents",
@@ -2035,7 +2035,7 @@
   },
   {
     "id": "114",
-    "index": "10.300",
+    "index": "10.3",
     "issuer": "Netherlands East Indies",
     "faceValue": "21/2",
     "currency": "Cents",
@@ -2053,7 +2053,7 @@
   },
   {
     "id": "115",
-    "index": "10.400",
+    "index": "10.4",
     "issuer": "Mysore",
     "faceValue": "10",
     "currency": "Cash",
@@ -2071,7 +2071,7 @@
   },
   {
     "id": "116",
-    "index": "10.500",
+    "index": "10.5",
     "issuer": "Travancore - Swathi Thirunal",
     "faceValue": "1",
     "currency": "Cash",
@@ -2089,7 +2089,7 @@
   },
   {
     "id": "117",
-    "index": "10.600",
+    "index": "10.6",
     "issuer": "Indo French, Pondicherry",
     "faceValue": "1",
     "currency": "Doudou",
@@ -2107,7 +2107,7 @@
   },
   {
     "id": "118",
-    "index": "10.700",
+    "index": "10.7",
     "issuer": "Hyderabad - Mir Usman Ali Khan",
     "faceValue": "2",
     "currency": "Pai",
@@ -2125,7 +2125,7 @@
   },
   {
     "id": "119",
-    "index": "10.800",
+    "index": "10.8",
     "issuer": "Indo Portugese, Luiz 1",
     "faceValue": "1/4",
     "currency": "Tanga",
@@ -2143,7 +2143,7 @@
   },
   {
     "id": "120",
-    "index": "10.900",
+    "index": "10.9",
     "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
@@ -2161,7 +2161,7 @@
   },
   {
     "id": "121",
-    "index": "10.910",
+    "index": "10.10",
     "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
@@ -2179,7 +2179,7 @@
   },
   {
     "id": "122",
-    "index": "10.911",
+    "index": "10.11",
     "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
@@ -2197,7 +2197,7 @@
   },
   {
     "id": "123",
-    "index": "10.912",
+    "index": "10.12",
     "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -2215,7 +2215,7 @@
   },
   {
     "id": "124",
-    "index": "11.100",
+    "index": "11.1",
     "issuer": "George V",
     "faceValue": "8",
     "currency": "Annas",
@@ -2233,7 +2233,7 @@
   },
   {
     "id": "125",
-    "index": "11.200",
+    "index": "11.2",
     "issuer": "George V",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2251,7 +2251,7 @@
   },
   {
     "id": "126",
-    "index": "11.300",
+    "index": "11.3",
     "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
@@ -2269,7 +2269,7 @@
   },
   {
     "id": "127",
-    "index": "11.400",
+    "index": "11.4",
     "issuer": "Madras Presidency",
     "faceValue": "20",
     "currency": "Cash",
@@ -2287,7 +2287,7 @@
   },
   {
     "id": "128",
-    "index": "11.500",
+    "index": "11.5",
     "issuer": "Madras Presidency",
     "faceValue": "1/8",
     "currency": "Rupee",
@@ -2305,7 +2305,7 @@
   },
   {
     "id": "129",
-    "index": "11.600",
+    "index": "11.6",
     "issuer": "Madras Presidency",
     "faceValue": "1/2",
     "currency": "Rupee",
@@ -2323,7 +2323,7 @@
   },
   {
     "id": "130",
-    "index": "11.700",
+    "index": "11.7",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2341,7 +2341,7 @@
   },
   {
     "id": "131",
-    "index": "11.800",
+    "index": "11.8",
     "issuer": "King Edward",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -2359,7 +2359,7 @@
   },
   {
     "id": "132",
-    "index": "11.900",
+    "index": "11.9",
     "issuer": "King Edward",
     "faceValue": "1/12",
     "currency": "Annas",
@@ -2377,7 +2377,7 @@
   },
   {
     "id": "133",
-    "index": "11.910",
+    "index": "11.10",
     "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanams",
@@ -2395,7 +2395,7 @@
   },
   {
     "id": "134",
-    "index": "11.911",
+    "index": "11.11",
     "issuer": "Victoria - Continuous Legend",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2413,7 +2413,7 @@
   },
   {
     "id": "135",
-    "index": "11.912",
+    "index": "11.12",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2431,7 +2431,7 @@
   },
   {
     "id": "136",
-    "index": "12.100",
+    "index": "12.1",
     "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2449,7 +2449,7 @@
   },
   {
     "id": "137",
-    "index": "12.200",
+    "index": "12.2",
     "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2467,7 +2467,7 @@
   },
   {
     "id": "138",
-    "index": "12.300",
+    "index": "12.3",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Fanam",
@@ -2485,7 +2485,7 @@
   },
   {
     "id": "139",
-    "index": "12.400",
+    "index": "12.4",
     "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Kasu",
@@ -2503,7 +2503,7 @@
   },
   {
     "id": "140",
-    "index": "12.500",
+    "index": "12.5",
     "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Paisa",
@@ -2521,7 +2521,7 @@
   },
   {
     "id": "141",
-    "index": "12.600",
+    "index": "12.6",
     "issuer": "Dutch - Pondycherry",
     "faceValue": "1",
     "currency": "Cash",
@@ -2539,7 +2539,7 @@
   },
   {
     "id": "142",
-    "index": "12.700",
+    "index": "12.7",
     "issuer": "Dutch - Nagapattanam",
     "faceValue": "1",
     "currency": "Duit",
@@ -2557,7 +2557,7 @@
   },
   {
     "id": "143",
-    "index": "12.800",
+    "index": "12.8",
     "issuer": "Jodhpur - Edward VIII",
     "faceValue": "1/4",
     "currency": "Annas",
@@ -2575,7 +2575,7 @@
   },
   {
     "id": "144",
-    "index": "12.900",
+    "index": "12.9",
     "issuer": "Travancore - BRV2",
     "faceValue": "1/2",
     "currency": "Rupee",
@@ -2593,7 +2593,7 @@
   },
   {
     "id": "145",
-    "index": "12.910",
+    "index": "12.10",
     "issuer": "Jaipur - Man Singh II",
     "faceValue": "1",
     "currency": "Annas",
@@ -2611,7 +2611,7 @@
   },
   {
     "id": "146",
-    "index": "12.911",
+    "index": "12.11",
     "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
@@ -2629,7 +2629,7 @@
   },
   {
     "id": "147",
-    "index": "12.912",
+    "index": "12.12",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2647,7 +2647,7 @@
   },
   {
     "id": "148",
-    "index": "13.100",
+    "index": "13.1",
     "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
@@ -2665,7 +2665,7 @@
   },
   {
     "id": "149",
-    "index": "13.200",
+    "index": "13.2",
     "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
@@ -2683,7 +2683,7 @@
   },
   {
     "id": "150",
-    "index": "13.300",
+    "index": "13.3",
     "issuer": "Jaipur",
     "faceValue": "1",
     "currency": "Paisa",
@@ -2701,7 +2701,7 @@
   },
   {
     "id": "151",
-    "index": "13.400",
+    "index": "13.4",
     "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
@@ -2719,7 +2719,7 @@
   },
   {
     "id": "152",
-    "index": "13.500",
+    "index": "13.5",
     "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
@@ -2737,7 +2737,7 @@
   },
   {
     "id": "153",
-    "index": "13.600",
+    "index": "13.6",
     "issuer": "Bikaner",
     "faceValue": "1",
     "currency": "Takka",
@@ -2755,7 +2755,7 @@
   },
   {
     "id": "154",
-    "index": "13.700",
+    "index": "13.7",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Dudu",
@@ -2773,7 +2773,7 @@
   },
   {
     "id": "155",
-    "index": "13.800",
+    "index": "13.8",
     "issuer": "William IV",
     "faceValue": "1/2",
     "currency": "Rupee",
@@ -2791,7 +2791,7 @@
   },
   {
     "id": "156",
-    "index": "13.900",
+    "index": "13.9",
     "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
@@ -2809,7 +2809,7 @@
   },
   {
     "id": "157",
-    "index": "13.910",
+    "index": "13.10",
     "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
@@ -2827,7 +2827,7 @@
   },
   {
     "id": "158",
-    "index": "13.911",
+    "index": "13.11",
     "issuer": "Madras Presidency",
     "faceValue": "1/4",
     "currency": "Rupee",
@@ -2845,7 +2845,7 @@
   },
   {
     "id": "159",
-    "index": "13.912",
+    "index": "13.12",
     "issuer": "Arcot",
     "faceValue": "1/2",
     "currency": "Paisa",
@@ -2863,7 +2863,7 @@
   },
   {
     "id": "160",
-    "index": "14.100",
+    "index": "14.1",
     "issuer": "Mysore",
     "faceValue": "10",
     "currency": "Cash",
@@ -2881,7 +2881,7 @@
   },
   {
     "id": "161",
-    "index": "14.200",
+    "index": "14.2",
     "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Kasu",
@@ -2899,7 +2899,7 @@
   },
   {
     "id": "162",
-    "index": "14.300",
+    "index": "14.3",
     "issuer": "Victoria - Continuous Legend",
     "faceValue": "1/2",
     "currency": "Anna",
@@ -2917,7 +2917,7 @@
   },
   {
     "id": "163",
-    "index": "14.400",
+    "index": "14.4",
     "issuer": "Sailana",
     "faceValue": "1",
     "currency": "Paisa",
@@ -2935,7 +2935,7 @@
   },
   {
     "id": "164",
-    "index": "14.500",
+    "index": "14.5",
     "issuer": "Ratlam",
     "faceValue": "1",
     "currency": "Paisa",
@@ -2953,7 +2953,7 @@
   },
   {
     "id": "165",
-    "index": "14.600",
+    "index": "14.6",
     "issuer": "Jaora",
     "faceValue": "1",
     "currency": "Paisa",
@@ -2971,7 +2971,7 @@
   },
   {
     "id": "166",
-    "index": "14.700",
+    "index": "14.7",
     "issuer": "Indore",
     "faceValue": "1/4",
     "currency": "Anna",
@@ -2989,7 +2989,7 @@
   },
   {
     "id": "167",
-    "index": "14.800",
+    "index": "14.8",
     "issuer": "Gwalior",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3007,7 +3007,7 @@
   },
   {
     "id": "168",
-    "index": "14.900",
+    "index": "14.9",
     "issuer": "Udaipur",
     "faceValue": "1/2",
     "currency": "Anna",
@@ -3025,7 +3025,7 @@
   },
   {
     "id": "169",
-    "index": "14.910",
+    "index": "14.10",
     "issuer": "Bundi",
     "faceValue": "1/2",
     "currency": "Paisa",
@@ -3043,7 +3043,7 @@
   },
   {
     "id": "170",
-    "index": "14.911",
+    "index": "14.11",
     "issuer": "Tonk",
     "faceValue": "1",
     "currency": "Pice",
@@ -3061,7 +3061,7 @@
   },
   {
     "id": "171",
-    "index": "14.912",
+    "index": "14.12",
     "issuer": "Kutch",
     "faceValue": "1",
     "currency": "Dokda",
@@ -3079,7 +3079,7 @@
   },
   {
     "id": "172",
-    "index": "15.100",
+    "index": "15.1",
     "issuer": "Radhanpur",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3097,7 +3097,7 @@
   },
   {
     "id": "173",
-    "index": "15.200",
+    "index": "15.2",
     "issuer": "Lunavada",
     "faceValue": "1/2",
     "currency": "Paisa",
@@ -3115,7 +3115,7 @@
   },
   {
     "id": "174",
-    "index": "15.300",
+    "index": "15.3",
     "issuer": "Travancore",
     "faceValue": "2",
     "currency": "Chuckram",
@@ -3133,7 +3133,7 @@
   },
   {
     "id": "175",
-    "index": "15.400",
+    "index": "15.4",
     "issuer": "Nawanagar",
     "faceValue": "1",
     "currency": "Dokdo",
@@ -3151,7 +3151,7 @@
   },
   {
     "id": "176",
-    "index": "15.500",
+    "index": "15.5",
     "issuer": "Ceylon",
     "faceValue": "1/2",
     "currency": "Cents",
@@ -3169,7 +3169,7 @@
   },
   {
     "id": "177",
-    "index": "15.600",
+    "index": "15.6",
     "issuer": "Bhavnagar",
     "faceValue": "1",
     "currency": "Dokdo",
@@ -3187,7 +3187,7 @@
   },
   {
     "id": "178",
-    "index": "15.700",
+    "index": "15.7",
     "issuer": "Hyderabad - Elichpur",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3205,7 +3205,7 @@
   },
   {
     "id": "179",
-    "index": "15.900",
+    "index": "15.9",
     "issuer": "British India Straights Settlement",
     "faceValue": "1",
     "currency": "Cents",
@@ -3223,7 +3223,7 @@
   },
   {
     "id": "180",
-    "index": "15.910",
+    "index": "15.10",
     "issuer": "Bahawalpur",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -3241,7 +3241,7 @@
   },
   {
     "id": "181",
-    "index": "15.911",
+    "index": "15.11",
     "issuer": "Dhar",
     "faceValue": "1/2",
     "currency": "Pice",
@@ -3259,7 +3259,7 @@
   },
   {
     "id": "182",
-    "index": "15.912",
+    "index": "15.12",
     "issuer": "Cambay",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3277,7 +3277,7 @@
   },
   {
     "id": "183",
-    "index": "16.100",
+    "index": "16.1",
     "issuer": "Baroda",
     "faceValue": "1",
     "currency": "Pai",
@@ -3295,7 +3295,7 @@
   },
   {
     "id": "184",
-    "index": "16.200",
+    "index": "16.2",
     "issuer": "Banswara",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3313,7 +3313,7 @@
   },
   {
     "id": "185",
-    "index": "16.300",
+    "index": "16.3",
     "issuer": "Pratapgarh",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3331,7 +3331,7 @@
   },
   {
     "id": "186",
-    "index": "16.400",
+    "index": "16.4",
     "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanam",
@@ -3349,7 +3349,7 @@
   },
   {
     "id": "187",
-    "index": "16.500",
+    "index": "16.5",
     "issuer": "Danish East India Company",
     "faceValue": "4",
     "currency": "Cash",
@@ -3367,7 +3367,7 @@
   },
   {
     "id": "188",
-    "index": "16.600",
+    "index": "16.6",
     "issuer": "Dutch East India Company (Counterfeit)",
     "faceValue": "1/4",
     "currency": "Stuiver",
@@ -3385,7 +3385,7 @@
   },
   {
     "id": "189",
-    "index": "16.700",
+    "index": "16.7",
     "issuer": "Indore",
     "faceValue": "1/4",
     "currency": "Anna",
@@ -3403,7 +3403,7 @@
   },
   {
     "id": "190",
-    "index": "16.800",
+    "index": "16.8",
     "issuer": "Jaipur",
     "faceValue": "1",
     "currency": "Anna",
@@ -3421,7 +3421,7 @@
   },
   {
     "id": "191",
-    "index": "16.900",
+    "index": "16.9",
     "issuer": "Delhi Sultanate",
     "faceValue": "2",
     "currency": "Gani",
@@ -3439,7 +3439,7 @@
   },
   {
     "id": "192",
-    "index": "16.910",
+    "index": "16.10",
     "issuer": "Jodhpur -George VI",
     "faceValue": "1/4",
     "currency": "Anna",
@@ -3457,7 +3457,7 @@
   },
   {
     "id": "193",
-    "index": "16.911",
+    "index": "16.11",
     "issuer": "Jodhpur - Edward VIII",
     "faceValue": "1/4",
     "currency": "Anna",
@@ -3475,7 +3475,7 @@
   },
   {
     "id": "194",
-    "index": "16.912",
+    "index": "16.12",
     "issuer": "Jodhpur -George VI",
     "faceValue": "1/4",
     "currency": "Anna",
@@ -3493,7 +3493,7 @@
   },
   {
     "id": "195",
-    "index": "17.100",
+    "index": "17.1",
     "issuer": "Hyderbad-Basmatnagar",
     "faceValue": "1",
     "currency": "Paisa",
@@ -3511,7 +3511,7 @@
   },
   {
     "id": "196",
-    "index": "17.200",
+    "index": "17.2",
     "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanam",
@@ -3529,7 +3529,7 @@
   },
   {
     "id": "197",
-    "index": "17.300",
+    "index": "17.3",
     "issuer": "Cochin",
     "faceValue": "2",
     "currency": "Puttuns",
@@ -3547,7 +3547,7 @@
   },
   {
     "id": "198",
-    "index": "17.400",
+    "index": "17.4",
     "issuer": "Partabgarh",
     "faceValue": "1",
     "currency": "Paisa",

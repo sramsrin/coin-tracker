@@ -34,6 +34,11 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
+  const [editingCoin, setEditingCoin] = useState<Coin | null>(null);
+  const [deletingCoin, setDeletingCoin] = useState<Coin | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deletePasswordError, setDeletePasswordError] = useState(false);
+  const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -120,6 +125,21 @@ export default function Home() {
     // Then sort by the selected field
     const aValue = a[sortField] || '';
     const bValue = b[sortField] || '';
+
+    // Special handling for index field (page.slot format)
+    if (sortField === 'index') {
+      const aParts = aValue.split('.');
+      const bParts = bValue.split('.');
+      const aPage = parseInt(aParts[0]) || 0;
+      const bPage = parseInt(bParts[0]) || 0;
+      const aSlot = parseInt(aParts[1]) || 0;
+      const bSlot = parseInt(bParts[1]) || 0;
+
+      if (aPage !== bPage) {
+        return sortDirection === 'asc' ? aPage - bPage : bPage - aPage;
+      }
+      return sortDirection === 'asc' ? aSlot - bSlot : bSlot - aSlot;
+    }
 
     // Try to parse as numbers for numeric sorting
     const aNum = parseFloat(aValue);
@@ -226,18 +246,91 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleEditClick = (coin: Coin) => {
+    setEditingCoin(coin);
+    setEditFormData({
+      section: coin.section,
+      subsection: coin.subsection,
+      subsubsection: coin.subsubsection,
+      issuer: coin.issuer,
+      faceValue: coin.faceValue,
+      currency: coin.currency,
+      kmNumber: coin.kmNumber,
+      numistaNumber: coin.numistaNumber,
+      numistaLink: coin.numistaLink,
+      weight: coin.weight,
+      book: coin.book,
+      numberAndNotes: coin.numberAndNotes,
+      obverse: coin.obverse,
+      reverse: coin.reverse,
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingCoin) return;
+
     try {
-      const response = await fetch(`/api/coins?id=${id}`, {
+      const response = await fetch(`/api/coins?id=${editingCoin.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...editingCoin,
+          ...editFormData,
+        }),
+      });
+
+      if (response.ok) {
+        fetchCoins();
+        setEditingCoin(null);
+        setEditFormData({});
+      }
+    } catch (error) {
+      console.error('Error updating coin:', error);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingCoin(null);
+    setEditFormData({});
+  };
+
+  const handleDeleteClick = (coin: Coin) => {
+    setDeletingCoin(coin);
+    setDeletePassword('');
+    setDeletePasswordError(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deletePassword !== 'SRMPv7006@') {
+      setDeletePasswordError(true);
+      return;
+    }
+
+    if (!deletingCoin) return;
+
+    try {
+      const response = await fetch(`/api/coins?id=${deletingCoin.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
         fetchCoins();
+        setDeletingCoin(null);
+        setDeletePassword('');
+        setDeletePasswordError(false);
+        setEditingCoin(null);
       }
     } catch (error) {
       console.error('Error deleting coin:', error);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingCoin(null);
+    setDeletePassword('');
+    setDeletePasswordError(false);
   };
 
   return (
@@ -655,10 +748,10 @@ export default function Home() {
                                         <td className="px-3 py-2 text-xs">
                                           {isAuthenticated && (
                                             <button
-                                              onClick={() => handleDelete(coin.id)}
-                                              className="text-red-600 hover:text-red-800 font-medium"
+                                              onClick={() => handleEditClick(coin)}
+                                              className="text-blue-600 hover:text-blue-800 font-medium"
                                             >
-                                              Del
+                                              Edit
                                             </button>
                                           )}
                                         </td>
@@ -742,12 +835,14 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
                       <td className="px-4 py-3 text-xs">
-                        <button
-                          onClick={() => handleDelete(coin.id)}
-                          className="text-red-600 hover:text-red-800 font-medium"
-                        >
-                          Delete
-                        </button>
+                        {isAuthenticated && (
+                          <button
+                            onClick={() => handleEditClick(coin)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -756,6 +851,233 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Edit Coin Modal */}
+        {editingCoin && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-800">
+                  Edit Coin - Index {editingCoin.index}
+                </h3>
+                <button
+                  onClick={handleEditCancel}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                    <input
+                      type="text"
+                      value={editFormData.section || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, section: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subsection</label>
+                    <input
+                      type="text"
+                      value={editFormData.subsection || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, subsection: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subsubsection</label>
+                    <input
+                      type="text"
+                      value={editFormData.subsubsection || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, subsubsection: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
+                    <input
+                      type="text"
+                      value={editFormData.issuer || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, issuer: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Face Value</label>
+                    <input
+                      type="text"
+                      value={editFormData.faceValue || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, faceValue: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <input
+                      type="text"
+                      value={editFormData.currency || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, currency: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">KM Number</label>
+                    <input
+                      type="text"
+                      value={editFormData.kmNumber || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, kmNumber: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Numista Number</label>
+                    <input
+                      type="text"
+                      value={editFormData.numistaNumber || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, numistaNumber: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Numista Link</label>
+                    <input
+                      type="url"
+                      value={editFormData.numistaLink || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, numistaLink: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+                    <input
+                      type="text"
+                      value={editFormData.weight || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Book</label>
+                    <input
+                      type="text"
+                      value={editFormData.book || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, book: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Number & Notes</label>
+                    <input
+                      type="text"
+                      value={editFormData.numberAndNotes || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, numberAndNotes: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div className="md:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Obverse Description</label>
+                    <textarea
+                      value={editFormData.obverse || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, obverse: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="md:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Reverse Description</label>
+                    <textarea
+                      value={editFormData.reverse || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, reverse: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={handleEditCancel}
+                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-md transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEditSubmit}
+                    className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDeletingCoin(editingCoin);
+                      setEditingCoin(null);
+                    }}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md transition"
+                  >
+                    Delete Coin
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deletingCoin && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Confirm Delete</h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to delete this coin?
+              </p>
+              <div className="bg-pink-50 border border-pink-200 rounded p-3 mb-4">
+                <p className="text-sm"><span className="font-semibold">Index:</span> {deletingCoin.index}</p>
+                <p className="text-sm"><span className="font-semibold">Issuer:</span> {deletingCoin.issuer}</p>
+                <p className="text-sm"><span className="font-semibold">Value:</span> {deletingCoin.faceValue} {deletingCoin.currency}</p>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter password to confirm deletion:
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => {
+                    setDeletePassword(e.target.value);
+                    setDeletePasswordError(false);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleDeleteConfirm()}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  autoFocus
+                />
+                {deletePasswordError && (
+                  <p className="text-red-600 text-sm mt-2">Incorrect password. Deletion cancelled.</p>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDeleteCancel}
+                  className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-md transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
