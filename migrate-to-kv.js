@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 const { kv } = require('@vercel/kv');
 const fs = require('fs');
 const path = require('path');
