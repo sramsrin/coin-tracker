@@ -69,6 +69,32 @@ export default function Home() {
     }
   };
 
+  // Calculate next available index
+  const getNextIndex = () => {
+    if (coins.length === 0) return '1.1';
+
+    // Find the highest index
+    const indices = coins.map(coin => {
+      const parts = coin.index.split('.');
+      const page = parseInt(parts[0]) || 0;
+      const slot = parseInt(parts[1]) || 0;
+      return { page, slot };
+    });
+
+    const maxIndex = indices.reduce((max, current) => {
+      if (current.page > max.page) return current;
+      if (current.page === max.page && current.slot > max.slot) return current;
+      return max;
+    }, { page: 0, slot: 0 });
+
+    // Calculate next index
+    if (maxIndex.slot < 12) {
+      return `${maxIndex.page}.${maxIndex.slot + 1}`;
+    } else {
+      return `${maxIndex.page + 1}.1`;
+    }
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -157,17 +183,24 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Auto-assign the next index
+    const nextIndex = getNextIndex();
+    const coinData = {
+      ...formData,
+      index: nextIndex
+    };
+
     try {
       const response = await fetch('/api/coins', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(coinData),
       });
 
       if (response.ok) {
-        // Clear form
+        // Clear form (index will be auto-assigned on next submission)
         setFormData({
           index: '',
           section: '',
@@ -257,19 +290,14 @@ export default function Home() {
           ) : (
             <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Add New Coin</h2>
+          <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold">Next Index:</span>{' '}
+              <span className="text-pink-700 font-bold">{getNextIndex()}</span>
+              <span className="text-gray-500 text-xs ml-2">(Page {getNextIndex().split('.')[0]}, Slot {getNextIndex().split('.')[1]})</span>
+            </p>
+          </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Index
-              </label>
-              <input
-                type="text"
-                value={formData.index}
-                onChange={(e) => setFormData({ ...formData, index: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., 1.100"
-              />
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Section
