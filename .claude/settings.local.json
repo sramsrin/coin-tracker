@@ -15,7 +15,8 @@
       "Bash(/Users/sahanavasanth/Desktop/LavenderCoinApp/VERCEL_DEPLOYMENT_GUIDE.md << 'EOF'\n# Deploying to Vercel with Database\n\n## Problem\nFile-based storage \\(coins-data.json\\) doesn't work on Vercel because:\n- Vercel has a read-only filesystem\n- Serverless functions are stateless and ephemeral\n\n## Solution: Use Vercel KV \\(Redis\\)\n\n### Step 1: Set up Vercel KV\n1. Go to your Vercel project dashboard\n2. Click \"Storage\" tab\n3. Click \"Create Database\" → \"KV\"\n4. Follow the setup instructions\n5. Copy the environment variables it provides\n\n### Step 2: Install dependencies\n```bash\nnpm install @vercel/kv\n```\n\n### Step 3: Update your API route\nReplace the file-based storage with Vercel KV in `app/api/coins/route.ts`\n\n### Step 4: Migration script\nRun this once to upload your existing data:\n```bash\nnode migrate-to-kv.js\n```\n\n## Alternative: Use Vercel Postgres or MongoDB Atlas\n\nBoth are good options for more complex data needs.\n\n## Quick Fix \\(Read-only mode\\)\nIf you just want to deploy to see your data \\(without add/edit/delete\\):\n- Keep coins-data.json\n- Make API write operations return 501 \\(Not Implemented\\) in production\n- Data will be read-only but viewable\nEOF)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
