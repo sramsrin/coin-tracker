@@ -2037,7 +2037,7 @@
     "id": "114",
     "index": "10.3",
     "issuer": "Netherlands East Indies",
-    "faceValue": "21/2",
+    "faceValue": "2.5",
     "currency": "Cents",
     "kmNumber": "308.1",
     "numistaNumber": "12708",
@@ -3546,9 +3546,12 @@
     "subsubsection": "Cochin"
   },
   {
-    "id": "198",
+    "id": "1770614355840",
     "index": "17.4",
-    "issuer": "Partabgarh",
+    "section": "Indian Princely States",
+    "subsection": "Central India Agency",
+    "subsubsection": "",
+    "issuer": "Pratapgarh",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "40",
@@ -3558,9 +3561,6 @@
     "book": "",
     "numberAndNotes": "",
     "obverse": "",
-    "reverse": "",
-    "section": "Indian Princely States",
-    "subsection": "Central India Agency",
-    "subsubsection": "Pratapgarh"
+    "reverse": ""
   }
 ]

@@ -74,6 +74,26 @@ export default function Home() {
     }
   };
 
+  // Get unique sections and subsections
+  const uniqueSections = Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort();
+
+  // Get subsections for a specific section
+  const getSubsectionsForSection = (section: string) => {
+    if (!section) return [];
+    return Array.from(new Set(
+      coins
+        .filter(c => c.section === section)
+        .map(c => c.subsection)
+        .filter(Boolean)
+    )).sort();
+  };
+
+  // Get subsections for the selected section in add form
+  const availableSubsections = getSubsectionsForSection(formData.section);
+
+  // Get subsections for the selected section in edit form
+  const availableEditSubsections = getSubsectionsForSection(editFormData.section || '');
+
   // Calculate next available index
   const getNextIndex = () => {
     if (coins.length === 0) return '1.1';
@@ -395,25 +415,32 @@ export default function Home() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Section
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.section}
-                onChange={(e) => setFormData({ ...formData, section: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, section: e.target.value, subsection: '' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., British India"
-              />
+              >
+                <option value="">Select section...</option>
+                {uniqueSections.map(section => (
+                  <option key={section} value={section}>{section}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Subsection
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.subsection}
                 onChange={(e) => setFormData({ ...formData, subsection: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., George VI"
-              />
+                disabled={!formData.section}
+              >
+                <option value="">Select subsection...</option>
+                {availableSubsections.map(subsection => (
+                  <option key={subsection} value={subsection}>{subsection}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -721,40 +748,34 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Currency</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Numista#</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Link</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Weight</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Actions</th>
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {stateCoins.map((coin) => (
                                       <tr key={coin.id} className="border-t border-gray-200 hover:bg-pink-25">
-                                        <td className="px-3 py-2 text-xs text-gray-800 font-medium">{coin.index}</td>
+                                        <td
+                                          className={`px-3 py-2 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
+                                          onClick={() => isAuthenticated && handleEditClick(coin)}
+                                        >
+                                          {coin.index}
+                                        </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.issuer}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.numistaNumber}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">
                                           {coin.numistaLink ? (
                                             <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
-                                              Link
+                                              {coin.numistaNumber || 'Link'}
                                             </a>
-                                          ) : '-'}
+                                          ) : (
+                                            coin.numistaNumber || '-'
+                                          )}
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
-                                        <td className="px-3 py-2 text-xs">
-                                          {isAuthenticated && (
-                                            <button
-                                              onClick={() => handleEditClick(coin)}
-                                              className="text-blue-600 hover:text-blue-800 font-medium"
-                                            >
-                                              Edit
-                                            </button>
-                                          )}
-                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -792,7 +813,6 @@ export default function Home() {
                     <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Numista # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Numista Link</th>
                     <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Weight {sortField === 'weight' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -808,25 +828,28 @@ export default function Home() {
                     <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {sortedCoins.map((coin) => (
                     <tr key={coin.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-xs text-gray-800 font-medium">{coin.index}</td>
+                      <td
+                        className={`px-4 py-3 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
+                        onClick={() => isAuthenticated && handleEditClick(coin)}
+                      >
+                        {coin.index}
+                      </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.issuer}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.numistaNumber}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         {coin.numistaLink ? (
                           <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
-                            Link
+                            {coin.numistaNumber || 'Link'}
                           </a>
                         ) : (
-                          '-'
+                          coin.numistaNumber || '-'
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
@@ -834,16 +857,6 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
-                      <td className="px-4 py-3 text-xs">
-                        {isAuthenticated && (
-                          <button
-                            onClick={() => handleEditClick(coin)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            Edit
-                          </button>
-                        )}
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -873,21 +886,30 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                    <input
-                      type="text"
+                    <select
                       value={editFormData.section || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, section: e.target.value })}
+                      onChange={(e) => setEditFormData({ ...editFormData, section: e.target.value, subsection: '' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
+                    >
+                      <option value="">Select section...</option>
+                      {uniqueSections.map(section => (
+                        <option key={section} value={section}>{section}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subsection</label>
-                    <input
-                      type="text"
+                    <select
                       value={editFormData.subsection || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, subsection: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
+                      disabled={!editFormData.section}
+                    >
+                      <option value="">Select subsection...</option>
+                      {availableEditSubsections.map(subsection => (
+                        <option key={subsection} value={subsection}>{subsection}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subsubsection</label>

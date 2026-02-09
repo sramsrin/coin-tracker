@@ -89,6 +89,47 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Update a coin
+export async function PUT(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Coin ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const coins = await readCoins();
+
+    const coinIndex = coins.findIndex((coin) => coin.id === id);
+    if (coinIndex === -1) {
+      return NextResponse.json(
+        { error: 'Coin not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update the coin
+    coins[coinIndex] = {
+      ...coins[coinIndex],
+      ...body,
+    };
+
+    await writeCoins(coins);
+
+    return NextResponse.json(coins[coinIndex]);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to update coin' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Remove a coin
 export async function DELETE(request: NextRequest) {
   try {
