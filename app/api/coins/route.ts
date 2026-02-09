@@ -57,23 +57,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const coins = await readCoins();
 
+    const issuer = body.issuer?.trim() || '';
+    const subsubsection = body.subsubsection?.trim() || '';
+
     const newCoin: Coin = {
       id: Date.now().toString(),
-      index: body.index,
-      section: body.section || '',
-      subsection: body.subsection || '',
-      subsubsection: body.subsubsection || '',
-      issuer: body.issuer,
-      faceValue: body.faceValue,
-      currency: body.currency,
-      kmNumber: body.kmNumber,
-      numistaNumber: body.numistaNumber,
-      numistaLink: body.numistaLink,
-      weight: body.weight,
-      book: body.book,
-      numberAndNotes: body.numberAndNotes,
-      obverse: body.obverse,
-      reverse: body.reverse,
+      index: body.index?.trim() || '',
+      section: body.section?.trim() || '',
+      subsection: body.subsection?.trim() || '',
+      subsubsection: subsubsection || issuer, // Use issuer if subsubsection is empty
+      issuer: issuer,
+      faceValue: body.faceValue?.trim() || '',
+      currency: body.currency?.trim() || '',
+      kmNumber: body.kmNumber?.trim() || '',
+      numistaNumber: body.numistaNumber?.trim() || '',
+      numistaLink: body.numistaLink?.trim() || '',
+      weight: body.weight?.trim() || '',
+      book: body.book?.trim() || '',
+      numberAndNotes: body.numberAndNotes?.trim() || '',
+      obverse: body.obverse?.trim() || '',
+      reverse: body.reverse?.trim() || '',
     };
 
     coins.push(newCoin);
@@ -112,10 +115,25 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Trim all string fields
+    const trimmedBody: Partial<Coin> = {};
+    for (const key in body) {
+      if (typeof body[key] === 'string') {
+        trimmedBody[key as keyof Coin] = body[key].trim() as any;
+      } else {
+        trimmedBody[key as keyof Coin] = body[key];
+      }
+    }
+
+    // If subsubsection is empty, use issuer
+    if (trimmedBody.subsubsection === '' && (trimmedBody.issuer || coins[coinIndex].issuer)) {
+      trimmedBody.subsubsection = trimmedBody.issuer || coins[coinIndex].issuer;
+    }
+
     // Update the coin
     coins[coinIndex] = {
       ...coins[coinIndex],
-      ...body,
+      ...trimmedBody,
     };
 
     await writeCoins(coins);

@@ -88,11 +88,28 @@ export default function Home() {
     )).sort();
   };
 
+  // Get subsubsections for a specific section and subsection
+  const getSubsubsectionsForSubsection = (section: string, subsection: string) => {
+    if (!section || !subsection) return [];
+    return Array.from(new Set(
+      coins
+        .filter(c => c.section === section && c.subsection === subsection)
+        .map(c => c.subsubsection)
+        .filter(Boolean)
+    )).sort();
+  };
+
   // Get subsections for the selected section in add form
   const availableSubsections = getSubsectionsForSection(formData.section);
 
   // Get subsections for the selected section in edit form
   const availableEditSubsections = getSubsectionsForSection(editFormData.section || '');
+
+  // Get subsubsections for add form
+  const availableSubsubsections = getSubsubsectionsForSubsection(formData.section, formData.subsection);
+
+  // Get subsubsections for edit form
+  const availableEditSubsubsections = getSubsubsectionsForSubsection(editFormData.section || '', editFormData.subsection || '');
 
   // Calculate next available index
   const getNextIndex = () => {
@@ -184,7 +201,8 @@ export default function Home() {
     if (!groupedCoins[coin.section][coin.subsection]) {
       groupedCoins[coin.section][coin.subsection] = {};
     }
-    const subsubsection = coin.subsubsection || 'Other';
+    // If subsubsection is empty, use the issuer for grouping
+    const subsubsection = coin.subsubsection || coin.issuer || 'Other';
     if (!groupedCoins[coin.section][coin.subsection][subsubsection]) {
       groupedCoins[coin.section][coin.subsection][subsubsection] = [];
     }
@@ -432,13 +450,29 @@ export default function Home() {
               </label>
               <select
                 value={formData.subsection}
-                onChange={(e) => setFormData({ ...formData, subsection: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, subsection: e.target.value, subsubsection: '' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 disabled={!formData.section}
               >
                 <option value="">Select subsection...</option>
                 {availableSubsections.map(subsection => (
                   <option key={subsection} value={subsection}>{subsection}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Subsubsection (State) <span className="text-xs text-gray-500">- optional</span>
+              </label>
+              <select
+                value={formData.subsubsection}
+                onChange={(e) => setFormData({ ...formData, subsubsection: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                disabled={!formData.subsection}
+              >
+                <option value="">None (will use Issuer)</option>
+                {availableSubsubsections.map(subsubsection => (
+                  <option key={subsubsection} value={subsubsection}>{subsubsection}</option>
                 ))}
               </select>
             </div>
@@ -901,7 +935,7 @@ export default function Home() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subsection</label>
                     <select
                       value={editFormData.subsection || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, subsection: e.target.value })}
+                      onChange={(e) => setEditFormData({ ...editFormData, subsection: e.target.value, subsubsection: '' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       disabled={!editFormData.section}
                     >
@@ -912,13 +946,20 @@ export default function Home() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Subsubsection</label>
-                    <input
-                      type="text"
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subsubsection (State) <span className="text-xs text-gray-500">- optional</span>
+                    </label>
+                    <select
                       value={editFormData.subsubsection || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, subsubsection: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
+                      disabled={!editFormData.subsection}
+                    >
+                      <option value="">None (will use Issuer)</option>
+                      {availableEditSubsubsections.map(subsubsection => (
+                        <option key={subsubsection} value={subsubsection}>{subsubsection}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
