@@ -2,7 +2,6 @@
   {
     "id": "1",
     "index": "0.1",
-    "issuer": "Dutch East India Company",
     "faceValue": "1",
     "currency": "Fanam",
     "kmNumber": "31",
@@ -20,7 +19,6 @@
   {
     "id": "2",
     "index": "0.2",
-    "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
     "kmNumber": "319",
@@ -38,7 +36,6 @@
   {
     "id": "3",
     "index": "0.3",
-    "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Fanam",
     "kmNumber": "",
@@ -56,7 +53,6 @@
   {
     "id": "4",
     "index": "1.1",
-    "issuer": "Travancore",
     "faceValue": "1",
     "currency": "Chuckram",
     "kmNumber": "49",
@@ -74,7 +70,6 @@
   {
     "id": "5",
     "index": "1.2",
-    "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Chuckram",
     "kmNumber": "49",
@@ -92,7 +87,6 @@
   {
     "id": "6",
     "index": "1.3",
-    "issuer": "Travancore - BRV2",
     "faceValue": "4",
     "currency": "Cash",
     "kmNumber": "58",
@@ -110,7 +104,6 @@
   {
     "id": "7",
     "index": "1.4",
-    "issuer": "Travancore - BRV2",
     "faceValue": "8",
     "currency": "Cash",
     "kmNumber": "59",
@@ -128,7 +121,6 @@
   {
     "id": "8",
     "index": "1.5",
-    "issuer": "Pudukottai",
     "faceValue": "1",
     "currency": "Amman Cash",
     "kmNumber": "6",
@@ -146,7 +138,6 @@
   {
     "id": "9",
     "index": "1.6",
-    "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "46",
@@ -164,7 +155,6 @@
   {
     "id": "10",
     "index": "1.7",
-    "issuer": "Travancore - MRV",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "34",
@@ -182,7 +172,6 @@
   {
     "id": "11",
     "index": "1.8",
-    "issuer": "Chola",
     "faceValue": "1",
     "currency": "Massa",
     "kmNumber": "",
@@ -200,7 +189,6 @@
   {
     "id": "12",
     "index": "1.9",
-    "issuer": "Mysore",
     "faceValue": "20",
     "currency": "Cash",
     "kmNumber": "",
@@ -218,7 +206,6 @@
   {
     "id": "13",
     "index": "1.10",
-    "issuer": "Mysore",
     "faceValue": "25",
     "currency": "Cash",
     "kmNumber": "",
@@ -236,7 +223,6 @@
   {
     "id": "14",
     "index": "1.11",
-    "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
     "kmNumber": "",
@@ -254,7 +240,6 @@
   {
     "id": "15",
     "index": "1.12",
-    "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
     "kmNumber": "",
@@ -272,7 +257,6 @@
   {
     "id": "16",
     "index": "2.1",
-    "issuer": "Hyderabad - Mir Mahbub Ali Khan",
     "faceValue": "2",
     "currency": "Pai",
     "kmNumber": "",
@@ -290,7 +274,6 @@
   {
     "id": "17",
     "index": "2.2",
-    "issuer": "Junagadh",
     "faceValue": "1",
     "currency": "Dokda",
     "kmNumber": "45.1",
@@ -308,7 +291,6 @@
   {
     "id": "18",
     "index": "2.3",
-    "issuer": "Nawanagar",
     "faceValue": "1",
     "currency": "Dokda",
     "kmNumber": "",
@@ -326,7 +308,6 @@
   {
     "id": "19",
     "index": "2.4",
-    "issuer": "Travancore - BRV2",
     "faceValue": "1",
     "currency": "Fanam",
     "kmNumber": "65",
@@ -344,7 +325,6 @@
   {
     "id": "20",
     "index": "2.5",
-    "issuer": "Hyderabad - Mir Usman Ali Khan",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "",
@@ -362,7 +342,6 @@
   {
     "id": "21",
     "index": "2.6",
-    "issuer": "Travancore - MRV",
     "faceValue": "4",
     "currency": "Cash",
     "kmNumber": "47",
@@ -380,7 +359,6 @@
   {
     "id": "22",
     "index": "2.7",
-    "issuer": "Travancore - MRV",
     "faceValue": "8",
     "currency": "Cash",
     "kmNumber": "42",
@@ -398,7 +376,6 @@
   {
     "id": "23",
     "index": "2.8",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "19",
@@ -416,7 +393,6 @@
   {
     "id": "24",
     "index": "2.9",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "23",
@@ -434,7 +410,6 @@
   {
     "id": "25",
     "index": "2.10",
-    "issuer": "Arcot",
     "faceValue": "1/2",
     "currency": "Paisa",
     "kmNumber": "",
@@ -452,7 +427,6 @@
   {
     "id": "26",
     "index": "2.11",
-    "issuer": "Travancore - Rani Gouri Laksmi Bayi",
     "faceValue": "1",
     "currency": "Chuckram",
     "kmNumber": "C8",
@@ -470,7 +444,6 @@
   {
     "id": "27",
     "index": "2.12",
-    "issuer": "Travancore - BRV2",
     "faceValue": "1",
     "currency": "Chuckram",
     "kmNumber": "60",
@@ -488,7 +461,6 @@
   {
     "id": "28",
     "index": "3.1",
-    "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "543",
@@ -506,7 +478,6 @@
   {
     "id": "29",
     "index": "3.2",
-    "issuer": "King Edward",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "508",
@@ -524,7 +495,6 @@
   {
     "id": "30",
     "index": "3.3",
-    "issuer": "George V",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "509",
@@ -542,7 +512,6 @@
   {
     "id": "31",
     "index": "3.4",
-    "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "528",
@@ -560,7 +529,6 @@
   {
     "id": "32",
     "index": "3.5",
-    "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "531",
@@ -578,7 +546,6 @@
   {
     "id": "33",
     "index": "3.6",
-    "issuer": "George VI",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "527",
@@ -596,7 +563,6 @@
   {
     "id": "34",
     "index": "3.7",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "533",
@@ -614,7 +580,6 @@
   {
     "id": "35",
     "index": "3.8",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "533",
@@ -632,7 +597,6 @@
   {
     "id": "36",
     "index": "3.9",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "Goddess",
@@ -650,7 +614,6 @@
   {
     "id": "37",
     "index": "3.10",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "Star of David",
@@ -668,7 +631,6 @@
   {
     "id": "38",
     "index": "3.11",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "Lotus",
@@ -686,7 +648,6 @@
   {
     "id": "39",
     "index": "3.12",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "Fish",
@@ -704,7 +665,6 @@
   {
     "id": "40",
     "index": "4.1",
-    "issuer": "Dutch East India Company",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "23",
@@ -722,7 +682,6 @@
   {
     "id": "41",
     "index": "4.2",
-    "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
     "kmNumber": "319",
@@ -740,7 +699,6 @@
   {
     "id": "42",
     "index": "4.3",
-    "issuer": "William IV",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "445",
@@ -758,7 +716,6 @@
   {
     "id": "43",
     "index": "4.4",
-    "issuer": "William IV",
     "faceValue": "1/2",
     "currency": "Annas",
     "kmNumber": "447",
@@ -776,7 +733,6 @@
   {
     "id": "44",
     "index": "4.5",
-    "issuer": "Victoria - Divided Legend",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "464",
@@ -794,7 +750,6 @@
   {
     "id": "45",
     "index": "4.6",
-    "issuer": "Victoria - Empress",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "483",
@@ -812,7 +767,6 @@
   {
     "id": "46",
     "index": "4.7",
-    "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "467",
@@ -830,7 +784,6 @@
   {
     "id": "47",
     "index": "4.8",
-    "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "467",
@@ -848,7 +801,6 @@
   {
     "id": "48",
     "index": "4.9",
-    "issuer": "Victoria - Crowned",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "466",
@@ -866,7 +818,6 @@
   {
     "id": "49",
     "index": "4.10",
-    "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "502",
@@ -884,7 +835,6 @@
   {
     "id": "50",
     "index": "4.11",
-    "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "502",
@@ -902,7 +852,6 @@
   {
     "id": "51",
     "index": "4.12",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "512",
@@ -920,7 +869,6 @@
   {
     "id": "52",
     "index": "5.1",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "512",
@@ -938,7 +886,6 @@
   {
     "id": "53",
     "index": "5.2",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "512",
@@ -956,7 +903,6 @@
   {
     "id": "54",
     "index": "5.3",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "512",
@@ -974,7 +920,6 @@
   {
     "id": "55",
     "index": "5.4",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "556",
@@ -992,7 +937,6 @@
   {
     "id": "56",
     "index": "5.5",
-    "issuer": "George V",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "516",
@@ -1010,7 +954,6 @@
   {
     "id": "57",
     "index": "5.6",
-    "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "530",
@@ -1028,7 +971,6 @@
   {
     "id": "58",
     "index": "5.7",
-    "issuer": "George VI",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "526",
@@ -1046,7 +988,6 @@
   {
     "id": "59",
     "index": "5.8",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "537a",
@@ -1064,7 +1005,6 @@
   {
     "id": "60",
     "index": "5.9",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "538",
@@ -1082,7 +1022,6 @@
   {
     "id": "61",
     "index": "5.10",
-    "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Annas",
     "kmNumber": "534",
@@ -1100,7 +1039,6 @@
   {
     "id": "62",
     "index": "5.11",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "533",
@@ -1118,7 +1056,6 @@
   {
     "id": "63",
     "index": "5.12",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "533",
@@ -1136,7 +1073,6 @@
   {
     "id": "64",
     "index": "6.1",
-    "issuer": "William IV",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "446",
@@ -1154,7 +1090,6 @@
   {
     "id": "65",
     "index": "6.2",
-    "issuer": "Victoria - Empress",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "484",
@@ -1172,7 +1107,6 @@
   {
     "id": "66",
     "index": "6.3",
-    "issuer": "Victoria - Crowned",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "467",
@@ -1190,7 +1124,6 @@
   {
     "id": "67",
     "index": "6.4",
-    "issuer": "Bombay Presidency",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "232",
@@ -1208,7 +1141,6 @@
   {
     "id": "68",
     "index": "6.5",
-    "issuer": "George V",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "513",
@@ -1226,7 +1158,6 @@
   {
     "id": "69",
     "index": "6.6",
-    "issuer": "Bombay Presidency",
     "faceValue": "1",
     "currency": "Pie",
     "kmNumber": "262",
@@ -1244,7 +1175,6 @@
   {
     "id": "70",
     "index": "6.7",
-    "issuer": "George V",
     "faceValue": "4",
     "currency": "Annas",
     "kmNumber": "519",
@@ -1262,7 +1192,6 @@
   {
     "id": "71",
     "index": "6.8",
-    "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "548",
@@ -1280,7 +1209,6 @@
   {
     "id": "72",
     "index": "6.9",
-    "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "56",
@@ -1298,7 +1226,6 @@
   {
     "id": "73",
     "index": "6.10",
-    "issuer": "Madras Presidency",
     "faceValue": "1/2",
     "currency": "Dub",
     "kmNumber": "397",
@@ -1316,7 +1243,6 @@
   {
     "id": "74",
     "index": "6.11",
-    "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Pies",
     "kmNumber": "429",
@@ -1334,7 +1260,6 @@
   {
     "id": "75",
     "index": "6.12",
-    "issuer": "Madras Presidency",
     "faceValue": "5",
     "currency": "Cash",
     "kmNumber": "316",
@@ -1352,7 +1277,6 @@
   {
     "id": "76",
     "index": "7.12",
-    "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Pie",
     "kmNumber": "58",
@@ -1370,7 +1294,6 @@
   {
     "id": "77",
     "index": "7.1",
-    "issuer": "Victoria - Divided Legend",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "463",
@@ -1388,7 +1311,6 @@
   {
     "id": "78",
     "index": "7.2",
-    "issuer": "Madras Presidency",
     "faceValue": "4",
     "currency": "Pies",
     "kmNumber": "431",
@@ -1406,7 +1328,6 @@
   {
     "id": "79",
     "index": "7.3",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Pies",
     "kmNumber": "428",
@@ -1424,7 +1345,6 @@
   {
     "id": "80",
     "index": "7.4",
-    "issuer": "Madras Presidency",
     "faceValue": "20",
     "currency": "Cash",
     "kmNumber": "321",
@@ -1442,7 +1362,6 @@
   {
     "id": "81",
     "index": "7.5",
-    "issuer": "Madras Presidency",
     "faceValue": "1/16",
     "currency": "Rupee",
     "kmNumber": "423",
@@ -1460,7 +1379,6 @@
   {
     "id": "82",
     "index": "7.6",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "536",
@@ -1478,7 +1396,6 @@
   {
     "id": "83",
     "index": "7.7",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "559",
@@ -1496,7 +1413,6 @@
   {
     "id": "84",
     "index": "7.8",
-    "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Annas",
     "kmNumber": "535",
@@ -1514,7 +1430,6 @@
   {
     "id": "85",
     "index": "7.9",
-    "issuer": "Bengal Presidency",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "125",
@@ -1532,7 +1447,6 @@
   {
     "id": "86",
     "index": "7.10",
-    "issuer": "King Edward",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "504",
@@ -1550,7 +1464,6 @@
   {
     "id": "87",
     "index": "7.11",
-    "issuer": "Victoria - Crowned",
     "faceValue": "1/2",
     "currency": "Annas",
     "kmNumber": "468",
@@ -1568,7 +1481,6 @@
   {
     "id": "88",
     "index": "7.12",
-    "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "501",
@@ -1586,7 +1498,6 @@
   {
     "id": "89",
     "index": "8.1",
-    "issuer": "King Edward",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "499",
@@ -1604,7 +1515,6 @@
   {
     "id": "90",
     "index": "8.2",
-    "issuer": "Victoria - Empress",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "486",
@@ -1622,7 +1532,6 @@
   {
     "id": "91",
     "index": "8.3",
-    "issuer": "Victoria - Divided Legend",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "465",
@@ -1640,7 +1549,6 @@
   {
     "id": "92",
     "index": "8.4",
-    "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Rupee",
     "kmNumber": "552",
@@ -1658,7 +1566,6 @@
   {
     "id": "93",
     "index": "8.5",
-    "issuer": "George VI",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "547",
@@ -1676,7 +1583,6 @@
   {
     "id": "94",
     "index": "8.6",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "518",
@@ -1694,7 +1600,6 @@
   {
     "id": "95",
     "index": "8.7",
-    "issuer": "Victoria - Empress",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "492",
@@ -1712,7 +1617,6 @@
   {
     "id": "96",
     "index": "8.8",
-    "issuer": "Madras Presidency",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "425",
@@ -1730,7 +1634,6 @@
   {
     "id": "97",
     "index": "8.9",
-    "issuer": "King Edward",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "505",
@@ -1748,7 +1651,6 @@
   {
     "id": "98",
     "index": "8.10",
-    "issuer": "King Edward",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "506",
@@ -1766,7 +1668,6 @@
   {
     "id": "99",
     "index": "8.11",
-    "issuer": "Victoria - Empress",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "488",
@@ -1784,7 +1685,6 @@
   {
     "id": "100",
     "index": "8.12",
-    "issuer": "Victoria - Divided Legend",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "454",
@@ -1802,7 +1702,6 @@
   {
     "id": "101",
     "index": "9.1",
-    "issuer": "William IV",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "448",
@@ -1820,7 +1719,6 @@
   {
     "id": "102",
     "index": "9.2",
-    "issuer": "William IV",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "450",
@@ -1838,7 +1736,6 @@
   {
     "id": "103",
     "index": "9.3",
-    "issuer": "George V",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "510",
@@ -1856,7 +1753,6 @@
   {
     "id": "104",
     "index": "9.4",
-    "issuer": "George VI",
     "faceValue": "1/2",
     "currency": "Rupee",
     "kmNumber": "553",
@@ -1874,7 +1770,6 @@
   {
     "id": "105",
     "index": "9.5",
-    "issuer": "King Edward",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "498",
@@ -1892,7 +1787,6 @@
   {
     "id": "106",
     "index": "9.6",
-    "issuer": "Victoria - Empress",
     "faceValue": "1/2",
     "currency": "Annas",
     "kmNumber": "487",
@@ -1910,7 +1804,6 @@
   {
     "id": "107",
     "index": "9.7",
-    "issuer": "Bombay Presidency",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "198",
@@ -1928,7 +1821,6 @@
   {
     "id": "108",
     "index": "9.9",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "312",
@@ -1946,7 +1838,6 @@
   {
     "id": "109",
     "index": "9.10",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "302",
@@ -1964,7 +1855,6 @@
   {
     "id": "110",
     "index": "9.11",
-    "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "1616",
@@ -1982,7 +1872,6 @@
   {
     "id": "111",
     "index": "9.12",
-    "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "7305",
@@ -2000,7 +1889,6 @@
   {
     "id": "112",
     "index": "10.1",
-    "issuer": "Dutch East India Company",
     "faceValue": "1",
     "currency": "Duit",
     "kmNumber": "70",
@@ -2018,7 +1906,6 @@
   {
     "id": "113",
     "index": "10.2",
-    "issuer": "Canada, King Edward",
     "faceValue": "25",
     "currency": "Cents",
     "kmNumber": "",
@@ -2036,7 +1923,6 @@
   {
     "id": "114",
     "index": "10.3",
-    "issuer": "Netherlands East Indies",
     "faceValue": "2 1/2",
     "currency": "Cents",
     "kmNumber": "308.1",
@@ -2054,7 +1940,6 @@
   {
     "id": "115",
     "index": "10.4",
-    "issuer": "Mysore",
     "faceValue": "10",
     "currency": "Cash",
     "kmNumber": "",
@@ -2072,7 +1957,6 @@
   {
     "id": "116",
     "index": "10.5",
-    "issuer": "Travancore - Swathi Thirunal",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "15",
@@ -2090,7 +1974,6 @@
   {
     "id": "117",
     "index": "10.6",
-    "issuer": "Indo French, Pondicherry",
     "faceValue": "1",
     "currency": "Doudou",
     "kmNumber": "35",
@@ -2108,7 +1991,6 @@
   {
     "id": "118",
     "index": "10.7",
-    "issuer": "Hyderabad - Mir Usman Ali Khan",
     "faceValue": "2",
     "currency": "Pai",
     "kmNumber": "",
@@ -2126,7 +2008,6 @@
   {
     "id": "119",
     "index": "10.8",
-    "issuer": "Indo Portugese, Luiz 1",
     "faceValue": "1/4",
     "currency": "Tanga",
     "kmNumber": "308",
@@ -2144,7 +2025,6 @@
   {
     "id": "120",
     "index": "10.9",
-    "issuer": "George VI",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "537",
@@ -2162,7 +2042,6 @@
   {
     "id": "121",
     "index": "10.10",
-    "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "541a",
@@ -2180,7 +2059,6 @@
   {
     "id": "122",
     "index": "10.11",
-    "issuer": "George VI",
     "faceValue": "2",
     "currency": "Annas",
     "kmNumber": "541a",
@@ -2198,7 +2076,6 @@
   {
     "id": "123",
     "index": "10.12",
-    "issuer": "George V",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "511",
@@ -2216,7 +2093,6 @@
   {
     "id": "124",
     "index": "11.1",
-    "issuer": "George V",
     "faceValue": "8",
     "currency": "Annas",
     "kmNumber": "520",
@@ -2234,7 +2110,6 @@
   {
     "id": "125",
     "index": "11.2",
-    "issuer": "George V",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "524",
@@ -2252,7 +2127,6 @@
   {
     "id": "126",
     "index": "11.3",
-    "issuer": "Madras Presidency",
     "faceValue": "10",
     "currency": "Cash",
     "kmNumber": "326",
@@ -2270,7 +2144,6 @@
   {
     "id": "127",
     "index": "11.4",
-    "issuer": "Madras Presidency",
     "faceValue": "20",
     "currency": "Cash",
     "kmNumber": "328",
@@ -2288,7 +2161,6 @@
   {
     "id": "128",
     "index": "11.5",
-    "issuer": "Madras Presidency",
     "faceValue": "1/8",
     "currency": "Rupee",
     "kmNumber": "424",
@@ -2306,7 +2178,6 @@
   {
     "id": "129",
     "index": "11.6",
-    "issuer": "Madras Presidency",
     "faceValue": "1/2",
     "currency": "Rupee",
     "kmNumber": "414",
@@ -2324,7 +2195,6 @@
   {
     "id": "130",
     "index": "11.7",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "415",
@@ -2342,7 +2212,6 @@
   {
     "id": "131",
     "index": "11.8",
-    "issuer": "King Edward",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "500",
@@ -2360,7 +2229,6 @@
   {
     "id": "132",
     "index": "11.9",
-    "issuer": "King Edward",
     "faceValue": "1/12",
     "currency": "Annas",
     "kmNumber": "497",
@@ -2378,7 +2246,6 @@
   {
     "id": "133",
     "index": "11.10",
-    "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanams",
     "kmNumber": "308",
@@ -2396,7 +2263,6 @@
   {
     "id": "134",
     "index": "11.11",
-    "issuer": "Victoria - Continuous Legend",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "457",
@@ -2414,7 +2280,6 @@
   {
     "id": "135",
     "index": "11.12",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "376",
@@ -2432,7 +2297,6 @@
   {
     "id": "136",
     "index": "12.1",
-    "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "69",
@@ -2450,7 +2314,6 @@
   {
     "id": "137",
     "index": "12.2",
-    "issuer": "Bengal Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "40.1",
@@ -2468,7 +2331,6 @@
   {
     "id": "138",
     "index": "12.3",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Fanam",
     "kmNumber": "307",
@@ -2486,7 +2348,6 @@
   {
     "id": "139",
     "index": "12.4",
-    "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Kasu",
     "kmNumber": "149.2",
@@ -2504,7 +2365,6 @@
   {
     "id": "140",
     "index": "12.5",
-    "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "103.7",
@@ -2522,7 +2382,6 @@
   {
     "id": "141",
     "index": "12.6",
-    "issuer": "Dutch East India Company",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "23",
@@ -2540,7 +2399,6 @@
   {
     "id": "142",
     "index": "12.7",
-    "issuer": "Dutch East India Company",
     "faceValue": "1",
     "currency": "Duit",
     "kmNumber": "26",
@@ -2558,7 +2416,6 @@
   {
     "id": "143",
     "index": "12.8",
-    "issuer": "Jodhpur - Edward VIII",
     "faceValue": "1/4",
     "currency": "Annas",
     "kmNumber": "133",
@@ -2576,7 +2433,6 @@
   {
     "id": "144",
     "index": "12.9",
-    "issuer": "Travancore - BRV2",
     "faceValue": "1/2",
     "currency": "Rupee",
     "kmNumber": "67",
@@ -2594,7 +2450,6 @@
   {
     "id": "145",
     "index": "12.10",
-    "issuer": "Jaipur - Man Singh II",
     "faceValue": "1",
     "currency": "Annas",
     "kmNumber": "185",
@@ -2612,7 +2467,6 @@
   {
     "id": "146",
     "index": "12.11",
-    "issuer": "Sivagangai",
     "faceValue": "1",
     "currency": "Kasu",
     "kmNumber": "",
@@ -2630,7 +2484,6 @@
   {
     "id": "147",
     "index": "12.12",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "384",
@@ -2648,7 +2501,6 @@
   {
     "id": "148",
     "index": "13.1",
-    "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "C5",
@@ -2666,7 +2518,6 @@
   {
     "id": "149",
     "index": "13.2",
-    "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "C5",
@@ -2684,7 +2535,6 @@
   {
     "id": "150",
     "index": "13.3",
-    "issuer": "Jaipur",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "29",
@@ -2702,7 +2552,6 @@
   {
     "id": "151",
     "index": "13.4",
-    "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "C5",
@@ -2720,7 +2569,6 @@
   {
     "id": "152",
     "index": "13.5",
-    "issuer": "Kishangarh",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "C5",
@@ -2738,7 +2586,6 @@
   {
     "id": "153",
     "index": "13.6",
-    "issuer": "Bikaner",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "23",
@@ -2756,7 +2603,6 @@
   {
     "id": "154",
     "index": "13.7",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Dudu",
     "kmNumber": "306",
@@ -2774,7 +2620,6 @@
   {
     "id": "155",
     "index": "13.8",
-    "issuer": "William IV",
     "faceValue": "1/2",
     "currency": "Rupee",
     "kmNumber": "449",
@@ -2792,7 +2637,6 @@
   {
     "id": "156",
     "index": "13.9",
-    "issuer": "Arcot",
     "faceValue": "1",
     "currency": "Cash",
     "kmNumber": "",
@@ -2810,7 +2654,6 @@
   {
     "id": "157",
     "index": "13.10",
-    "issuer": "Madras Presidency",
     "faceValue": "1",
     "currency": "Rupee",
     "kmNumber": "427",
@@ -2828,7 +2671,6 @@
   {
     "id": "158",
     "index": "13.11",
-    "issuer": "Madras Presidency",
     "faceValue": "1/4",
     "currency": "Rupee",
     "kmNumber": "425",
@@ -2846,7 +2688,6 @@
   {
     "id": "159",
     "index": "13.12",
-    "issuer": "Arcot",
     "faceValue": "1/2",
     "currency": "Paisa",
     "kmNumber": "",
@@ -2864,7 +2705,6 @@
   {
     "id": "160",
     "index": "14.1",
-    "issuer": "Mysore",
     "faceValue": "10",
     "currency": "Cash",
     "kmNumber": "",
@@ -2882,7 +2722,6 @@
   {
     "id": "161",
     "index": "14.2",
-    "issuer": "Mysore",
     "faceValue": "1",
     "currency": "Kasu",
     "kmNumber": "156",
@@ -2900,7 +2739,6 @@
   {
     "id": "162",
     "index": "14.3",
-    "issuer": "Victoria - Continuous Legend",
     "faceValue": "1/2",
     "currency": "Anna",
     "kmNumber": "447",
@@ -2918,7 +2756,6 @@
   {
     "id": "163",
     "index": "14.4",
-    "issuer": "Sailana",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "14",
@@ -2936,7 +2773,6 @@
   {
     "id": "164",
     "index": "14.5",
-    "issuer": "Ratlam",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "25",
@@ -2954,7 +2790,6 @@
   {
     "id": "165",
     "index": "14.6",
-    "issuer": "Jaora",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "10",
@@ -2972,7 +2807,6 @@
   {
     "id": "166",
     "index": "14.7",
-    "issuer": "Indore",
     "faceValue": "1/4",
     "currency": "Anna",
     "kmNumber": "32",
@@ -2990,7 +2824,6 @@
   {
     "id": "167",
     "index": "14.8",
-    "issuer": "Gwalior",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "143.1",
@@ -3008,7 +2841,6 @@
   {
     "id": "168",
     "index": "14.9",
-    "issuer": "Udaipur",
     "faceValue": "1/2",
     "currency": "Anna",
     "kmNumber": "",
@@ -3026,7 +2858,6 @@
   {
     "id": "169",
     "index": "14.10",
-    "issuer": "Bundi",
     "faceValue": "1/2",
     "currency": "Paisa",
     "kmNumber": "",
@@ -3044,7 +2875,6 @@
   {
     "id": "170",
     "index": "14.11",
-    "issuer": "Tonk",
     "faceValue": "1",
     "currency": "Pice",
     "kmNumber": "29a",
@@ -3062,7 +2892,6 @@
   {
     "id": "171",
     "index": "14.12",
-    "issuer": "Kutch",
     "faceValue": "1",
     "currency": "Dokda",
     "kmNumber": "",
@@ -3080,7 +2909,6 @@
   {
     "id": "172",
     "index": "15.1",
-    "issuer": "Radhanpur",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "16",
@@ -3098,7 +2926,6 @@
   {
     "id": "173",
     "index": "15.2",
-    "issuer": "Lunavada",
     "faceValue": "1/2",
     "currency": "Paisa",
     "kmNumber": "",
@@ -3116,7 +2943,6 @@
   {
     "id": "174",
     "index": "15.3",
-    "issuer": "Travancore",
     "faceValue": "2",
     "currency": "Chuckram",
     "kmNumber": "50",
@@ -3134,7 +2960,6 @@
   {
     "id": "175",
     "index": "15.4",
-    "issuer": "Nawanagar",
     "faceValue": "1",
     "currency": "Dokdo",
     "kmNumber": "",
@@ -3152,7 +2977,6 @@
   {
     "id": "176",
     "index": "15.5",
-    "issuer": "Ceylon",
     "faceValue": "1/2",
     "currency": "Cents",
     "kmNumber": "106",
@@ -3170,7 +2994,6 @@
   {
     "id": "177",
     "index": "15.6",
-    "issuer": "Bhavnagar",
     "faceValue": "1",
     "currency": "Dokdo",
     "kmNumber": "",
@@ -3188,7 +3011,6 @@
   {
     "id": "178",
     "index": "15.7",
-    "issuer": "Hyderabad - Elichpur",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "10a",
@@ -3206,7 +3028,6 @@
   {
     "id": "179",
     "index": "15.9",
-    "issuer": "British India Straights Settlement",
     "faceValue": "1",
     "currency": "Cents",
     "kmNumber": "32",
@@ -3224,7 +3045,6 @@
   {
     "id": "180",
     "index": "15.10",
-    "issuer": "Bahawalpur",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "",
@@ -3242,7 +3062,6 @@
   {
     "id": "181",
     "index": "15.11",
-    "issuer": "Dhar",
     "faceValue": "1/2",
     "currency": "Pice",
     "kmNumber": "12",
@@ -3260,7 +3079,6 @@
   {
     "id": "182",
     "index": "15.12",
-    "issuer": "Cambay",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "",
@@ -3278,7 +3096,6 @@
   {
     "id": "183",
     "index": "16.1",
-    "issuer": "Baroda",
     "faceValue": "1",
     "currency": "Pai",
     "kmNumber": "",
@@ -3296,7 +3113,6 @@
   {
     "id": "184",
     "index": "16.2",
-    "issuer": "Banswara",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "10",
@@ -3314,7 +3130,6 @@
   {
     "id": "185",
     "index": "16.3",
-    "issuer": "Pratapgarh",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "30",
@@ -3332,7 +3147,6 @@
   {
     "id": "186",
     "index": "16.4",
-    "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanam",
     "kmNumber": "350",
@@ -3350,7 +3164,6 @@
   {
     "id": "187",
     "index": "16.5",
-    "issuer": "Danish East India Company",
     "faceValue": "4",
     "currency": "Cash",
     "kmNumber": "155",
@@ -3368,7 +3181,6 @@
   {
     "id": "188",
     "index": "16.6",
-    "issuer": "Dutch East India Company",
     "faceValue": "1/4",
     "currency": "Stuiver",
     "kmNumber": "Tn6",
@@ -3386,7 +3198,6 @@
   {
     "id": "189",
     "index": "16.7",
-    "issuer": "Indore",
     "faceValue": "1/4",
     "currency": "Anna",
     "kmNumber": "49",
@@ -3404,7 +3215,6 @@
   {
     "id": "190",
     "index": "16.8",
-    "issuer": "Jaipur",
     "faceValue": "1",
     "currency": "Anna",
     "kmNumber": "188",
@@ -3422,7 +3232,6 @@
   {
     "id": "191",
     "index": "16.9",
-    "issuer": "Delhi Sultanate",
     "faceValue": "2",
     "currency": "Gani",
     "kmNumber": "",
@@ -3440,7 +3249,6 @@
   {
     "id": "192",
     "index": "16.10",
-    "issuer": "Jodhpur -George VI",
     "faceValue": "1/4",
     "currency": "Anna",
     "kmNumber": "142",
@@ -3458,7 +3266,6 @@
   {
     "id": "193",
     "index": "16.11",
-    "issuer": "Jodhpur - Edward VIII",
     "faceValue": "1/4",
     "currency": "Anna",
     "kmNumber": "131",
@@ -3476,7 +3283,6 @@
   {
     "id": "194",
     "index": "16.12",
-    "issuer": "Jodhpur -George VI",
     "faceValue": "1/4",
     "currency": "Anna",
     "kmNumber": "",
@@ -3494,7 +3300,6 @@
   {
     "id": "195",
     "index": "17.1",
-    "issuer": "Hyderbad-Basmatnagar",
     "faceValue": "1",
     "currency": "Paisa",
     "kmNumber": "",
@@ -3512,7 +3317,6 @@
   {
     "id": "196",
     "index": "17.2",
-    "issuer": "Madras Presidency",
     "faceValue": "2",
     "currency": "Fanam",
     "kmNumber": "341",
@@ -3530,7 +3334,6 @@
   {
     "id": "197",
     "index": "17.3",
-    "issuer": "Cochin",
     "faceValue": "2",
     "currency": "Puttuns",
     "kmNumber": "2",
@@ -3551,13 +3354,29 @@
     "section": "Indian Princely States",
     "subsection": "Central India Agency",
     "subsubsection": "Pratapgarh",
-    "issuer": "Pratapgarh",
     "faceValue": "1",
     "currency": "Anna",
     "kmNumber": "40",
     "numistaNumber": "37124",
     "numistaLink": "https://en.numista.com/37124",
     "weight": "7.58 gms",
+    "book": "",
+    "numberAndNotes": "",
+    "obverse": "",
+    "reverse": ""
+  },
+  {
+    "id": "1770684896385",
+    "index": "17.5",
+    "section": "Indian Princely States",
+    "subsection": "Madras States Agency",
+    "subsubsection": "Madurai",
+    "faceValue": "1",
+    "currency": "Kasu",
+    "kmNumber": "",
+    "numistaNumber": "194488",
+    "numistaLink": "https://en.numista.com/194488",
+    "weight": "2.67 gms",
     "book": "",
     "numberAndNotes": "",
     "obverse": "",

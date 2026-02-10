@@ -8,7 +8,6 @@ interface Coin {
   section: string;
   subsection: string;
   subsubsection: string;
-  issuer: string;
   faceValue: string;
   currency: string;
   kmNumber: string;
@@ -44,7 +43,6 @@ export default function Home() {
     section: '',
     subsection: '',
     subsubsection: '',
-    issuer: '',
     faceValue: '',
     currency: '',
     kmNumber: '',
@@ -201,8 +199,8 @@ export default function Home() {
     if (!groupedCoins[coin.section][coin.subsection]) {
       groupedCoins[coin.section][coin.subsection] = {};
     }
-    // If subsubsection is empty, use the issuer for grouping
-    const subsubsection = coin.subsubsection || coin.issuer || 'Other';
+    // If subsubsection is empty, use 'All' as the default grouping
+    const subsubsection = coin.subsubsection || 'All';
     if (!groupedCoins[coin.section][coin.subsection][subsubsection]) {
       groupedCoins[coin.section][coin.subsection][subsubsection] = [];
     }
@@ -278,7 +276,6 @@ export default function Home() {
           section: '',
           subsection: '',
           subsubsection: '',
-          issuer: '',
           faceValue: '',
           currency: '',
           kmNumber: '',
@@ -304,7 +301,6 @@ export default function Home() {
       section: coin.section,
       subsection: coin.subsection,
       subsubsection: coin.subsubsection,
-      issuer: coin.issuer,
       faceValue: coin.faceValue,
       currency: coin.currency,
       kmNumber: coin.kmNumber,
@@ -447,61 +443,54 @@ export default function Home() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Section
               </label>
-              <select
+              <input
+                list="sections-list"
                 value={formData.section}
                 onChange={(e) => setFormData({ ...formData, section: e.target.value, subsection: '' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-              >
-                <option value="">Select section...</option>
+                placeholder="Select or type new section..."
+                required
+              />
+              <datalist id="sections-list">
                 {uniqueSections.map(section => (
-                  <option key={section} value={section}>{section}</option>
+                  <option key={section} value={section} />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Subsection
               </label>
-              <select
+              <input
+                list="subsections-list"
                 value={formData.subsection}
                 onChange={(e) => setFormData({ ...formData, subsection: e.target.value, subsubsection: '' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                disabled={!formData.section}
-              >
-                <option value="">Select subsection...</option>
+                placeholder="Select or type new subsection..."
+                required
+              />
+              <datalist id="subsections-list">
                 {availableSubsections.map(subsection => (
-                  <option key={subsection} value={subsection}>{subsection}</option>
+                  <option key={subsection} value={subsection} />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Subsubsection (State) <span className="text-xs text-gray-500">- optional</span>
               </label>
-              <select
+              <input
+                list="subsubsections-list"
                 value={formData.subsubsection}
                 onChange={(e) => setFormData({ ...formData, subsubsection: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                disabled={!formData.subsection}
-              >
-                <option value="">None (will use Issuer)</option>
-                {availableSubsubsections.map(subsubsection => (
-                  <option key={subsubsection} value={subsubsection}>{subsubsection}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Issuer
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.issuer}
-                onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., United States"
+                placeholder="None (will use Issuer) or type new..."
               />
+              <datalist id="subsubsections-list">
+                {availableSubsubsections.map(subsubsection => (
+                  <option key={subsubsection} value={subsubsection} />
+                ))}
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -928,55 +917,50 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                    <select
+                    <input
+                      list="edit-sections-list"
                       value={editFormData.section || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, section: e.target.value, subsection: '' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    >
-                      <option value="">Select section...</option>
+                      placeholder="Select or type new section..."
+                    />
+                    <datalist id="edit-sections-list">
                       {uniqueSections.map(section => (
-                        <option key={section} value={section}>{section}</option>
+                        <option key={section} value={section} />
                       ))}
-                    </select>
+                    </datalist>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subsection</label>
-                    <select
+                    <input
+                      list="edit-subsections-list"
                       value={editFormData.subsection || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, subsection: e.target.value, subsubsection: '' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      disabled={!editFormData.section}
-                    >
-                      <option value="">Select subsection...</option>
+                      placeholder="Select or type new subsection..."
+                    />
+                    <datalist id="edit-subsections-list">
                       {availableEditSubsections.map(subsection => (
-                        <option key={subsection} value={subsection}>{subsection}</option>
+                        <option key={subsection} value={subsection} />
                       ))}
-                    </select>
+                    </datalist>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Subsubsection (State) <span className="text-xs text-gray-500">- optional</span>
                     </label>
-                    <select
+                    <input
+                      list="edit-subsubsections-list"
                       value={editFormData.subsubsection || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, subsubsection: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      disabled={!editFormData.subsection}
-                    >
-                      <option value="">None (will use Issuer)</option>
-                      {availableEditSubsubsections.map(subsubsection => (
-                        <option key={subsubsection} value={subsubsection}>{subsubsection}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Issuer</label>
-                    <input
-                      type="text"
-                      value={editFormData.issuer || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, issuer: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="None (will use Issuer) or type new..."
                     />
+                    <datalist id="edit-subsubsections-list">
+                      {availableEditSubsubsections.map(subsubsection => (
+                        <option key={subsubsection} value={subsubsection} />
+                      ))}
+                    </datalist>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Face Value</label>
@@ -1109,7 +1093,7 @@ export default function Home() {
               </p>
               <div className="bg-pink-50 border border-pink-200 rounded p-3 mb-4">
                 <p className="text-sm"><span className="font-semibold">Index:</span> {deletingCoin.index}</p>
-                <p className="text-sm"><span className="font-semibold">Issuer:</span> {deletingCoin.issuer}</p>
+                <p className="text-sm"><span className="font-semibold">Section:</span> {deletingCoin.section} - {deletingCoin.subsection}</p>
                 <p className="text-sm"><span className="font-semibold">Value:</span> {deletingCoin.faceValue} {deletingCoin.currency}</p>
               </div>
               <div className="mb-4">

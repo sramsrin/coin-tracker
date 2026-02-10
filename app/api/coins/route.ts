@@ -9,7 +9,6 @@ interface Coin {
   section: string;
   subsection: string;
   subsubsection: string;
-  issuer: string;
   faceValue: string;
   currency: string;
   kmNumber: string;
@@ -57,16 +56,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const coins = await readCoins();
 
-    const issuer = body.issuer?.trim() || '';
-    const subsubsection = body.subsubsection?.trim() || '';
-
     const newCoin: Coin = {
       id: Date.now().toString(),
       index: body.index?.trim() || '',
       section: body.section?.trim() || '',
       subsection: body.subsection?.trim() || '',
-      subsubsection: subsubsection || issuer, // Use issuer if subsubsection is empty
-      issuer: issuer,
+      subsubsection: body.subsubsection?.trim() || '',
       faceValue: body.faceValue?.trim() || '',
       currency: body.currency?.trim() || '',
       kmNumber: body.kmNumber?.trim() || '',
@@ -123,11 +118,6 @@ export async function PUT(request: NextRequest) {
       } else {
         trimmedBody[key as keyof Coin] = body[key];
       }
-    }
-
-    // If subsubsection is empty, use issuer
-    if (trimmedBody.subsubsection === '' && (trimmedBody.issuer || coins[coinIndex].issuer)) {
-      trimmedBody.subsubsection = trimmedBody.issuer || coins[coinIndex].issuer;
     }
 
     // Update the coin
