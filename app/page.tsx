@@ -40,9 +40,14 @@ export default function Home() {
   const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
   const [activeTab, setActiveTab] = useState<'collection' | 'map'>('collection');
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedSubsection, setSelectedSubsection] = useState<string | null>(null);
   const [colorMappings, setColorMappings] = useState<{state: string, color: string}[]>([]);
   const [mapCanvas, setMapCanvas] = useState<HTMLCanvasElement | null>(null);
   const [originalImageData, setOriginalImageData] = useState<ImageData | null>(null);
+  const [showMappingModal, setShowMappingModal] = useState(false);
+  const [editingMapping, setEditingMapping] = useState<{state: string, color: string} | null>(null);
+  const [mappingFormState, setMappingFormState] = useState('');
+  const [ambiguousStates, setAmbiguousStates] = useState<{color: string, states: string[]} | null>(null);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -78,7 +83,7 @@ export default function Home() {
     }
   };
 
-  const highlightStateOnMap = (stateName: string | null) => {
+  const highlightStateOnMap = (stateNames: string[] | null) => {
     if (!mapCanvas || !originalImageData) return;
 
     const ctx = mapCanvas.getContext('2d');
@@ -87,15 +92,21 @@ export default function Home() {
     // Restore original image
     ctx.putImageData(originalImageData, 0, 0);
 
-    if (!stateName) return;
+    if (!stateNames || stateNames.length === 0) return;
 
-    // Find the color for this state
-    const mapping = colorMappings.find(m => m.state === stateName);
-    if (!mapping) return;
+    // Get all colors for the states to highlight
+    const targetColors = stateNames
+      .map(stateName => {
+        const mapping = colorMappings.find(m => m.state === stateName);
+        if (!mapping) return null;
+        const [r, g, b] = mapping.color.split(',').map(Number);
+        return { r, g, b };
+      })
+      .filter(Boolean) as { r: number; g: number; b: number }[];
 
-    const [targetR, targetG, targetB] = mapping.color.split(',').map(Number);
+    if (targetColors.length === 0) return;
 
-    // Get image data and highlight the matching color with stripes
+    // Get image data and highlight the matching colors with stripes
     const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
     const data = imageData.data;
     const width = mapCanvas.width;
@@ -105,8 +116,12 @@ export default function Home() {
       const g = data[i + 1];
       const b = data[i + 2];
 
-      // If this pixel matches the target color
-      if (r === targetR && g === targetG && b === targetB) {
+      // Check if this pixel matches any target color
+      const matchesTarget = targetColors.some(
+        target => target.r === r && target.g === g && target.b === b
+      );
+
+      if (matchesTarget) {
         // Calculate pixel position for stripe pattern
         const pixelIndex = i / 4;
         const x = pixelIndex % width;
@@ -132,12 +147,25 @@ export default function Home() {
     ctx.putImageData(imageData, 0, 0);
   };
 
-  // Highlight state when selection changes
+  // Highlight state(s) when selection changes
   useEffect(() => {
     if (activeTab === 'map') {
-      highlightStateOnMap(selectedState);
+      let statesToHighlight: string[] = [];
+
+      if (selectedSubsection) {
+        // Get all states in this subsection
+        statesToHighlight = coins
+          .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+          .map(c => c.subsubsection)
+          .filter(Boolean);
+      } else if (selectedState) {
+        // Just highlight the single selected state
+        statesToHighlight = [selectedState];
+      }
+
+      highlightStateOnMap(statesToHighlight.length > 0 ? statesToHighlight : null);
     }
-  }, [selectedState, colorMappings, mapCanvas, originalImageData]);
+  }, [selectedState, selectedSubsection, colorMappings, mapCanvas, originalImageData, coins, activeTab]);
 
   const fetchCoins = async () => {
     try {
@@ -458,6 +486,49 @@ export default function Home() {
     setDeletingCoin(null);
     setDeletePassword('');
     setDeletePasswordError(false);
+  };
+
+  const handleSaveMapping = async () => {
+    if (!editingMapping || !mappingFormState.trim()) return;
+
+    try {
+      // Delete old mapping if state name changed
+      if (editingMapping.state !== mappingFormState.trim()) {
+        await fetch(`/api/map-points?state=${encodeURIComponent(editingMapping.state)}`, {
+          method: 'DELETE',
+        });
+      }
+
+      // Save new/updated mapping
+      await fetch('/api/map-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          state: mappingFormState.trim(),
+          color: editingMapping.color
+        })
+      });
+
+      await fetchColorMappings();
+      setShowMappingModal(false);
+      setEditingMapping(null);
+      setMappingFormState('');
+    } catch (error) {
+      console.error('Error saving mapping:', error);
+    }
+  };
+
+  const handleDeleteMapping = async (state: string) => {
+    if (!confirm(`Delete mapping for ${state}?`)) return;
+
+    try {
+      await fetch(`/api/map-points?state=${encodeURIComponent(state)}`, {
+        method: 'DELETE',
+      });
+      await fetchColorMappings();
+    } catch (error) {
+      console.error('Error deleting mapping:', error);
+    }
   };
 
   return (
@@ -1246,9 +1317,9 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">Explore Princely States</h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Map Section */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-3">
                 <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
                   <div className="relative cursor-pointer">
                     <canvas
@@ -1276,26 +1347,33 @@ export default function Home() {
                         const rect = canvas.getBoundingClientRect();
                         const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
                         const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
                         const ctx = canvas.getContext('2d');
                         if (ctx && originalImageData) {
-                          const pixel = ctx.getImageData(x, y, 1, 1).data;
-                          const color = `${pixel[0]},${pixel[1]},${pixel[2]}`;
+                          if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+                            const index = (y * canvas.width + x) * 4;
+                            const pixel = originalImageData.data;
+                            const color = `${pixel[index]},${pixel[index + 1]},${pixel[index + 2]}`;
 
-                          // Find state by color
-                          const mapping = colorMappings.find(m => m.color === color);
-                          if (mapping) {
-                            setSelectedState(mapping.state);
-                          } else {
-                            console.log('Clicked color:', color);
-                            if (isAuthenticated) {
-                              const stateName = prompt(`No state mapped to color RGB(${color}).\n\nEnter state name to map this color:`);
-                              if (stateName) {
-                                // Save the mapping
-                                fetch('/api/map-points', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ state: stateName, color })
-                                }).then(() => fetchColorMappings());
+                            // Find all states with this color
+                            const mappings = colorMappings.filter(m => m.color === color);
+
+                            if (mappings.length === 1) {
+                              // Single state - select it
+                              setSelectedState(mappings[0].state);
+                            } else if (mappings.length > 1) {
+                              // Multiple states share this color - show disambiguation
+                              setAmbiguousStates({
+                                color,
+                                states: mappings.map(m => m.state)
+                              });
+                            } else {
+                              // No mapping for this color
+                              console.log('Clicked color:', color, 'at', x, y);
+                              if (isAuthenticated) {
+                                setEditingMapping({ state: '', color });
+                                setMappingFormState('');
+                                setShowMappingModal(true);
                               }
                             }
                           }
@@ -1315,21 +1393,79 @@ export default function Home() {
                 )}
               </div>
 
+              {/* Subsections/Agencies List */}
+              <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
+                <h3 className="font-semibold text-gray-800 mb-4">Agencies</h3>
+                <div className="space-y-2">
+                  {Array.from(new Set(
+                    coins
+                      .filter(c => c.section === 'Indian Princely States')
+                      .map(c => c.subsection)
+                      .filter(Boolean)
+                  )).sort().map(subsection => {
+                    const subsectionStates = Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States' && c.subsection === subsection)
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    ));
+                    const totalCoins = coins.filter(
+                      c => c.section === 'Indian Princely States' && c.subsection === subsection
+                    ).length;
+                    const mappedCount = subsectionStates.filter(state =>
+                      colorMappings.some(m => m.state === state)
+                    ).length;
+
+                    return (
+                      <button
+                        key={subsection}
+                        onClick={() => {
+                          setSelectedSubsection(selectedSubsection === subsection ? null : subsection);
+                          setSelectedState(null);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg transition ${
+                          selectedSubsection === subsection
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : 'bg-gray-50 hover:bg-purple-50 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-sm font-medium">{subsection}</div>
+                        <div className={`text-xs ${selectedSubsection === subsection ? 'text-purple-100' : 'text-gray-500'}`}>
+                          {subsectionStates.length} states • {totalCoins} coins
+                        </div>
+                        <div className={`text-xs ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
+                          {mappedCount}/{subsectionStates.length} mapped
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* States List */}
               <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
-                <h3 className="font-semibold text-gray-800 mb-4">Princely States</h3>
+                <h3 className="font-semibold text-gray-800 mb-4">
+                  {selectedSubsection ? `${selectedSubsection} - States` : 'All Princely States'}
+                </h3>
 
                 {/* Mapped States */}
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center">
                     <span className="mr-2">✓</span> Mapped on Map ({colorMappings.filter(m =>
-                      coins.some(c => c.section === 'Indian Princely States' && c.subsubsection === m.state)
+                      coins.some(c =>
+                        c.section === 'Indian Princely States' &&
+                        c.subsubsection === m.state &&
+                        (!selectedSubsection || c.subsection === selectedSubsection)
+                      )
                     ).length})
                   </h4>
                   <div className="space-y-2">
                     {Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States')
+                        .filter(c =>
+                          c.section === 'Indian Princely States' &&
+                          (!selectedSubsection || c.subsection === selectedSubsection)
+                        )
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     )).sort().filter(state => colorMappings.some(m => m.state === state)).map(state => {
@@ -1339,7 +1475,10 @@ export default function Home() {
                       return (
                         <button
                           key={state}
-                          onClick={() => setSelectedState(selectedState === state ? null : state)}
+                          onClick={() => {
+                            setSelectedState(selectedState === state ? null : state);
+                            setSelectedSubsection(null);
+                          }}
                           className={`w-full text-left px-4 py-3 rounded-lg transition ${
                             selectedState === state
                               ? 'bg-pink-600 text-white shadow-md'
@@ -1361,7 +1500,10 @@ export default function Home() {
                   <h4 className="text-sm font-semibold text-orange-700 mb-2 flex items-center">
                     <span className="mr-2">⚠</span> Not Mapped Yet ({Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States')
+                        .filter(c =>
+                          c.section === 'Indian Princely States' &&
+                          (!selectedSubsection || c.subsection === selectedSubsection)
+                        )
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     )).filter(state => !colorMappings.some(m => m.state === state)).length})
@@ -1369,7 +1511,10 @@ export default function Home() {
                   <div className="space-y-2">
                     {Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States')
+                        .filter(c =>
+                          c.section === 'Indian Princely States' &&
+                          (!selectedSubsection || c.subsection === selectedSubsection)
+                        )
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     )).sort().filter(state => !colorMappings.some(m => m.state === state)).map(state => {
@@ -1379,7 +1524,10 @@ export default function Home() {
                       return (
                         <button
                           key={state}
-                          onClick={() => setSelectedState(selectedState === state ? null : state)}
+                          onClick={() => {
+                            setSelectedState(selectedState === state ? null : state);
+                            setSelectedSubsection(null);
+                          }}
                           className={`w-full text-left px-4 py-3 rounded-lg transition ${
                             selectedState === state
                               ? 'bg-pink-600 text-white shadow-md'
@@ -1395,6 +1543,184 @@ export default function Home() {
                     })}
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Mapping Management - Admin Only */}
+            {isAuthenticated && (
+              <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">🔧 Manage Color Mappings</h3>
+                {/* Color Conflicts Warning */}
+                {(() => {
+                  const colorGroups = colorMappings.reduce((acc, m) => {
+                    if (!acc[m.color]) acc[m.color] = [];
+                    acc[m.color].push(m.state);
+                    return acc;
+                  }, {} as Record<string, string[]>);
+                  const conflicts = Object.entries(colorGroups).filter(([_, states]) => states.length > 1);
+
+                  if (conflicts.length > 0) {
+                    return (
+                      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Color Conflicts Detected</h4>
+                        <p className="text-sm text-yellow-700 mb-2">
+                          {conflicts.length} color{conflicts.length !== 1 ? 's are' : ' is'} shared by multiple states:
+                        </p>
+                        <ul className="text-xs text-yellow-700 space-y-1">
+                          {conflicts.map(([color, states]) => (
+                            <li key={color}>
+                              <span className="font-mono">RGB({color})</span>: {states.join(', ')}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
+                  {colorMappings
+                    .filter(m => coins.some(c => c.section === 'Indian Princely States' && c.subsubsection === m.state))
+                    .sort((a, b) => a.state.localeCompare(b.state))
+                    .map(mapping => {
+                      const hasDuplicate = colorMappings.filter(m => m.color === mapping.color).length > 1;
+                      return (
+                      <div key={mapping.state} className={`border rounded p-3 flex items-center justify-between ${
+                        hasDuplicate ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'
+                      }`}>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm flex items-center gap-2">
+                            {mapping.state}
+                            {hasDuplicate && <span className="text-yellow-600 text-xs">⚠️</span>}
+                          </div>
+                          <div className="text-xs text-gray-500">RGB({mapping.color})</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMapping(mapping);
+                              setMappingFormState(mapping.state);
+                              setShowMappingModal(true);
+                            }}
+                            className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMapping(mapping.state)}
+                            className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Disambiguation Modal for Shared Colors */}
+        {ambiguousStates && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Multiple States Share This Color</h3>
+              <div className="mb-4">
+                <div className="h-12 rounded border border-gray-300 mb-3" style={{
+                  backgroundColor: `rgb(${ambiguousStates.color})`
+                }}></div>
+                <p className="text-sm text-gray-600 mb-3">
+                  This color is mapped to {ambiguousStates.states.length} states. Which state did you click on?
+                </p>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {ambiguousStates.states.map(state => {
+                    const stateCoins = coins.filter(
+                      c => c.section === 'Indian Princely States' && c.subsubsection === state
+                    );
+                    return (
+                      <button
+                        key={state}
+                        onClick={() => {
+                          setSelectedState(state);
+                          setAmbiguousStates(null);
+                        }}
+                        className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-pink-50 rounded-lg border border-gray-200 transition"
+                      >
+                        <div className="font-medium text-gray-800">{state}</div>
+                        <div className="text-sm text-gray-500">{stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <button
+                onClick={() => setAmbiguousStates(null)}
+                className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-md transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Mapping Edit Modal */}
+        {showMappingModal && editingMapping && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                {editingMapping.state ? 'Edit Mapping' : 'Add New Mapping'}
+              </h3>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color: RGB({editingMapping.color})
+                </label>
+                <div className="h-8 rounded border border-gray-300" style={{
+                  backgroundColor: `rgb(${editingMapping.color})`
+                }}></div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  State Name
+                </label>
+                <input
+                  list="all-states-list"
+                  value={mappingFormState}
+                  onChange={(e) => setMappingFormState(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  placeholder="Select or type state name..."
+                  autoFocus
+                />
+                <datalist id="all-states-list">
+                  {Array.from(new Set(
+                    coins
+                      .filter(c => c.section === 'Indian Princely States')
+                      .map(c => c.subsubsection)
+                      .filter(Boolean)
+                  )).sort().map(state => (
+                    <option key={state} value={state} />
+                  ))}
+                </datalist>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowMappingModal(false);
+                    setEditingMapping(null);
+                    setMappingFormState('');
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-md transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveMapping}
+                  disabled={!mappingFormState.trim()}
+                  className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Save
+                </button>
               </div>
             </div>
           </div>

@@ -1275,23 +1275,6 @@
     "subsubsection": ""
   },
   {
-    "id": "76",
-    "index": "7.12",
-    "faceValue": "1",
-    "currency": "Pie",
-    "kmNumber": "58",
-    "numistaNumber": "22395",
-    "numistaLink": "https://en.numista.com/catalogue/pieces22395.html",
-    "weight": "",
-    "book": "",
-    "numberAndNotes": "",
-    "obverse": "",
-    "reverse": "",
-    "section": "British India Presidencies",
-    "subsection": "Bengal Presidency",
-    "subsubsection": ""
-  },
-  {
     "id": "77",
     "index": "7.1",
     "faceValue": "1/4",
@@ -1476,6 +1459,23 @@
     "reverse": "I",
     "section": "British India",
     "subsection": "Victoria - Crowned (1862-1876)",
+    "subsubsection": ""
+  },
+  {
+    "id": "76",
+    "index": "7.12",
+    "faceValue": "1",
+    "currency": "Pie",
+    "kmNumber": "58",
+    "numistaNumber": "22395",
+    "numistaLink": "https://en.numista.com/catalogue/pieces22395.html",
+    "weight": "",
+    "book": "",
+    "numberAndNotes": "",
+    "obverse": "",
+    "reverse": "",
+    "section": "British India Presidencies",
+    "subsection": "Bengal Presidency",
     "subsubsection": ""
   },
   {
@@ -2586,6 +2586,9 @@
   {
     "id": "153",
     "index": "13.6",
+    "section": "Indian Princely States",
+    "subsection": "Rajputana Agency",
+    "subsubsection": "Bikaner",
     "faceValue": "1",
     "currency": "Takka",
     "kmNumber": "23",
@@ -2595,10 +2598,7 @@
     "book": "",
     "numberAndNotes": "",
     "obverse": "",
-    "reverse": "",
-    "section": "Indian Princely States",
-    "subsection": "Rajputana Agency",
-    "subsubsection": "Bikaner"
+    "reverse": ""
   },
   {
     "id": "154",
@@ -3369,7 +3369,7 @@
     "id": "1770684896385",
     "index": "17.5",
     "section": "Indian Princely States",
-    "subsection": "Madras States Agency",
+    "subsection": "Madras Presidency Territories",
     "subsubsection": "Madurai",
     "faceValue": "1",
     "currency": "Kasu",
@@ -3379,6 +3379,23 @@
     "weight": "2.67 gms",
     "book": "",
     "numberAndNotes": "",
+    "obverse": "If you really squint, you can see flying Garuda",
+    "reverse": "The two fishes and staff in the middle are very prominent."
+  },
+  {
+    "id": "1770686692420",
+    "index": "17.6",
+    "section": "Indian Princely States",
+    "subsection": "Madras Presidency Territories",
+    "subsubsection": "Madurai",
+    "faceValue": "1",
+    "currency": "Kasu",
+    "kmNumber": "",
+    "numistaNumber": "484079",
+    "numistaLink": "https://en.numista.com/484079",
+    "weight": "1.11 g",
+    "book": "",
+    "numberAndNotes": "See here for more discussion:  https://www.worldofcoins.eu/forum/index.php/topic,19681.0.html",
     "obverse": "",
     "reverse": ""
   }
