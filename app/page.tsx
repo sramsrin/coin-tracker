@@ -1317,6 +1317,49 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">Explore Princely States</h2>
 
+            {/* Agency Selector */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Agency</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {Array.from(new Set(
+                  coins
+                    .filter(c => c.section === 'Indian Princely States')
+                    .map(c => c.subsection)
+                    .filter(Boolean)
+                )).sort().map(subsection => {
+                  const subsectionStates = Array.from(new Set(
+                    coins
+                      .filter(c => c.section === 'Indian Princely States' && c.subsection === subsection)
+                      .map(c => c.subsubsection)
+                      .filter(Boolean)
+                  ));
+                  const mappedCount = subsectionStates.filter(state =>
+                    colorMappings.some(m => m.state === state)
+                  ).length;
+
+                  return (
+                    <button
+                      key={subsection}
+                      onClick={() => {
+                        setSelectedSubsection(selectedSubsection === subsection ? null : subsection);
+                        setSelectedState(null);
+                      }}
+                      className={`px-4 py-3 rounded-lg transition text-left ${
+                        selectedSubsection === subsection
+                          ? 'bg-purple-600 text-white shadow-lg'
+                          : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold">{subsection}</div>
+                      <div className={`text-xs mt-1 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
+                        {mappedCount}/{subsectionStates.length} mapped
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Map Section */}
               <div className="lg:col-span-3">
@@ -1393,60 +1436,18 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Subsections/Agencies List */}
-              <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
-                <h3 className="font-semibold text-gray-800 mb-4">Agencies</h3>
-                <div className="space-y-2">
-                  {Array.from(new Set(
-                    coins
-                      .filter(c => c.section === 'Indian Princely States')
-                      .map(c => c.subsection)
-                      .filter(Boolean)
-                  )).sort().map(subsection => {
-                    const subsectionStates = Array.from(new Set(
-                      coins
-                        .filter(c => c.section === 'Indian Princely States' && c.subsection === subsection)
-                        .map(c => c.subsubsection)
-                        .filter(Boolean)
-                    ));
-                    const totalCoins = coins.filter(
-                      c => c.section === 'Indian Princely States' && c.subsection === subsection
-                    ).length;
-                    const mappedCount = subsectionStates.filter(state =>
-                      colorMappings.some(m => m.state === state)
-                    ).length;
-
-                    return (
-                      <button
-                        key={subsection}
-                        onClick={() => {
-                          setSelectedSubsection(selectedSubsection === subsection ? null : subsection);
-                          setSelectedState(null);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition ${
-                          selectedSubsection === subsection
-                            ? 'bg-purple-600 text-white shadow-md'
-                            : 'bg-gray-50 hover:bg-purple-50 text-gray-700'
-                        }`}
-                      >
-                        <div className="text-sm font-medium">{subsection}</div>
-                        <div className={`text-xs ${selectedSubsection === subsection ? 'text-purple-100' : 'text-gray-500'}`}>
-                          {subsectionStates.length} states • {totalCoins} coins
-                        </div>
-                        <div className={`text-xs ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
-                          {mappedCount}/{subsectionStates.length} mapped
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* States List */}
               <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
-                <h3 className="font-semibold text-gray-800 mb-4">
-                  {selectedSubsection ? `${selectedSubsection} - States` : 'All Princely States'}
-                </h3>
+                {!selectedSubsection ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 mb-2">👆 Select an agency above</p>
+                    <p className="text-sm text-gray-400">to view its princely states</p>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-gray-800 mb-4">
+                      {selectedSubsection}
+                    </h3>
 
                 {/* Mapped States */}
                 <div className="mb-6">
@@ -1543,6 +1544,8 @@ export default function Home() {
                     })}
                   </div>
                 </div>
+                  </>
+                )}
               </div>
             </div>
 
