@@ -126,25 +126,15 @@ export default function Home() {
       );
 
       if (matchesTarget) {
-        // Calculate pixel position for stripe pattern
-        const pixelIndex = i / 4;
-        const x = pixelIndex % width;
-        const y = Math.floor(pixelIndex / width);
-
-        // Create diagonal stripes (every 6 pixels for visibility)
-        const isStripe = (x + y) % 12 < 6;
-
-        if (isStripe) {
-          // Black stripes for maximum visibility
-          data[i] = 0;
-          data[i + 1] = 0;
-          data[i + 2] = 0;
-        } else {
-          // Keep original color
-          data[i] = r;
-          data[i + 1] = g;
-          data[i + 2] = b;
-        }
+        // Highlighted state - keep original color at full brightness
+        data[i] = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
+      } else {
+        // Non-highlighted area - dim it (reduce brightness by 60%)
+        data[i] = Math.floor(r * 0.4);
+        data[i + 1] = Math.floor(g * 0.4);
+        data[i + 2] = Math.floor(b * 0.4);
       }
     }
 
