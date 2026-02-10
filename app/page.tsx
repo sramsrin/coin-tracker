@@ -38,6 +38,11 @@ export default function Home() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deletePasswordError, setDeletePasswordError] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
+  const [activeTab, setActiveTab] = useState<'collection' | 'map'>('collection');
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [colorMappings, setColorMappings] = useState<{state: string, color: string}[]>([]);
+  const [mapCanvas, setMapCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [originalImageData, setOriginalImageData] = useState<ImageData | null>(null);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -58,7 +63,81 @@ export default function Home() {
   // Load coins on mount
   useEffect(() => {
     fetchCoins();
+    fetchColorMappings();
   }, []);
+
+  const fetchColorMappings = async () => {
+    try {
+      const response = await fetch('/api/map-points');
+      if (response.ok) {
+        const data = await response.json();
+        setColorMappings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching color mappings:', error);
+    }
+  };
+
+  const highlightStateOnMap = (stateName: string | null) => {
+    if (!mapCanvas || !originalImageData) return;
+
+    const ctx = mapCanvas.getContext('2d');
+    if (!ctx) return;
+
+    // Restore original image
+    ctx.putImageData(originalImageData, 0, 0);
+
+    if (!stateName) return;
+
+    // Find the color for this state
+    const mapping = colorMappings.find(m => m.state === stateName);
+    if (!mapping) return;
+
+    const [targetR, targetG, targetB] = mapping.color.split(',').map(Number);
+
+    // Get image data and highlight the matching color with stripes
+    const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
+    const data = imageData.data;
+    const width = mapCanvas.width;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      // If this pixel matches the target color
+      if (r === targetR && g === targetG && b === targetB) {
+        // Calculate pixel position for stripe pattern
+        const pixelIndex = i / 4;
+        const x = pixelIndex % width;
+        const y = Math.floor(pixelIndex / width);
+
+        // Create diagonal stripes (every 6 pixels for visibility)
+        const isStripe = (x + y) % 12 < 6;
+
+        if (isStripe) {
+          // Black stripes for maximum visibility
+          data[i] = 0;
+          data[i + 1] = 0;
+          data[i + 2] = 0;
+        } else {
+          // Keep original color
+          data[i] = r;
+          data[i + 1] = g;
+          data[i + 2] = b;
+        }
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  // Highlight state when selection changes
+  useEffect(() => {
+    if (activeTab === 'map') {
+      highlightStateOnMap(selectedState);
+    }
+  }, [selectedState, colorMappings, mapCanvas, originalImageData]);
 
   const fetchCoins = async () => {
     try {
@@ -398,6 +477,32 @@ export default function Home() {
           )}
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-8">
+          <button
+            onClick={() => setActiveTab('collection')}
+            className={`px-6 py-3 rounded-lg font-semibold transition ${
+              activeTab === 'collection'
+                ? 'bg-pink-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-pink-50'
+            }`}
+          >
+            📊 Collection
+          </button>
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`px-6 py-3 rounded-lg font-semibold transition ${
+              activeTab === 'map'
+                ? 'bg-pink-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-pink-50'
+            }`}
+          >
+            🗺️ Explore Princely States
+          </button>
+        </div>
+
+        {activeTab === 'collection' && (
+          <>
         {/* Password Protection / Add Coin Form */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           {!isAuthenticated ? (
@@ -1129,6 +1234,167 @@ export default function Home() {
                 >
                   Delete
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+          </>
+        )}
+
+        {/* Map Tab */}
+        {activeTab === 'map' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-6">Explore Princely States</h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Map Section */}
+              <div className="lg:col-span-2">
+                <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
+                  <div className="relative cursor-pointer">
+                    <canvas
+                      ref={(canvas) => {
+                        if (canvas && !canvas.dataset.initialized) {
+                          canvas.dataset.initialized = 'true';
+                          setMapCanvas(canvas);
+                          const ctx = canvas.getContext('2d');
+                          const img = new Image();
+                          img.onload = () => {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx?.drawImage(img, 0, 0);
+                            // Save original image data for highlighting
+                            const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
+                            if (imageData) {
+                              setOriginalImageData(imageData);
+                            }
+                          };
+                          img.src = '/maps/princely-states.png';
+                        }
+                      }}
+                      onClick={(e) => {
+                        const canvas = e.currentTarget;
+                        const rect = canvas.getBoundingClientRect();
+                        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                        const ctx = canvas.getContext('2d');
+                        if (ctx && originalImageData) {
+                          const pixel = ctx.getImageData(x, y, 1, 1).data;
+                          const color = `${pixel[0]},${pixel[1]},${pixel[2]}`;
+
+                          // Find state by color
+                          const mapping = colorMappings.find(m => m.color === color);
+                          if (mapping) {
+                            setSelectedState(mapping.state);
+                          } else {
+                            console.log('Clicked color:', color);
+                            if (isAuthenticated) {
+                              const stateName = prompt(`No state mapped to color RGB(${color}).\n\nEnter state name to map this color:`);
+                              if (stateName) {
+                                // Save the mapping
+                                fetch('/api/map-points', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ state: stateName, color })
+                                }).then(() => fetchColorMappings());
+                              }
+                            }
+                          }
+                        }
+                      }}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+                {selectedState && (
+                  <div className="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-2">Selected: {selectedState}</h3>
+                    <p className="text-sm text-gray-600">
+                      {coins.filter(c => c.section === 'Indian Princely States' && c.subsubsection === selectedState).length} coins in collection
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* States List */}
+              <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
+                <h3 className="font-semibold text-gray-800 mb-4">Princely States</h3>
+
+                {/* Mapped States */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center">
+                    <span className="mr-2">✓</span> Mapped on Map ({colorMappings.filter(m =>
+                      coins.some(c => c.section === 'Indian Princely States' && c.subsubsection === m.state)
+                    ).length})
+                  </h4>
+                  <div className="space-y-2">
+                    {Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States')
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    )).sort().filter(state => colorMappings.some(m => m.state === state)).map(state => {
+                      const stateCoins = coins.filter(
+                        c => c.section === 'Indian Princely States' && c.subsubsection === state
+                      );
+                      return (
+                        <button
+                          key={state}
+                          onClick={() => setSelectedState(selectedState === state ? null : state)}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                            selectedState === state
+                              ? 'bg-pink-600 text-white shadow-md'
+                              : 'bg-green-50 hover:bg-pink-50 text-gray-700'
+                          }`}
+                        >
+                          <div className="font-medium">{state}</div>
+                          <div className={`text-sm ${selectedState === state ? 'text-pink-100' : 'text-gray-500'}`}>
+                            {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Unmapped States */}
+                <div>
+                  <h4 className="text-sm font-semibold text-orange-700 mb-2 flex items-center">
+                    <span className="mr-2">⚠</span> Not Mapped Yet ({Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States')
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    )).filter(state => !colorMappings.some(m => m.state === state)).length})
+                  </h4>
+                  <div className="space-y-2">
+                    {Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States')
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    )).sort().filter(state => !colorMappings.some(m => m.state === state)).map(state => {
+                      const stateCoins = coins.filter(
+                        c => c.section === 'Indian Princely States' && c.subsubsection === state
+                      );
+                      return (
+                        <button
+                          key={state}
+                          onClick={() => setSelectedState(selectedState === state ? null : state)}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                            selectedState === state
+                              ? 'bg-pink-600 text-white shadow-md'
+                              : 'bg-orange-50 hover:bg-pink-50 text-gray-700 border border-orange-200'
+                          }`}
+                        >
+                          <div className="font-medium">{state}</div>
+                          <div className={`text-sm ${selectedState === state ? 'text-pink-100' : 'text-gray-500'}`}>
+                            {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''} • Click map to mark
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
