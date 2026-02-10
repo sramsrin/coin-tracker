@@ -832,6 +832,7 @@ export default function Home() {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'Indian Princely States';
+                          const isMadrasPresidencyTerritories = section === 'British India Presidencies' && subsection === 'Madras Presidency - Subsumed Kingdoms';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -839,7 +840,7 @@ export default function Home() {
                           return (
                             <li key={subsection}>
                               <div className="flex items-center">
-                                {isPrincelyStates && hasMultipleStates && (
+                                {(isPrincelyStates || isMadrasPresidencyTerritories) && hasMultipleStates && (
                                   <button
                                     onClick={() => toggleAgency(agencyKey)}
                                     className="mr-1 text-pink-600 hover:text-pink-800 focus:outline-none"
@@ -858,7 +859,7 @@ export default function Home() {
                                   </span>
                                 </a>
                               </div>
-                              {isPrincelyStates && hasMultipleStates && isExpanded && (
+                              {(isPrincelyStates || isMadrasPresidencyTerritories) && hasMultipleStates && isExpanded && (
                                 <ul className="ml-6 mt-1 space-y-1">
                                   {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
                                     if (subsubsection === 'Other') return null;
@@ -931,7 +932,8 @@ export default function Home() {
                         {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'Indian Princely States';
-                          const showStateHeader = isPrincelyStates && subsubsection !== 'Other';
+                          const isMadrasPresidencyTerritories = section === 'British India Presidencies' && subsection === 'Madras Presidency - Subsumed Kingdoms';
+                          const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
 
                           return (
                             <div
