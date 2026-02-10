@@ -48,6 +48,10 @@ export default function Home() {
   const [editingMapping, setEditingMapping] = useState<{state: string, color: string} | null>(null);
   const [mappingFormState, setMappingFormState] = useState('');
   const [ambiguousStates, setAmbiguousStates] = useState<{color: string, states: string[]} | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 });
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -152,15 +156,15 @@ export default function Home() {
     if (activeTab === 'map') {
       let statesToHighlight: string[] = [];
 
-      if (selectedSubsection) {
-        // Get all states in this subsection
+      if (selectedState) {
+        // Just highlight the single selected state
+        statesToHighlight = [selectedState];
+      } else if (selectedSubsection) {
+        // Get all states in this subsection (when "All" is selected)
         statesToHighlight = coins
           .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
           .map(c => c.subsubsection)
           .filter(Boolean);
-      } else if (selectedState) {
-        // Just highlight the single selected state
-        statesToHighlight = [selectedState];
       }
 
       highlightStateOnMap(statesToHighlight.length > 0 ? statesToHighlight : null);
@@ -1364,7 +1368,39 @@ export default function Home() {
               {/* Map Section */}
               <div className="lg:col-span-3">
                 <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
-                  <div className="relative cursor-pointer">
+                  {/* Zoom Controls - Only in View Mode */}
+                  {!isAuthenticated && (
+                    <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+                      <button
+                        onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
+                        title="Zoom In"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => setZoom(Math.max(zoom / 1.2, 0.5))}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
+                        title="Zoom Out"
+                      >
+                        −
+                      </button>
+                      <button
+                        onClick={() => {
+                          setZoom(1);
+                          setPan({ x: 0, y: 0 });
+                        }}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300"
+                        title="Reset Zoom"
+                      >
+                        ⟲
+                      </button>
+                      <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300">
+                        {Math.round(zoom * 100)}%
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative overflow-hidden" style={{ cursor: !isAuthenticated && isPanning ? 'grabbing' : !isAuthenticated ? 'grab' : 'pointer' }}>
                     <canvas
                       ref={(canvas) => {
                         if (canvas && !canvas.dataset.initialized) {
@@ -1386,10 +1422,23 @@ export default function Home() {
                         }
                       }}
                       onClick={(e) => {
+                        if (!isAuthenticated && isPanning) return; // Don't click while panning in view mode
+
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
-                        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
-                        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
+                        let x, y;
+                        if (isAuthenticated) {
+                          // Admin mode - simple click without zoom adjustment
+                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                        } else {
+                          // View mode - adjust for zoom and pan
+                          const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                          const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                          x = Math.floor((clickX - pan.x) / zoom);
+                          y = Math.floor((clickY - pan.y) / zoom);
+                        }
 
                         const ctx = canvas.getContext('2d');
                         if (ctx && originalImageData) {
@@ -1422,6 +1471,38 @@ export default function Home() {
                           }
                         }
                       }}
+                      onMouseDown={(e) => {
+                        if (!isAuthenticated) {
+                          setIsPanning(true);
+                          setLastPanPosition({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (!isAuthenticated && isPanning) {
+                          const dx = e.clientX - lastPanPosition.x;
+                          const dy = e.clientY - lastPanPosition.y;
+                          setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+                          setLastPanPosition({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseUp={() => {
+                        if (!isAuthenticated) setIsPanning(false);
+                      }}
+                      onMouseLeave={() => {
+                        if (!isAuthenticated) setIsPanning(false);
+                      }}
+                      onWheel={(e) => {
+                        if (!isAuthenticated) {
+                          e.preventDefault();
+                          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                          setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
+                        }
+                      }}
+                      style={!isAuthenticated ? {
+                        transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                        transformOrigin: '0 0',
+                        transition: isPanning ? 'none' : 'transform 0.1s ease-out'
+                      } : {}}
                       className="w-full h-auto"
                     />
                   </div>
@@ -1448,6 +1529,30 @@ export default function Home() {
                     <h3 className="font-semibold text-gray-800 mb-4">
                       {selectedSubsection}
                     </h3>
+
+                    {/* All States Button */}
+                    <div className="mb-4">
+                      <button
+                        onClick={() => setSelectedState(null)}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition font-semibold ${
+                          !selectedState
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-2 border-purple-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>🗺️ All States</span>
+                          <span className="text-sm font-normal">
+                            {Array.from(new Set(
+                              coins
+                                .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+                                .map(c => c.subsubsection)
+                                .filter(Boolean)
+                            )).length} states
+                          </span>
+                        </div>
+                      </button>
+                    </div>
 
                 {/* Mapped States */}
                 <div className="mb-6">
@@ -1478,7 +1583,6 @@ export default function Home() {
                           key={state}
                           onClick={() => {
                             setSelectedState(selectedState === state ? null : state);
-                            setSelectedSubsection(null);
                           }}
                           className={`w-full text-left px-4 py-3 rounded-lg transition ${
                             selectedState === state
@@ -1527,7 +1631,6 @@ export default function Home() {
                           key={state}
                           onClick={() => {
                             setSelectedState(selectedState === state ? null : state);
-                            setSelectedSubsection(null);
                           }}
                           className={`w-full text-left px-4 py-3 rounded-lg transition ${
                             selectedState === state
