@@ -723,11 +723,11 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-bold text-gray-800">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
               💰 Ram & Dhruvan Coin Collection
             </h1>
 
@@ -735,7 +735,7 @@ export default function Home() {
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveTab('map')}
-                className={`px-4 py-2 rounded-lg font-semibold transition text-sm ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
                   activeTab === 'map'
                     ? 'bg-pink-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-pink-50'
@@ -745,7 +745,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setActiveTab('collection')}
-                className={`px-4 py-2 rounded-lg font-semibold transition text-sm ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
                   activeTab === 'collection'
                     ? 'bg-pink-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-pink-50'
@@ -758,7 +758,7 @@ export default function Home() {
 
           {/* Admin Login / Logout */}
           {!isAuthenticated ? (
-            <form onSubmit={handlePasswordSubmit} className="flex gap-2 items-center">
+            <form onSubmit={handlePasswordSubmit} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
               <input
                 type="password"
                 value={password}
@@ -767,11 +767,11 @@ export default function Home() {
                   setShowPasswordError(false);
                 }}
                 placeholder="Admin password"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm w-full sm:w-auto"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200 text-sm"
+                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200 text-sm whitespace-nowrap"
               >
                 Login
               </button>
@@ -780,16 +780,16 @@ export default function Home() {
               )}
             </form>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setShowAddCoinForm(!showAddCoinForm)}
-                className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-md text-sm font-medium transition"
+                className="px-3 sm:px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-md text-xs sm:text-sm font-medium transition whitespace-nowrap"
               >
                 {showAddCoinForm ? 'Hide' : 'Add Coin'}
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm font-medium transition"
+                className="px-3 sm:px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-xs sm:text-sm font-medium transition"
               >
                 Logout
               </button>
@@ -1514,12 +1514,12 @@ export default function Home() {
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Explore</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4">Explore</h2>
 
             {/* Section Selector */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Section</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Section</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort().map(section => {
                   const sectionCoins = coins.filter(c => c.section === section).length;
                   return (
@@ -1565,18 +1565,18 @@ export default function Home() {
             </div>
 
             {/* Main Content with Sidebar Layout */}
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Column - Main Content */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 order-2 lg:order-1">
 
             {/* Princely States Mode */}
             {selectedSection === 'Indian Princely States' && (<>
 
             {/* Agency Selector and Selected State */}
-            <div className="mb-6 flex flex-col lg:flex-row gap-6">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Agency</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="mb-6">
+              <div className="mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Agency</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {Array.from(new Set(
                     coins
                       .filter(c => c.section === 'Indian Princely States')
@@ -1846,8 +1846,8 @@ export default function Home() {
 
             {/* Colonial Power Selector */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Colonial Power</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Colonial Power</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {Array.from(new Set(
                   coins
                     .filter(c => c.section === 'European Colonial Powers in India')
@@ -2114,8 +2114,8 @@ export default function Home() {
             {/* Other Sections Mode (no map, just subsections) */}
             {selectedSection && selectedSection !== 'Indian Princely States' && selectedSection !== 'European Colonial Powers in India' && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {Array.from(new Set(
                     coins
                       .filter(c => c.section === selectedSection)
@@ -2169,9 +2169,9 @@ export default function Home() {
               {/* End Left Column */}
 
               {/* Right Column - Selection Info Box */}
-              <div className="w-80 flex-shrink-0">
+              <div className="w-full lg:w-80 flex-shrink-0 order-1 lg:order-2">
                 {(selectedSection || selectedSubsection || selectedState || selectedEuropeanCategory || selectedEuropeanPower) && (
-                  <div className="sticky top-6">
+                  <div className="lg:sticky lg:top-6">
                     <div className="p-4 bg-pink-50 border-2 border-pink-300 rounded-lg shadow-md">
                       <h3 className="text-lg font-semibold text-gray-800 mb-3">Current Selection</h3>
                       <div className="space-y-3">
