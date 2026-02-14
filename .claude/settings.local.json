@@ -17,7 +17,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(pkill:*)",
-      "WebFetch(domain:www.deviantart.com)"
+      "WebFetch(domain:www.deviantart.com)",
+      "Bash(npx next build:*)",
+      "Bash(npx next dev)",
+      "Bash(lsof:*)"
     ]
   }
 }

@@ -38,7 +38,7 @@ export default function Home() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deletePasswordError, setDeletePasswordError] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
-  const [activeTab, setActiveTab] = useState<'collection' | 'map'>('collection');
+  const [activeTab, setActiveTab] = useState<'collection' | 'map'>('map');
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [selectedSubsection, setSelectedSubsection] = useState<string | null>(null);
   const [colorMappings, setColorMappings] = useState<{state: string, color: string}[]>([]);
@@ -52,6 +52,14 @@ export default function Home() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 });
+  const [mapMode, setMapMode] = useState<'princely' | 'european'>('princely');
+  const [europeanColorMappings, setEuropeanColorMappings] = useState<{state: string, color: string}[]>([]);
+  const [europeanMapCanvas, setEuropeanMapCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [europeanOriginalImageData, setEuropeanOriginalImageData] = useState<ImageData | null>(null);
+  const [selectedEuropeanPower, setSelectedEuropeanPower] = useState<string | null>(null);
+  const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [showAddCoinForm, setShowAddCoinForm] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -69,10 +77,17 @@ export default function Home() {
     reverse: '',
   });
 
-  // Load coins on mount
+  // Load coins on mount and restore authentication
   useEffect(() => {
     fetchCoins();
     fetchColorMappings();
+    fetchEuropeanColorMappings();
+
+    // Restore authentication from localStorage
+    const savedAuth = localStorage.getItem('isAuthenticated');
+    if (savedAuth === 'true') {
+      setIsAuthenticated(true);
+    }
   }, []);
 
   const fetchColorMappings = async () => {
@@ -86,6 +101,145 @@ export default function Home() {
       console.error('Error fetching color mappings:', error);
     }
   };
+
+  const fetchEuropeanColorMappings = async () => {
+    try {
+      const response = await fetch('/api/european-map-points');
+      if (response.ok) {
+        const data = await response.json();
+        setEuropeanColorMappings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching European color mappings:', error);
+    }
+  };
+
+  const highlightEuropeanOnMap = (categoryNames: string[] | null) => {
+    if (!europeanMapCanvas || !europeanOriginalImageData) return;
+
+    const ctx = europeanMapCanvas.getContext('2d');
+    if (!ctx) return;
+
+    // Start with a copy of the original image data
+    const imageData = ctx.createImageData(europeanOriginalImageData);
+    imageData.data.set(europeanOriginalImageData.data);
+
+    if (!categoryNames || categoryNames.length === 0) {
+      // No selection - show original map
+      ctx.putImageData(imageData, 0, 0);
+      return;
+    }
+
+    // Get colors for selected colonial power
+    const selectedColors = categoryNames
+      .map(name => {
+        const mapping = europeanColorMappings.find(m => m.state === name);
+        if (!mapping) return null;
+        const [r, g, b] = mapping.color.split(',').map(Number);
+        return { r, g, b };
+      })
+      .filter(Boolean) as { r: number; g: number; b: number }[];
+
+    console.log('Selected regions:', categoryNames);
+    console.log('Selected colors:', selectedColors);
+
+    if (selectedColors.length === 0) {
+      console.log('No colors mapped for selected regions');
+      ctx.putImageData(imageData, 0, 0);
+      return;
+    }
+
+    const data = imageData.data;
+    const width = europeanMapCanvas.width;
+    let keptCount = 0;
+    let hiddenCount = 0;
+    const coloredPixels: {x: number, y: number, r: number, g: number, b: number}[] = [];
+
+    // First pass: hide everything except selected colors, black borders, and shared trading posts
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      // Check if this pixel matches the selected colonial power's color
+      const isSelectedColor = selectedColors.some(
+        color => color.r === r && color.g === g && color.b === b
+      );
+
+      // Check if this pixel is black (borders) - pure black
+      const isBlack = r < 30 && g < 30 && b < 30;
+
+      // Check if this pixel is dark grey/near-black (shared trading posts)
+      // Looking for dark colors that are close to black but not quite
+      const isSharedTradingPost = !isBlack && (
+        (r >= 30 && r <= 80 && g >= 30 && g <= 80 && b >= 30 && b <= 80) ||
+        (r < 100 && g < 100 && b < 100 && Math.abs(r - g) < 20 && Math.abs(g - b) < 20)
+      );
+
+      if (!isSelectedColor && !isBlack && !isSharedTradingPost) {
+        // Hide everything that's not the selected color, black borders, or shared trading posts
+        data[i] = 255;     // R - white
+        data[i + 1] = 255; // G - white
+        data[i + 2] = 255; // B - white
+        hiddenCount++;
+      } else {
+        keptCount++;
+        if (isSelectedColor) {
+          // Store colored pixel positions for enlarging
+          const pixelIndex = i / 4;
+          const x = pixelIndex % width;
+          const y = Math.floor(pixelIndex / width);
+          coloredPixels.push({x, y, r, g, b});
+        }
+      }
+    }
+
+    // Apply the hidden pixels first
+    ctx.putImageData(imageData, 0, 0);
+
+    // Second pass: enhance and enlarge the colored dots
+    coloredPixels.forEach(pixel => {
+      // Make colors pop more by increasing saturation and brightness
+      const popR = Math.min(255, Math.floor(pixel.r * 1.3));
+      const popG = Math.min(255, Math.floor(pixel.g * 1.3));
+      const popB = Math.min(255, Math.floor(pixel.b * 1.3));
+
+      ctx.fillStyle = `rgb(${popR},${popG},${popB})`;
+
+      // Draw a small circle to make it 1.5x larger (radius ~1 pixel)
+      ctx.beginPath();
+      ctx.arc(pixel.x, pixel.y, 1, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+
+    console.log('Kept pixels:', keptCount);
+    console.log('Hidden pixels:', hiddenCount);
+    console.log('Enhanced dots:', coloredPixels.length);
+  };
+
+  // Highlight European colonial power when selection changes
+  useEffect(() => {
+    if (activeTab === 'map' && mapMode === 'european') {
+      let regionsToHighlight: string[] = [];
+
+      if (selectedEuropeanCategory) {
+        // Get all regions in this subsection that have color mappings
+        // When subsubsection is empty, use the subsection name itself
+        const subsectionRegions = Array.from(new Set(
+          coins
+            .filter(c => c.section === 'European Colonial Powers in India' && c.subsection === selectedEuropeanCategory)
+            .map(c => c.subsubsection || c.subsection)
+        ));
+
+        // Only include regions that have been mapped to colors
+        regionsToHighlight = subsectionRegions.filter(region =>
+          europeanColorMappings.some(m => m.state === region)
+        );
+      }
+
+      highlightEuropeanOnMap(regionsToHighlight.length > 0 ? regionsToHighlight : null);
+    }
+  }, [selectedEuropeanPower, selectedEuropeanCategory, europeanColorMappings, europeanMapCanvas, europeanOriginalImageData, coins, activeTab, mapMode]);
 
   const highlightStateOnMap = (stateNames: string[] | null) => {
     if (!mapCanvas || !originalImageData) return;
@@ -337,6 +491,7 @@ export default function Home() {
     // Simple password check - in production, this should be done server-side
     if (password === 'SRMPv7006@') {
       setIsAuthenticated(true);
+      localStorage.setItem('isAuthenticated', 'true');
       setPassword('');
       setShowPasswordError(false);
     } else {
@@ -347,6 +502,7 @@ export default function Home() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
     setPassword('');
     setShowPasswordError(false);
   };
@@ -525,6 +681,47 @@ export default function Home() {
     }
   };
 
+  const handleSaveEuropeanMapping = async () => {
+    if (!editingMapping || !mappingFormState.trim()) return;
+
+    try {
+      if (editingMapping.state !== mappingFormState.trim()) {
+        await fetch(`/api/european-map-points?state=${encodeURIComponent(editingMapping.state)}`, {
+          method: 'DELETE',
+        });
+      }
+
+      await fetch('/api/european-map-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          state: mappingFormState.trim(),
+          color: editingMapping.color
+        })
+      });
+
+      await fetchEuropeanColorMappings();
+      setShowMappingModal(false);
+      setEditingMapping(null);
+      setMappingFormState('');
+    } catch (error) {
+      console.error('Error saving European mapping:', error);
+    }
+  };
+
+  const handleDeleteEuropeanMapping = async (state: string) => {
+    if (!confirm(`Delete mapping for ${state}?`)) return;
+
+    try {
+      await fetch(`/api/european-map-points?state=${encodeURIComponent(state)}`, {
+        method: 'DELETE',
+      });
+      await fetchEuropeanColorMappings();
+    } catch (error) {
+      console.error('Error deleting European mapping:', error);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
       <div className="max-w-6xl mx-auto">
@@ -532,18 +729,60 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-800">
             💰 Ram & Dhruvan Coin Collection
           </h1>
-          {isAuthenticated && (
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm font-medium transition"
-            >
-              Logout
-            </button>
+
+          {/* Admin Login / Logout */}
+          {!isAuthenticated ? (
+            <form onSubmit={handlePasswordSubmit} className="flex gap-2 items-center">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setShowPasswordError(false);
+                }}
+                placeholder="Admin password"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200 text-sm"
+              >
+                Login
+              </button>
+              {showPasswordError && (
+                <span className="text-red-600 text-xs">Incorrect password</span>
+              )}
+            </form>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowAddCoinForm(!showAddCoinForm)}
+                className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-md text-sm font-medium transition"
+              >
+                {showAddCoinForm ? 'Hide' : 'Add Coin'}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm font-medium transition"
+              >
+                Logout
+              </button>
+            </div>
           )}
         </div>
 
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-8">
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`px-6 py-3 rounded-lg font-semibold transition ${
+              activeTab === 'map'
+                ? 'bg-pink-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-pink-50'
+            }`}
+          >
+            🗺️ Explore
+          </button>
           <button
             onClick={() => setActiveTab('collection')}
             className={`px-6 py-3 rounded-lg font-semibold transition ${
@@ -554,52 +793,14 @@ export default function Home() {
           >
             📊 Collection
           </button>
-          <button
-            onClick={() => setActiveTab('map')}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === 'map'
-                ? 'bg-pink-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-pink-50'
-            }`}
-          >
-            🗺️ Explore Princely States
-          </button>
         </div>
 
         {activeTab === 'collection' && (
           <>
-        {/* Password Protection / Add Coin Form */}
+        {/* Add Coin Form - Admin Only */}
+        {isAuthenticated && showAddCoinForm && (
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          {!isAuthenticated ? (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">Admin Access Required</h2>
-              <p className="text-gray-600 mb-4">Enter password to add or delete coins from the collection.</p>
-              <form onSubmit={handlePasswordSubmit} className="max-w-md">
-                <div className="flex gap-2">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setShowPasswordError(false);
-                    }}
-                    placeholder="Enter password"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  />
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200"
-                  >
-                    Login
-                  </button>
-                </div>
-                {showPasswordError && (
-                  <p className="text-red-600 text-sm mt-2">Incorrect password. Please try again.</p>
-                )}
-              </form>
-            </div>
-          ) : (
-            <div>
+          <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Add New Coin</h2>
           <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md">
             <p className="text-sm text-gray-700">
@@ -794,8 +995,8 @@ export default function Home() {
             </div>
           </form>
             </div>
-          )}
         </div>
+        )}
 
         {/* Table of Contents */}
         {groupBySection && coins.length > 0 && (
@@ -1311,7 +1512,58 @@ export default function Home() {
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-6">Explore Princely States</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Explore</h2>
+
+            {/* Section Selector */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Section</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort().map(section => {
+                  const sectionCoins = coins.filter(c => c.section === section).length;
+                  return (
+                    <button
+                      key={section}
+                      onClick={() => {
+                        if (selectedSection === section) {
+                          setSelectedSection(null);
+                          setSelectedSubsection(null);
+                          setSelectedState(null);
+                          setSelectedEuropeanCategory(null);
+                          setSelectedEuropeanPower(null);
+                        } else {
+                          setSelectedSection(section);
+                          setSelectedSubsection(null);
+                          setSelectedState(null);
+                          setSelectedEuropeanCategory(null);
+                          setSelectedEuropeanPower(null);
+                          // Set map mode based on section
+                          if (section === 'Indian Princely States') {
+                            setMapMode('princely');
+                          } else if (section === 'European Colonial Powers in India') {
+                            setMapMode('european');
+                          }
+                        }
+                        setZoom(1);
+                        setPan({ x: 0, y: 0 });
+                      }}
+                      className={`px-4 py-3 rounded-lg transition text-left ${
+                        selectedSection === section
+                          ? 'bg-purple-600 text-white shadow-lg'
+                          : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold">{section}</div>
+                      <div className={`text-xs mt-1 ${selectedSection === section ? 'text-purple-200' : 'text-gray-500'}`}>
+                        {sectionCoins} coin{sectionCoins !== 1 ? 's' : ''}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Princely States Mode */}
+            {selectedSection === 'Indian Princely States' && (<>
 
             {/* Agency Selector and Selected State */}
             <div className="mb-6 flex flex-col lg:flex-row gap-6">
@@ -1420,9 +1672,10 @@ export default function Home() {
                   )}
                   <div className="relative overflow-hidden" style={{ cursor: !isAuthenticated && isPanning ? 'grabbing' : !isAuthenticated ? 'grab' : 'pointer' }}>
                     <canvas
+                      key="princely-map-canvas"
                       ref={(canvas) => {
-                        if (canvas && !canvas.dataset.initialized) {
-                          canvas.dataset.initialized = 'true';
+                        if (canvas && !canvas.dataset.princelyInitialized) {
+                          canvas.dataset.princelyInitialized = 'true';
                           setMapCanvas(canvas);
                           const ctx = canvas.getContext('2d');
                           const img = new Image();
@@ -1435,6 +1688,9 @@ export default function Home() {
                             if (imageData) {
                               setOriginalImageData(imageData);
                             }
+                          };
+                          img.onerror = () => {
+                            console.error('Failed to load Princely States map image');
                           };
                           img.src = '/maps/princely-states.png';
                         }
@@ -1776,6 +2032,320 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            </>)}
+
+            {/* European Colonial Powers Mode */}
+            {selectedSection === 'European Colonial Powers in India' && (<>
+
+            {/* Colonial Power Selector */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Select Colonial Power</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {Array.from(new Set(
+                  coins
+                    .filter(c => c.section === 'European Colonial Powers in India')
+                    .map(c => c.subsection)
+                    .filter(Boolean)
+                )).sort().map(subsection => {
+                  const coinCount = coins.filter(c =>
+                    c.section === 'European Colonial Powers in India' &&
+                    c.subsection === subsection
+                  ).length;
+
+                  return (
+                    <button
+                      key={subsection}
+                      onClick={() => {
+                        setSelectedEuropeanCategory(selectedEuropeanCategory === subsection ? null : subsection);
+                        setSelectedEuropeanPower(null);
+                      }}
+                      className={`px-4 py-3 rounded-lg transition text-left ${
+                        selectedEuropeanCategory === subsection
+                          ? 'bg-purple-600 text-white shadow-lg'
+                          : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold">{subsection}</div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTab('collection');
+                          setTimeout(() => {
+                            const element = document.getElementById(
+                              `subsection-european-colonial-powers-in-india-${subsection.replace(/\s+/g, '-').toLowerCase()}`
+                            );
+                            element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 100);
+                        }}
+                        className={`text-xs mt-1 underline hover:no-underline ${
+                          selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-pink-600 hover:text-pink-800'
+                        }`}
+                      >
+                        {coinCount} coin{coinCount !== 1 ? 's' : ''} →
+                      </button>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+              {/* European Map Section */}
+              <div>
+                <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
+                  {/* Zoom Controls - Only in View Mode */}
+                  {!isAuthenticated && (
+                    <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+                      <button
+                        onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
+                        title="Zoom In"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => setZoom(Math.max(zoom / 1.2, 0.5))}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
+                        title="Zoom Out"
+                      >
+                        −
+                      </button>
+                      <button
+                        onClick={() => {
+                          setZoom(1);
+                          setPan({ x: 0, y: 0 });
+                        }}
+                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300"
+                        title="Reset Zoom"
+                      >
+                        ⟲
+                      </button>
+                      <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300">
+                        {Math.round(zoom * 100)}%
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative overflow-hidden" style={{ cursor: !isAuthenticated && isPanning ? 'grabbing' : !isAuthenticated ? 'grab' : 'pointer' }}>
+                    <canvas
+                      key="european-map-canvas"
+                      ref={(canvas) => {
+                        if (canvas && !canvas.dataset.europeanInitialized) {
+                          canvas.dataset.europeanInitialized = 'true';
+                          setEuropeanMapCanvas(canvas);
+                          const ctx = canvas.getContext('2d');
+                          const img = new Image();
+                          img.onload = () => {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx?.drawImage(img, 0, 0);
+                            const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
+                            if (imageData) {
+                              setEuropeanOriginalImageData(imageData);
+                            }
+                          };
+                          img.onerror = () => {
+                            console.error('Failed to load European map image');
+                          };
+                          img.src = '/maps/european-trading-posts-1600-1750.png';
+                        }
+                      }}
+                      onClick={(e) => {
+                        if (!isAuthenticated && isPanning) return;
+
+                        const canvas = e.currentTarget;
+                        const rect = canvas.getBoundingClientRect();
+
+                        let x, y;
+                        if (isAuthenticated) {
+                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                        } else {
+                          const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                          const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                          x = Math.floor((clickX - pan.x) / zoom);
+                          y = Math.floor((clickY - pan.y) / zoom);
+                        }
+
+                        const ctx = canvas.getContext('2d');
+                        if (ctx && europeanOriginalImageData) {
+                          if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+                            const index = (y * canvas.width + x) * 4;
+                            const pixel = europeanOriginalImageData.data;
+                            const color = `${pixel[index]},${pixel[index + 1]},${pixel[index + 2]}`;
+
+                            const mappings = europeanColorMappings.filter(m => m.color === color);
+
+                            if (mappings.length === 1) {
+                              setSelectedEuropeanPower(mappings[0].state);
+                            } else if (mappings.length > 1) {
+                              setAmbiguousStates({
+                                color,
+                                states: mappings.map(m => m.state)
+                              });
+                            } else {
+                              console.log('Clicked color:', color, 'at', x, y);
+                              if (isAuthenticated) {
+                                setEditingMapping({ state: '', color });
+                                setMappingFormState('');
+                                setShowMappingModal(true);
+                              }
+                            }
+                          }
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        if (!isAuthenticated) {
+                          setIsPanning(true);
+                          setLastPanPosition({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (!isAuthenticated && isPanning) {
+                          const dx = e.clientX - lastPanPosition.x;
+                          const dy = e.clientY - lastPanPosition.y;
+                          setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+                          setLastPanPosition({ x: e.clientX, y: e.clientY });
+                        }
+                      }}
+                      onMouseUp={() => {
+                        if (!isAuthenticated) setIsPanning(false);
+                      }}
+                      onMouseLeave={() => {
+                        if (!isAuthenticated) setIsPanning(false);
+                      }}
+                      onWheel={(e) => {
+                        if (!isAuthenticated) {
+                          e.preventDefault();
+                          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                          setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
+                        }
+                      }}
+                      style={!isAuthenticated ? {
+                        transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                        transformOrigin: '0 0',
+                        transition: isPanning ? 'none' : 'transform 0.1s ease-out'
+                      } : {}}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            {/* European Mapping Management - Admin Only */}
+            {isAuthenticated && (
+              <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">🔧 Manage European Colonial Mappings</h3>
+                {/* Color Conflicts Warning */}
+                {(() => {
+                  const colorGroups = europeanColorMappings.reduce((acc, m) => {
+                    if (!acc[m.color]) acc[m.color] = [];
+                    acc[m.color].push(m.state);
+                    return acc;
+                  }, {} as Record<string, string[]>);
+                  const conflicts = Object.entries(colorGroups).filter(([_, states]) => states.length > 1);
+
+                  if (conflicts.length > 0) {
+                    return (
+                      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Color Conflicts Detected</h4>
+                        <p className="text-sm text-yellow-700 mb-2">
+                          {conflicts.length} color{conflicts.length !== 1 ? 's are' : ' is'} shared by multiple regions:
+                        </p>
+                        <ul className="text-xs text-yellow-700 space-y-1">
+                          {conflicts.map(([color, states]) => (
+                            <li key={color}>
+                              <span className="font-mono">RGB({color})</span>: {states.join(', ')}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
+                  {europeanColorMappings
+                    .sort((a, b) => a.state.localeCompare(b.state))
+                    .map(mapping => {
+                      const hasDuplicate = europeanColorMappings.filter(m => m.color === mapping.color).length > 1;
+                      return (
+                      <div key={mapping.state} className={`border rounded p-3 flex items-center justify-between ${
+                        hasDuplicate ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'
+                      }`}>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm flex items-center gap-2">
+                            {mapping.state}
+                            {hasDuplicate && <span className="text-yellow-600 text-xs">⚠️</span>}
+                          </div>
+                          <div className="text-xs text-gray-500">RGB({mapping.color})</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMapping(mapping);
+                              setMappingFormState(mapping.state);
+                              setShowMappingModal(true);
+                            }}
+                            className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEuropeanMapping(mapping.state)}
+                            className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            </>)}
+
+            {/* Other Sections Mode (no map, just subsections) */}
+            {selectedSection && selectedSection !== 'Indian Princely States' && selectedSection !== 'European Colonial Powers in India' && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Array.from(new Set(
+                    coins
+                      .filter(c => c.section === selectedSection)
+                      .map(c => c.subsection)
+                      .filter(Boolean)
+                  )).sort().map(subsection => {
+                    const subsectionCoins = coins.filter(c =>
+                      c.section === selectedSection && c.subsection === subsection
+                    ).length;
+
+                    return (
+                      <div
+                        key={subsection}
+                        className="px-4 py-3 rounded-lg bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200 transition"
+                      >
+                        <div className="text-sm font-semibold mb-2">{subsection}</div>
+                        <button
+                          onClick={() => {
+                            setActiveTab('collection');
+                            setTimeout(() => {
+                              const element = document.getElementById(
+                                `subsection-${selectedSection.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`
+                              );
+                              element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                          }}
+                          className="text-xs text-pink-600 hover:text-pink-800 underline hover:no-underline"
+                        >
+                          {subsectionCoins} coin{subsectionCoins !== 1 ? 's' : ''} →
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1800,12 +2370,17 @@ export default function Home() {
                       <button
                         key={state}
                         onClick={() => {
-                          setSelectedState(state);
+                          if (mapMode === 'european') {
+                            setSelectedEuropeanPower(state);
+                          } else {
+                            setSelectedState(state);
+                          }
                           setAmbiguousStates(null);
                         }}
                         className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-pink-50 rounded-lg border border-gray-200 transition"
                       >
                         <div className="font-medium text-gray-800">{state}</div>
+                        {mapMode === 'princely' && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1822,6 +2397,7 @@ export default function Home() {
                         >
                           {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''} →
                         </button>
+                        )}
                       </button>
                     );
                   })}
@@ -1843,6 +2419,7 @@ export default function Home() {
             <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
               <h3 className="text-xl font-bold text-gray-800 mb-4">
                 {editingMapping.state ? 'Edit Mapping' : 'Add New Mapping'}
+                {mapMode === 'european' && <span className="text-sm font-normal text-gray-500 ml-2">(European Map)</span>}
               </h3>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1854,26 +2431,43 @@ export default function Home() {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  State Name
+                  {mapMode === 'european' ? 'Region Name' : 'State Name'}
                 </label>
                 <input
                   list="all-states-list"
                   value={mappingFormState}
                   onChange={(e) => setMappingFormState(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  placeholder="Select or type state name..."
+                  placeholder={mapMode === 'european' ? 'Select or type region name...' : 'Select or type state name...'}
                   autoFocus
                 />
-                <datalist id="all-states-list">
-                  {Array.from(new Set(
-                    coins
-                      .filter(c => c.section === 'Indian Princely States')
-                      .map(c => c.subsubsection)
-                      .filter(Boolean)
-                  )).sort().map(state => (
-                    <option key={state} value={state} />
-                  ))}
-                </datalist>
+                {mapMode === 'princely' && (
+                  <datalist id="all-states-list">
+                    {Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States')
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    )).sort().map(state => (
+                      <option key={state} value={state} />
+                    ))}
+                  </datalist>
+                )}
+                {mapMode === 'european' && (
+                  <datalist id="all-states-list">
+                    {Array.from(new Set([
+                      // Show both actual subsubsections and subsection names
+                      ...coins
+                        .filter(c => c.section === 'European Colonial Powers in India' && c.subsubsection)
+                        .map(c => c.subsubsection),
+                      ...coins
+                        .filter(c => c.section === 'European Colonial Powers in India')
+                        .map(c => c.subsection)
+                    ])).sort().map(region => (
+                      <option key={region} value={region} />
+                    ))}
+                  </datalist>
+                )}
               </div>
               <div className="flex gap-3">
                 <button
@@ -1887,7 +2481,7 @@ export default function Home() {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSaveMapping}
+                  onClick={mapMode === 'european' ? handleSaveEuropeanMapping : handleSaveMapping}
                   disabled={!mappingFormState.trim()}
                   className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
