@@ -726,9 +726,35 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">
-            💰 Ram & Dhruvan Coin Collection
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl font-bold text-gray-800">
+              💰 Ram & Dhruvan Coin Collection
+            </h1>
+
+            {/* Tab Navigation */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('map')}
+                className={`px-4 py-2 rounded-lg font-semibold transition text-sm ${
+                  activeTab === 'map'
+                    ? 'bg-pink-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-pink-50'
+                }`}
+              >
+                🗺️ Explore
+              </button>
+              <button
+                onClick={() => setActiveTab('collection')}
+                className={`px-4 py-2 rounded-lg font-semibold transition text-sm ${
+                  activeTab === 'collection'
+                    ? 'bg-pink-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-pink-50'
+                }`}
+              >
+                📊 Collection
+              </button>
+            </div>
+          </div>
 
           {/* Admin Login / Logout */}
           {!isAuthenticated ? (
@@ -769,30 +795,6 @@ export default function Home() {
               </button>
             </div>
           )}
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-8">
-          <button
-            onClick={() => setActiveTab('map')}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === 'map'
-                ? 'bg-pink-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-pink-50'
-            }`}
-          >
-            🗺️ Explore
-          </button>
-          <button
-            onClick={() => setActiveTab('collection')}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === 'collection'
-                ? 'bg-pink-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-pink-50'
-            }`}
-          >
-            📊 Collection
-          </button>
         </div>
 
         {activeTab === 'collection' && (
@@ -1562,6 +1564,11 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Main Content with Sidebar Layout */}
+            <div className="flex gap-6">
+              {/* Left Column - Main Content */}
+              <div className="flex-1 min-w-0">
+
             {/* Princely States Mode */}
             {selectedSection === 'Indian Princely States' && (<>
 
@@ -1608,36 +1615,11 @@ export default function Home() {
                   })}
                 </div>
               </div>
-
-              {/* Selected State Display */}
-              {selectedState && (
-                <div className="lg:w-80 flex-shrink-0">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Selected State</h3>
-                  <div className="p-4 bg-pink-50 border-2 border-pink-300 rounded-lg shadow-md">
-                    <h4 className="font-bold text-gray-800 mb-2 text-lg">{selectedState}</h4>
-                    <button
-                      onClick={() => {
-                        setActiveTab('collection');
-                        setTimeout(() => {
-                          const element = document.getElementById(
-                            `subsubsection-indian-princely-states-${coins.find(c => c.subsubsection === selectedState)?.subsection.replace(/\s+/g, '-').toLowerCase()}-${selectedState.replace(/\s+/g, '-').toLowerCase()}`
-                          );
-                          element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-                      }}
-                      className="text-pink-600 hover:text-pink-800 hover:underline font-medium text-sm"
-                    >
-                      {coins.filter(c => c.section === 'Indian Princely States' && c.subsubsection === selectedState).length} coin{coins.filter(c => c.section === 'Indian Princely States' && c.subsubsection === selectedState).length !== 1 ? 's' : ''} in collection →
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Map Section */}
-              <div className="lg:col-span-3">
-                <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
+            {/* Map Section */}
+            <div className="mb-6">
+              <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
                   {/* Zoom Controls - Only in View Mode */}
                   {!isAuthenticated && (
                     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
@@ -1782,182 +1764,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-              {/* States List */}
-              <div className="border-2 border-gray-300 rounded-lg p-4 max-h-[600px] overflow-y-auto">
-                {!selectedSubsection ? (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500 mb-2">👆 Select an agency above</p>
-                    <p className="text-sm text-gray-400">to view its princely states</p>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="font-semibold text-gray-800 mb-4">
-                      {selectedSubsection}
-                    </h3>
-
-                    {/* All States Button */}
-                    <div className="mb-4">
-                      <button
-                        onClick={() => setSelectedState(null)}
-                        className={`w-full text-left px-4 py-3 rounded-lg transition font-semibold ${
-                          !selectedState
-                            ? 'bg-purple-600 text-white shadow-md'
-                            : 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-2 border-purple-200'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>🗺️ All States</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveTab('collection');
-                              setTimeout(() => {
-                                const element = document.getElementById(
-                                  `subsection-indian-princely-states-${selectedSubsection.replace(/\s+/g, '-').toLowerCase()}`
-                                );
-                                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                              }, 100);
-                            }}
-                            className={`text-sm font-normal underline hover:no-underline ${
-                              !selectedState ? 'text-purple-200' : 'text-purple-600 hover:text-purple-800'
-                            }`}
-                          >
-                            {Array.from(new Set(
-                              coins
-                                .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
-                                .map(c => c.subsubsection)
-                                .filter(Boolean)
-                            )).length} states →
-                          </button>
-                        </div>
-                      </button>
-                    </div>
-
-                {/* Mapped States */}
-                <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center">
-                    <span className="mr-2">✓</span> Mapped on Map ({colorMappings.filter(m =>
-                      coins.some(c =>
-                        c.section === 'Indian Princely States' &&
-                        c.subsubsection === m.state &&
-                        (!selectedSubsection || c.subsection === selectedSubsection)
-                      )
-                    ).length})
-                  </h4>
-                  <div className="space-y-2">
-                    {Array.from(new Set(
-                      coins
-                        .filter(c =>
-                          c.section === 'Indian Princely States' &&
-                          (!selectedSubsection || c.subsection === selectedSubsection)
-                        )
-                        .map(c => c.subsubsection)
-                        .filter(Boolean)
-                    )).sort().filter(state => colorMappings.some(m => m.state === state)).map(state => {
-                      const stateCoins = coins.filter(
-                        c => c.section === 'Indian Princely States' && c.subsubsection === state
-                      );
-                      return (
-                        <button
-                          key={state}
-                          onClick={() => {
-                            setSelectedState(selectedState === state ? null : state);
-                          }}
-                          className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                            selectedState === state
-                              ? 'bg-pink-600 text-white shadow-md'
-                              : 'bg-green-50 hover:bg-pink-50 text-gray-700'
-                          }`}
-                        >
-                          <div className="font-medium">{state}</div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveTab('collection');
-                              setTimeout(() => {
-                                const element = document.getElementById(
-                                  `subsubsection-indian-princely-states-${coins.find(c => c.subsubsection === state)?.subsection.replace(/\s+/g, '-').toLowerCase()}-${state.replace(/\s+/g, '-').toLowerCase()}`
-                                );
-                                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                              }, 100);
-                            }}
-                            className={`text-sm underline hover:no-underline ${selectedState === state ? 'text-pink-100' : 'text-pink-600 hover:text-pink-800'}`}
-                          >
-                            {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''} →
-                          </button>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Unmapped States */}
-                <div>
-                  <h4 className="text-sm font-semibold text-orange-700 mb-2 flex items-center">
-                    <span className="mr-2">⚠</span> Not Mapped Yet ({Array.from(new Set(
-                      coins
-                        .filter(c =>
-                          c.section === 'Indian Princely States' &&
-                          (!selectedSubsection || c.subsection === selectedSubsection)
-                        )
-                        .map(c => c.subsubsection)
-                        .filter(Boolean)
-                    )).filter(state => !colorMappings.some(m => m.state === state)).length})
-                  </h4>
-                  <div className="space-y-2">
-                    {Array.from(new Set(
-                      coins
-                        .filter(c =>
-                          c.section === 'Indian Princely States' &&
-                          (!selectedSubsection || c.subsection === selectedSubsection)
-                        )
-                        .map(c => c.subsubsection)
-                        .filter(Boolean)
-                    )).sort().filter(state => !colorMappings.some(m => m.state === state)).map(state => {
-                      const stateCoins = coins.filter(
-                        c => c.section === 'Indian Princely States' && c.subsubsection === state
-                      );
-                      return (
-                        <button
-                          key={state}
-                          onClick={() => {
-                            setSelectedState(selectedState === state ? null : state);
-                          }}
-                          className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                            selectedState === state
-                              ? 'bg-pink-600 text-white shadow-md'
-                              : 'bg-orange-50 hover:bg-pink-50 text-gray-700 border border-orange-200'
-                          }`}
-                        >
-                          <div className="font-medium">{state}</div>
-                          <div className={`text-sm flex items-center gap-2 ${selectedState === state ? 'text-pink-100' : 'text-gray-500'}`}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveTab('collection');
-                                setTimeout(() => {
-                                  const element = document.getElementById(
-                                    `subsubsection-indian-princely-states-${coins.find(c => c.subsubsection === state)?.subsection.replace(/\s+/g, '-').toLowerCase()}-${state.replace(/\s+/g, '-').toLowerCase()}`
-                                  );
-                                  element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }, 100);
-                              }}
-                              className={`underline hover:no-underline ${selectedState === state ? 'text-pink-100' : 'text-pink-600 hover:text-pink-800'}`}
-                            >
-                              {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''} →
-                            </button>
-                            <span>• Click map to mark</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                  </>
-                )}
-              </div>
-            </div>
 
             {/* Mapping Management - Admin Only */}
             {isAuthenticated && (
@@ -2321,13 +2127,21 @@ export default function Home() {
                     ).length;
 
                     return (
-                      <div
+                      <button
                         key={subsection}
-                        className="px-4 py-3 rounded-lg bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200 transition"
+                        onClick={() => {
+                          setSelectedSubsection(selectedSubsection === subsection ? null : subsection);
+                        }}
+                        className={`w-full px-4 py-3 rounded-lg text-left transition ${
+                          selectedSubsection === subsection
+                            ? 'bg-purple-600 text-white shadow-lg border-2 border-purple-600'
+                            : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                        }`}
                       >
                         <div className="text-sm font-semibold mb-2">{subsection}</div>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setActiveTab('collection');
                             setTimeout(() => {
                               const element = document.getElementById(
@@ -2336,16 +2150,174 @@ export default function Home() {
                               element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }, 100);
                           }}
-                          className="text-xs text-pink-600 hover:text-pink-800 underline hover:no-underline"
+                          className={`text-xs underline hover:no-underline ${
+                            selectedSubsection === subsection
+                              ? 'text-purple-200 hover:text-purple-100'
+                              : 'text-pink-600 hover:text-pink-800'
+                          }`}
                         >
                           {subsectionCoins} coin{subsectionCoins !== 1 ? 's' : ''} →
                         </button>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
               </div>
             )}
+
+              </div>
+              {/* End Left Column */}
+
+              {/* Right Column - Selection Info Box */}
+              <div className="w-80 flex-shrink-0">
+                {(selectedSection || selectedSubsection || selectedState || selectedEuropeanCategory || selectedEuropeanPower) && (
+                  <div className="sticky top-6">
+                    <div className="p-4 bg-pink-50 border-2 border-pink-300 rounded-lg shadow-md">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-3">Current Selection</h3>
+                      <div className="space-y-3">
+                        {selectedSection && (
+                          <div>
+                            <span className="text-xs font-semibold text-gray-600 uppercase">Section:</span>
+                            <div className="text-sm font-bold text-gray-800 mt-1">{selectedSection}</div>
+                          </div>
+                        )}
+                        {(selectedSubsection || selectedEuropeanCategory) && (
+                          <div>
+                            <span className="text-xs font-semibold text-gray-600 uppercase">Subsection:</span>
+                            <div className="text-sm font-bold text-gray-800 mt-1">
+                              {selectedSubsection || selectedEuropeanCategory}
+                            </div>
+                          </div>
+                        )}
+                        {(selectedState || selectedEuropeanPower) && (
+                          <div>
+                            <span className="text-xs font-semibold text-gray-600 uppercase">
+                              {selectedSection === 'Indian Princely States' ? 'State:' : 'Region:'}
+                            </span>
+                            <div className="text-sm font-bold text-gray-800 mt-1">
+                              {selectedState || selectedEuropeanPower}
+                            </div>
+                            <button
+                              onClick={() => {
+                                setActiveTab('collection');
+                                setTimeout(() => {
+                                  let elementId = '';
+                                  if (selectedSection === 'Indian Princely States' && selectedState) {
+                                    const coin = coins.find(c => c.subsubsection === selectedState);
+                                    if (coin) {
+                                      elementId = `subsubsection-indian-princely-states-${coin.subsection.replace(/\s+/g, '-').toLowerCase()}-${selectedState.replace(/\s+/g, '-').toLowerCase()}`;
+                                    }
+                                  } else if (selectedSection === 'European Colonial Powers in India' && selectedEuropeanPower) {
+                                    elementId = `subsubsection-european-colonial-powers-in-india-${selectedEuropeanCategory?.replace(/\s+/g, '-').toLowerCase()}-${selectedEuropeanPower.replace(/\s+/g, '-').toLowerCase()}`;
+                                  }
+                                  if (elementId) {
+                                    const element = document.getElementById(elementId);
+                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }
+                                }, 100);
+                              }}
+                              className="text-pink-600 hover:text-pink-800 hover:underline font-medium text-xs mt-2 block"
+                            >
+                              {(() => {
+                                let count = 0;
+                                if (selectedSection === 'Indian Princely States' && selectedState) {
+                                  count = coins.filter(c => c.section === 'Indian Princely States' && c.subsubsection === selectedState).length;
+                                } else if (selectedSection === 'European Colonial Powers in India' && selectedEuropeanPower) {
+                                  count = coins.filter(c => c.section === 'European Colonial Powers in India' && c.subsection === selectedEuropeanCategory && c.subsubsection === selectedEuropeanPower).length;
+                                }
+                                return `${count} coin${count !== 1 ? 's' : ''}` + (count > 0 ? ' in collection →' : '');
+                              })()}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* States List for Princely States */}
+                      {selectedSection === 'Indian Princely States' && selectedSubsection && (
+                        <div className="mt-4 pt-4 border-t-2 border-pink-200">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                            {selectedSubsection} States
+                          </h4>
+
+                          {/* All States Button */}
+                          <div className="mb-3">
+                            <button
+                              onClick={() => setSelectedState(null)}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition text-sm font-semibold ${
+                                !selectedState
+                                  ? 'bg-purple-600 text-white shadow-md'
+                                  : 'bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span>🗺️ All States</span>
+                                <span className={`text-xs ${!selectedState ? 'text-purple-200' : 'text-purple-600'}`}>
+                                  {Array.from(new Set(
+                                    coins
+                                      .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+                                      .map(c => c.subsubsection)
+                                      .filter(Boolean)
+                                  )).length}
+                                </span>
+                              </div>
+                            </button>
+                          </div>
+
+                          {/* States List */}
+                          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                            {Array.from(new Set(
+                              coins
+                                .filter(c =>
+                                  c.section === 'Indian Princely States' &&
+                                  c.subsection === selectedSubsection
+                                )
+                                .map(c => c.subsubsection)
+                                .filter(Boolean)
+                            )).sort().map(state => {
+                              const stateCoins = coins.filter(
+                                c => c.section === 'Indian Princely States' && c.subsubsection === state
+                              );
+                              const isMapped = colorMappings.some(m => m.state === state);
+                              return (
+                                <button
+                                  key={state}
+                                  onClick={() => {
+                                    setSelectedState(selectedState === state ? null : state);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 rounded-lg transition text-sm ${
+                                    selectedState === state
+                                      ? 'bg-pink-600 text-white shadow-md'
+                                      : isMapped
+                                      ? 'bg-green-50 hover:bg-pink-50 text-gray-700'
+                                      : 'bg-orange-50 hover:bg-pink-50 text-gray-700 border border-orange-200'
+                                  }`}
+                                >
+                                  <div className="font-medium flex items-center gap-2">
+                                    {isMapped ? (
+                                      <span className={`text-xs ${selectedState === state ? 'text-pink-200' : 'text-green-600'}`}>✓</span>
+                                    ) : (
+                                      <span className={`text-xs ${selectedState === state ? 'text-pink-200' : 'text-orange-600'}`}>⚠</span>
+                                    )}
+                                    <span className="truncate">{state}</span>
+                                  </div>
+                                  <div className={`text-xs flex items-center gap-2 mt-1 ${selectedState === state ? 'text-pink-100' : 'text-gray-500'}`}>
+                                    <span>{stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}</span>
+                                    {!isMapped && <span>• Click map</span>}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* End Right Column */}
+
+            </div>
+            {/* End Main Content with Sidebar Layout */}
           </div>
         )}
 
