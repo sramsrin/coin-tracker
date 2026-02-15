@@ -32,6 +32,7 @@ export default function Home() {
   const [showTOC, setShowTOC] = useState(true);
   const [expandedAgencies, setExpandedAgencies] = useState<Set<string>>(new Set());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [password, setPassword] = useState('');
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [editingCoin, setEditingCoin] = useState<Coin | null>(null);
@@ -489,12 +490,20 @@ export default function Home() {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If password input isn't shown yet, just show it
+    if (!showPasswordInput) {
+      setShowPasswordInput(true);
+      return;
+    }
+
     // Simple password check - in production, this should be done server-side
     if (password === 'SRMPv7006@') {
       setIsAuthenticated(true);
       localStorage.setItem('isAuthenticated', 'true');
       setPassword('');
       setShowPasswordError(false);
+      setShowPasswordInput(false);
     } else {
       setShowPasswordError(true);
       setPassword('');
@@ -506,6 +515,7 @@ export default function Home() {
     localStorage.removeItem('isAuthenticated');
     setPassword('');
     setShowPasswordError(false);
+    setShowPasswordInput(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -760,16 +770,19 @@ export default function Home() {
           {/* Admin Login / Logout */}
           {!isAuthenticated ? (
             <form onSubmit={handlePasswordSubmit} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setShowPasswordError(false);
-                }}
-                placeholder="Admin password"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm w-full sm:w-auto"
-              />
+              {showPasswordInput && (
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setShowPasswordError(false);
+                  }}
+                  placeholder="Admin password"
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm w-full sm:w-auto"
+                  autoFocus
+                />
+              )}
               <button
                 type="submit"
                 className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition duration-200 text-sm whitespace-nowrap"
