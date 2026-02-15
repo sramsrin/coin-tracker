@@ -85,6 +85,7 @@ export default function Home() {
     fetchCoins();
     fetchColorMappings();
     fetchEuropeanColorMappings();
+    fetchTextNote();
 
     // Restore authentication from localStorage
     const savedAuth = localStorage.getItem('isAuthenticated');
@@ -92,6 +93,15 @@ export default function Home() {
       setIsAuthenticated(true);
     }
   }, []);
+
+  // Save text box value to database with debouncing (500ms delay)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      saveTextNote(textBoxValue);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [textBoxValue]);
 
   const fetchColorMappings = async () => {
     try {
@@ -114,6 +124,32 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error fetching European color mappings:', error);
+    }
+  };
+
+  const fetchTextNote = async () => {
+    try {
+      const response = await fetch('/api/text-note');
+      if (response.ok) {
+        const data = await response.json();
+        setTextBoxValue(data.text || '');
+      }
+    } catch (error) {
+      console.error('Error fetching text note:', error);
+    }
+  };
+
+  const saveTextNote = async (text: string) => {
+    try {
+      await fetch('/api/text-note', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+    } catch (error) {
+      console.error('Error saving text note:', error);
     }
   };
 
@@ -1529,7 +1565,34 @@ export default function Home() {
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4">Explore</h2>
+            {/* Text display/edit area - Box only in edit mode */}
+            <div className="mb-6">
+              {isAuthenticated ? (
+                <textarea
+                  value={textBoxValue}
+                  onChange={(e) => setTextBoxValue(e.target.value)}
+                  placeholder="Type here (edit mode enabled)..."
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none border-purple-200 bg-white bg-opacity-50 text-gray-400 placeholder-gray-300 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 focus:text-gray-500"
+                  style={{
+                    fontFamily: 'Georgia, serif',
+                    fontStyle: 'italic',
+                    lineHeight: '1.6'
+                  }}
+                />
+              ) : (
+                <div
+                  className="text-gray-400 whitespace-pre-wrap"
+                  style={{
+                    fontFamily: 'Georgia, serif',
+                    fontStyle: 'italic',
+                    lineHeight: '1.6'
+                  }}
+                >
+                  {textBoxValue || ''}
+                </div>
+              )}
+            </div>
 
             {/* Section Selector */}
             <div className="mb-6">
@@ -1779,22 +1842,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-            {/* Full-width Text Box - Always visible, only editable in edit mode */}
-            <div className="mt-6">
-              <input
-                type="text"
-                value={textBoxValue}
-                onChange={(e) => setTextBoxValue(e.target.value)}
-                disabled={!isAuthenticated}
-                placeholder={isAuthenticated ? "Type here (edit mode enabled)..." : "Login to enable editing"}
-                className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
-                  isAuthenticated
-                    ? 'border-purple-300 bg-white text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200'
-                    : 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed'
-                }`}
-              />
-            </div>
 
             {/* Mapping Management - Admin Only */}
             {isAuthenticated && (
