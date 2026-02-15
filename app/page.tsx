@@ -1634,8 +1634,8 @@ export default function Home() {
             {/* Map Section */}
             <div className="mb-6">
               <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
-                  {/* Zoom Controls - Only in View Mode */}
-                  {!isAuthenticated && (
+                  {/* Zoom Controls - Only in Edit Mode */}
+                  {isAuthenticated && (
                     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                       <button
                         onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
@@ -1666,7 +1666,7 @@ export default function Home() {
                       </div>
                     </div>
                   )}
-                  <div className="relative overflow-hidden" style={{ cursor: !isAuthenticated && isPanning ? 'grabbing' : !isAuthenticated ? 'grab' : 'pointer' }}>
+                  <div className="relative overflow-hidden" style={{ cursor: isAuthenticated && isPanning ? 'grabbing' : isAuthenticated ? 'grab' : 'pointer' }}>
                     <canvas
                       key="princely-map-canvas"
                       ref={(canvas) => {
@@ -1692,22 +1692,22 @@ export default function Home() {
                         }
                       }}
                       onClick={(e) => {
-                        if (!isAuthenticated && isPanning) return; // Don't click while panning in view mode
+                        if (isAuthenticated && isPanning) return; // Don't click while panning in edit mode
 
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
                         let x, y;
                         if (isAuthenticated) {
-                          // Admin mode - simple click without zoom adjustment
-                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
-                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
-                        } else {
-                          // View mode - adjust for zoom and pan
+                          // Edit mode - adjust for zoom and pan
                           const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
                           const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
                           x = Math.floor((clickX - pan.x) / zoom);
                           y = Math.floor((clickY - pan.y) / zoom);
+                        } else {
+                          // View mode - simple click without zoom adjustment
+                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
                         }
 
                         const ctx = canvas.getContext('2d');
@@ -1742,13 +1742,13 @@ export default function Home() {
                         }
                       }}
                       onMouseDown={(e) => {
-                        if (!isAuthenticated) {
+                        if (isAuthenticated) {
                           setIsPanning(true);
                           setLastPanPosition({ x: e.clientX, y: e.clientY });
                         }
                       }}
                       onMouseMove={(e) => {
-                        if (!isAuthenticated && isPanning) {
+                        if (isAuthenticated && isPanning) {
                           const dx = e.clientX - lastPanPosition.x;
                           const dy = e.clientY - lastPanPosition.y;
                           setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
@@ -1756,19 +1756,19 @@ export default function Home() {
                         }
                       }}
                       onMouseUp={() => {
-                        if (!isAuthenticated) setIsPanning(false);
+                        if (isAuthenticated) setIsPanning(false);
                       }}
                       onMouseLeave={() => {
-                        if (!isAuthenticated) setIsPanning(false);
+                        if (isAuthenticated) setIsPanning(false);
                       }}
                       onWheel={(e) => {
-                        if (!isAuthenticated) {
+                        if (isAuthenticated) {
                           e.preventDefault();
                           const delta = e.deltaY > 0 ? 0.9 : 1.1;
                           setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
                         }
                       }}
-                      style={!isAuthenticated ? {
+                      style={isAuthenticated ? {
                         transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
                         transformOrigin: '0 0',
                         transition: isPanning ? 'none' : 'transform 0.1s ease-out'
@@ -1912,8 +1912,8 @@ export default function Home() {
               {/* European Map Section */}
               <div>
                 <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
-                  {/* Zoom Controls - Only in View Mode */}
-                  {!isAuthenticated && (
+                  {/* Zoom Controls - Only in Edit Mode */}
+                  {isAuthenticated && (
                     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                       <button
                         onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
@@ -1944,7 +1944,7 @@ export default function Home() {
                       </div>
                     </div>
                   )}
-                  <div className="relative overflow-hidden" style={{ cursor: !isAuthenticated && isPanning ? 'grabbing' : !isAuthenticated ? 'grab' : 'pointer' }}>
+                  <div className="relative overflow-hidden" style={{ cursor: isAuthenticated && isPanning ? 'grabbing' : isAuthenticated ? 'grab' : 'pointer' }}>
                     <canvas
                       key="european-map-canvas"
                       ref={(canvas) => {
@@ -1969,20 +1969,20 @@ export default function Home() {
                         }
                       }}
                       onClick={(e) => {
-                        if (!isAuthenticated && isPanning) return;
+                        if (isAuthenticated && isPanning) return;
 
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
                         let x, y;
                         if (isAuthenticated) {
-                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
-                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
-                        } else {
                           const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
                           const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
                           x = Math.floor((clickX - pan.x) / zoom);
                           y = Math.floor((clickY - pan.y) / zoom);
+                        } else {
+                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
                         }
 
                         const ctx = canvas.getContext('2d');
@@ -2013,13 +2013,13 @@ export default function Home() {
                         }
                       }}
                       onMouseDown={(e) => {
-                        if (!isAuthenticated) {
+                        if (isAuthenticated) {
                           setIsPanning(true);
                           setLastPanPosition({ x: e.clientX, y: e.clientY });
                         }
                       }}
                       onMouseMove={(e) => {
-                        if (!isAuthenticated && isPanning) {
+                        if (isAuthenticated && isPanning) {
                           const dx = e.clientX - lastPanPosition.x;
                           const dy = e.clientY - lastPanPosition.y;
                           setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
@@ -2027,19 +2027,19 @@ export default function Home() {
                         }
                       }}
                       onMouseUp={() => {
-                        if (!isAuthenticated) setIsPanning(false);
+                        if (isAuthenticated) setIsPanning(false);
                       }}
                       onMouseLeave={() => {
-                        if (!isAuthenticated) setIsPanning(false);
+                        if (isAuthenticated) setIsPanning(false);
                       }}
                       onWheel={(e) => {
-                        if (!isAuthenticated) {
+                        if (isAuthenticated) {
                           e.preventDefault();
                           const delta = e.deltaY > 0 ? 0.9 : 1.1;
                           setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
                         }
                       }}
-                      style={!isAuthenticated ? {
+                      style={isAuthenticated ? {
                         transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
                         transformOrigin: '0 0',
                         transition: isPanning ? 'none' : 'transform 0.1s ease-out'
