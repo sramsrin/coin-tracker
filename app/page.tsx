@@ -724,7 +724,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 p-4 sm:p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
