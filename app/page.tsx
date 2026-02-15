@@ -58,6 +58,7 @@ export default function Home() {
   const [europeanColorMappings, setEuropeanColorMappings] = useState<{state: string, color: string}[]>([]);
   const [europeanMapCanvas, setEuropeanMapCanvas] = useState<HTMLCanvasElement | null>(null);
   const [europeanOriginalImageData, setEuropeanOriginalImageData] = useState<ImageData | null>(null);
+  const [textBoxValue, setTextBoxValue] = useState('');
   const [selectedEuropeanPower, setSelectedEuropeanPower] = useState<string | null>(null);
   const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
