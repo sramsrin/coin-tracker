@@ -65,6 +65,11 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const isTextLoadedRef = useRef(false);
   const initialTextRef = useRef('');
+  const previousSelectionRef = useRef<{section: string | null, subsection: string | null, subsubsection: string | null}>({
+    section: null,
+    subsection: null,
+    subsubsection: null
+  });
   const [selectedEuropeanPower, setSelectedEuropeanPower] = useState<string | null>(null);
   const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
@@ -100,6 +105,28 @@ export default function Home() {
     }
   }, []);
 
+  // Fetch text note when selection changes (with auto-save)
+  useEffect(() => {
+    // Only fetch after initial load
+    if (isTextLoadedRef.current) {
+      // Auto-save current text before switching if there are unsaved changes
+      const autoSaveAndFetch = async () => {
+        if (hasUnsavedChanges && textBoxValue !== initialTextRef.current) {
+          // Save to the PREVIOUS selection context
+          await saveTextNote(textBoxValue, previousSelectionRef.current);
+        }
+        // Update the previous selection ref to current selection
+        previousSelectionRef.current = getCurrentSelectionContext();
+        // Fetch text for the new selection
+        fetchTextNote();
+      };
+      autoSaveAndFetch();
+    } else {
+      // On first load, just update the previous selection ref
+      previousSelectionRef.current = getCurrentSelectionContext();
+    }
+  }, [selectedSection, selectedSubsection, selectedState, selectedEuropeanCategory, selectedEuropeanPower]);
+
   const fetchColorMappings = async () => {
     try {
       const response = await fetch('/api/map-points');
@@ -124,14 +151,31 @@ export default function Home() {
     }
   };
 
+  // Helper to get current selection context
+  const getCurrentSelectionContext = () => {
+    let section = selectedSection;
+    let subsection = selectedSubsection || selectedEuropeanCategory;
+    let subsubsection = selectedState || selectedEuropeanPower;
+
+    return { section, subsection, subsubsection };
+  };
+
   const fetchTextNote = async () => {
     try {
-      const response = await fetch('/api/text-note');
+      const { section, subsection, subsubsection } = getCurrentSelectionContext();
+
+      const params = new URLSearchParams();
+      if (section) params.append('section', section);
+      if (subsection) params.append('subsection', subsection);
+      if (subsubsection) params.append('subsubsection', subsubsection);
+
+      const response = await fetch(`/api/section-notes?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         const text = data.text || '';
         setTextBoxValue(text);
         initialTextRef.current = text;
+        setHasUnsavedChanges(false);
       }
     } catch (error) {
       console.error('Error fetching text note:', error);
@@ -141,14 +185,21 @@ export default function Home() {
     }
   };
 
-  const saveTextNote = async (text: string) => {
+  const saveTextNote = async (text: string, context?: {section: string | null, subsection: string | null, subsubsection: string | null}) => {
     try {
-      await fetch('/api/text-note', {
+      const { section, subsection, subsubsection } = context || getCurrentSelectionContext();
+
+      await fetch('/api/section-notes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({
+          section: section || undefined,
+          subsection: subsection || undefined,
+          subsubsection: subsubsection || undefined,
+          text
+        }),
       });
     } catch (error) {
       console.error('Error saving text note:', error);
@@ -194,7 +245,7 @@ export default function Home() {
       return;
     }
 
-    // Get colors for selected colonial power
+    // Get colors for selected trading company
     const selectedColors = categoryNames
       .map(name => {
         const mapping = europeanColorMappings.find(m => m.state === name);
@@ -225,7 +276,7 @@ export default function Home() {
       const g = data[i + 1];
       const b = data[i + 2];
 
-      // Check if this pixel matches the selected colonial power's color
+      // Check if this pixel matches the selected trading company's color
       const isSelectedColor = selectedColors.some(
         color => color.r === r && color.g === g && color.b === b
       );
@@ -281,7 +332,7 @@ export default function Home() {
     console.log('Enhanced dots:', coloredPixels.length);
   };
 
-  // Highlight European colonial power when selection changes
+  // Highlight European trading company when selection changes
   useEffect(() => {
     if (activeTab === 'map' && mapMode === 'european') {
       let regionsToHighlight: string[] = [];
@@ -291,7 +342,7 @@ export default function Home() {
         // When subsubsection is empty, use the subsection name itself
         const subsectionRegions = Array.from(new Set(
           coins
-            .filter(c => c.section === 'European Colonial Powers in India' && c.subsection === selectedEuropeanCategory)
+            .filter(c => c.section === 'European Trading Companies' && c.subsection === selectedEuropeanCategory)
             .map(c => c.subsubsection || c.subsection)
         ));
 
@@ -1590,8 +1641,29 @@ export default function Home() {
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            {/* Text display/edit area - Box only in edit mode */}
-            <div className="mb-8">
+            {/* Text display/edit area - Sticky at top */}
+            <div className="sticky top-0 z-50 bg-white pb-6 mb-2 -mt-6 -mx-6 px-6 pt-6 shadow-sm">
+              {/* Context Label */}
+              <div className="mb-3 px-2">
+                <div className="text-sm font-semibold text-gray-700">
+                  {(() => {
+                    const { section, subsection, subsubsection } = getCurrentSelectionContext();
+                    if (!section) {
+                      return <span className="text-purple-600">📝 Introduction</span>;
+                    }
+                    let parts = [`Section: ${section}`];
+                    if (subsection) {
+                      parts.push(`Subsection: ${subsection}`);
+                    }
+                    if (subsubsection) {
+                      const label = section === 'Indian Princely States' ? 'State' : 'Region';
+                      parts.push(`${label}: ${subsubsection}`);
+                    }
+                    return <span className="text-purple-600">📝 {parts.join(' → ')}</span>;
+                  })()}
+                </div>
+              </div>
+
               {isAuthenticated ? (
                 <div>
                   <textarea
@@ -1651,7 +1723,11 @@ export default function Home() {
                       {isTextExpanded ? '← Show less' : 'Read more →'}
                     </button>
                   </div>
-                ) : null
+                ) : (
+                  <div className="text-gray-400 italic text-center py-6">
+                    No description available for this selection.
+                  </div>
+                )
               )}
             </div>
 
@@ -1680,7 +1756,7 @@ export default function Home() {
                           // Set map mode based on section
                           if (section === 'Indian Princely States') {
                             setMapMode('princely');
-                          } else if (section === 'European Colonial Powers in India') {
+                          } else if (section === 'European Trading Companies') {
                             setMapMode('european');
                           }
                         }
@@ -1703,10 +1779,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Main Content with Sidebar Layout */}
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Left Column - Main Content */}
-              <div className="flex-1 min-w-0 order-2 lg:order-1">
+            {/* Main Content */}
+            <div>
 
             {/* Princely States Mode */}
             {selectedSection === 'Indian Princely States' && (<>
@@ -1754,6 +1828,48 @@ export default function Home() {
                   })}
                 </div>
               </div>
+
+              {/* State Selector - Only shown when a subsection is selected */}
+              {selectedSubsection && (
+                <div className="mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                    Select State - {selectedSubsection}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+                        .map(c => c.subsubsection)
+                        .filter(Boolean)
+                    )).sort().map(state => {
+                      const stateCoins = coins.filter(
+                        c => c.section === 'Indian Princely States' && c.subsubsection === state
+                      );
+                      const isMapped = colorMappings.some(m => m.state === state);
+
+                      return (
+                        <button
+                          key={state}
+                          onClick={() => {
+                            setSelectedState(selectedState === state ? null : state);
+                          }}
+                          className={`px-4 py-3 rounded-lg transition text-left ${
+                            selectedState === state
+                              ? 'bg-purple-600 text-white shadow-lg'
+                              : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                          }`}
+                        >
+                          <div className="text-sm font-semibold">{state}</div>
+                          <div className={`text-xs mt-1 ${selectedState === state ? 'text-purple-200' : 'text-gray-500'}`}>
+                            {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}
+                            {isMapped && <span> • Mapped</span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Map Section */}
@@ -1980,21 +2096,21 @@ export default function Home() {
 
             </>)}
 
-            {/* European Colonial Powers Mode */}
-            {selectedSection === 'European Colonial Powers in India' && (<>
+            {/* European Trading Companies Mode */}
+            {selectedSection === 'European Trading Companies' && (<>
 
-            {/* Colonial Power Selector */}
+            {/* Trading Company Selector */}
             <div className="mb-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Colonial Power</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Trading Company</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {Array.from(new Set(
                   coins
-                    .filter(c => c.section === 'European Colonial Powers in India')
+                    .filter(c => c.section === 'European Trading Companies')
                     .map(c => c.subsection)
                     .filter(Boolean)
                 )).sort().map(subsection => {
                   const coinCount = coins.filter(c =>
-                    c.section === 'European Colonial Powers in India' &&
+                    c.section === 'European Trading Companies' &&
                     c.subsection === subsection
                   ).length;
 
@@ -2018,7 +2134,7 @@ export default function Home() {
                           setActiveTab('collection');
                           setTimeout(() => {
                             const element = document.getElementById(
-                              `subsection-european-colonial-powers-in-india-${subsection.replace(/\s+/g, '-').toLowerCase()}`
+                              `subsection-european-trading-companies-${subsection.replace(/\s+/g, '-').toLowerCase()}`
                             );
                             element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                           }, 100);
@@ -2178,7 +2294,7 @@ export default function Home() {
             {/* European Mapping Management - Admin Only */}
             {isAuthenticated && (
               <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">🔧 Manage European Colonial Mappings</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">🔧 Manage European Trading Company Mappings</h3>
                 {/* Color Conflicts Warning */}
                 {(() => {
                   const colorGroups = europeanColorMappings.reduce((acc, m) => {
@@ -2251,7 +2367,7 @@ export default function Home() {
             </>)}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'Indian Princely States' && selectedSection !== 'European Colonial Powers in India' && (
+            {selectedSection && selectedSection !== 'Indian Princely States' && selectedSection !== 'European Trading Companies' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -2304,159 +2420,8 @@ export default function Home() {
               </div>
             )}
 
-              </div>
-              {/* End Left Column */}
-
-              {/* Right Column - Selection Info Box */}
-              <div className="w-full lg:w-80 flex-shrink-0 order-1 lg:order-2">
-                {(selectedSection || selectedSubsection || selectedState || selectedEuropeanCategory || selectedEuropeanPower) && (
-                  <div className="lg:sticky lg:top-6">
-                    <div className="p-4 bg-pink-50 border-2 border-pink-300 rounded-lg shadow-md">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-3">Current Selection</h3>
-                      <div className="space-y-3">
-                        {selectedSection && (
-                          <div>
-                            <span className="text-xs font-semibold text-gray-600 uppercase">Section:</span>
-                            <div className="text-sm font-bold text-gray-800 mt-1">{selectedSection}</div>
-                          </div>
-                        )}
-                        {(selectedSubsection || selectedEuropeanCategory) && (
-                          <div>
-                            <span className="text-xs font-semibold text-gray-600 uppercase">Subsection:</span>
-                            <div className="text-sm font-bold text-gray-800 mt-1">
-                              {selectedSubsection || selectedEuropeanCategory}
-                            </div>
-                          </div>
-                        )}
-                        {(selectedState || selectedEuropeanPower) && (
-                          <div>
-                            <span className="text-xs font-semibold text-gray-600 uppercase">
-                              {selectedSection === 'Indian Princely States' ? 'State:' : 'Region:'}
-                            </span>
-                            <div className="text-sm font-bold text-gray-800 mt-1">
-                              {selectedState || selectedEuropeanPower}
-                            </div>
-                            <button
-                              onClick={() => {
-                                setActiveTab('collection');
-                                setTimeout(() => {
-                                  let elementId = '';
-                                  if (selectedSection === 'Indian Princely States' && selectedState) {
-                                    const coin = coins.find(c => c.subsubsection === selectedState);
-                                    if (coin) {
-                                      elementId = `subsubsection-indian-princely-states-${coin.subsection.replace(/\s+/g, '-').toLowerCase()}-${selectedState.replace(/\s+/g, '-').toLowerCase()}`;
-                                    }
-                                  } else if (selectedSection === 'European Colonial Powers in India' && selectedEuropeanPower) {
-                                    elementId = `subsubsection-european-colonial-powers-in-india-${selectedEuropeanCategory?.replace(/\s+/g, '-').toLowerCase()}-${selectedEuropeanPower.replace(/\s+/g, '-').toLowerCase()}`;
-                                  }
-                                  if (elementId) {
-                                    const element = document.getElementById(elementId);
-                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                  }
-                                }, 100);
-                              }}
-                              className="text-pink-600 hover:text-pink-800 hover:underline font-medium text-xs mt-2 block"
-                            >
-                              {(() => {
-                                let count = 0;
-                                if (selectedSection === 'Indian Princely States' && selectedState) {
-                                  count = coins.filter(c => c.section === 'Indian Princely States' && c.subsubsection === selectedState).length;
-                                } else if (selectedSection === 'European Colonial Powers in India' && selectedEuropeanPower) {
-                                  count = coins.filter(c => c.section === 'European Colonial Powers in India' && c.subsection === selectedEuropeanCategory && c.subsubsection === selectedEuropeanPower).length;
-                                }
-                                return `${count} coin${count !== 1 ? 's' : ''}` + (count > 0 ? ' in collection →' : '');
-                              })()}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* States List for Princely States */}
-                      {selectedSection === 'Indian Princely States' && selectedSubsection && (
-                        <div className="mt-4 pt-4 border-t-2 border-pink-200">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                            {selectedSubsection} States
-                          </h4>
-
-                          {/* All States Button */}
-                          <div className="mb-3">
-                            <button
-                              onClick={() => setSelectedState(null)}
-                              className={`w-full text-left px-3 py-2 rounded-lg transition text-sm font-semibold ${
-                                !selectedState
-                                  ? 'bg-purple-600 text-white shadow-md'
-                                  : 'bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span>🗺️ All States</span>
-                                <span className={`text-xs ${!selectedState ? 'text-purple-200' : 'text-purple-600'}`}>
-                                  {Array.from(new Set(
-                                    coins
-                                      .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
-                                      .map(c => c.subsubsection)
-                                      .filter(Boolean)
-                                  )).length}
-                                </span>
-                              </div>
-                            </button>
-                          </div>
-
-                          {/* States List */}
-                          <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                            {Array.from(new Set(
-                              coins
-                                .filter(c =>
-                                  c.section === 'Indian Princely States' &&
-                                  c.subsection === selectedSubsection
-                                )
-                                .map(c => c.subsubsection)
-                                .filter(Boolean)
-                            )).sort().map(state => {
-                              const stateCoins = coins.filter(
-                                c => c.section === 'Indian Princely States' && c.subsubsection === state
-                              );
-                              const isMapped = colorMappings.some(m => m.state === state);
-                              return (
-                                <button
-                                  key={state}
-                                  onClick={() => {
-                                    setSelectedState(selectedState === state ? null : state);
-                                  }}
-                                  className={`w-full text-left px-3 py-2 rounded-lg transition text-sm ${
-                                    selectedState === state
-                                      ? 'bg-pink-600 text-white shadow-md'
-                                      : isMapped
-                                      ? 'bg-green-50 hover:bg-pink-50 text-gray-700'
-                                      : 'bg-orange-50 hover:bg-pink-50 text-gray-700 border border-orange-200'
-                                  }`}
-                                >
-                                  <div className="font-medium flex items-center gap-2">
-                                    {isMapped ? (
-                                      <span className={`text-xs ${selectedState === state ? 'text-pink-200' : 'text-green-600'}`}>✓</span>
-                                    ) : (
-                                      <span className={`text-xs ${selectedState === state ? 'text-pink-200' : 'text-orange-600'}`}>⚠</span>
-                                    )}
-                                    <span className="truncate">{state}</span>
-                                  </div>
-                                  <div className={`text-xs flex items-center gap-2 mt-1 ${selectedState === state ? 'text-pink-100' : 'text-gray-500'}`}>
-                                    <span>{stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}</span>
-                                    {!isMapped && <span>• Click map</span>}
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-              {/* End Right Column */}
-
             </div>
-            {/* End Main Content with Sidebar Layout */}
+            {/* End Main Content */}
           </div>
         )}
 
@@ -2569,10 +2534,10 @@ export default function Home() {
                     {Array.from(new Set([
                       // Show both actual subsubsections and subsection names
                       ...coins
-                        .filter(c => c.section === 'European Colonial Powers in India' && c.subsubsection)
+                        .filter(c => c.section === 'European Trading Companies' && c.subsubsection)
                         .map(c => c.subsubsection),
                       ...coins
-                        .filter(c => c.section === 'European Colonial Powers in India')
+                        .filter(c => c.section === 'European Trading Companies')
                         .map(c => c.subsection)
                     ])).sort().map(region => (
                       <option key={region} value={region} />
