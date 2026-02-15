@@ -1780,6 +1780,22 @@ export default function Home() {
                 </div>
               </div>
 
+            {/* Full-width Text Box - Always visible, only editable in edit mode */}
+            <div className="mt-6">
+              <input
+                type="text"
+                value={textBoxValue}
+                onChange={(e) => setTextBoxValue(e.target.value)}
+                disabled={!isAuthenticated}
+                placeholder={isAuthenticated ? "Type here (edit mode enabled)..." : "Login to enable editing"}
+                className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                  isAuthenticated
+                    ? 'border-purple-300 bg-white text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200'
+                    : 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed'
+                }`}
+              />
+            </div>
+
             {/* Mapping Management - Admin Only */}
             {isAuthenticated && (
               <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
