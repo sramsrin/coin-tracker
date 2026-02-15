@@ -1,4 +1,5 @@
 'use client';
+// Test commit - responsive design updates
 
 import { useState, useEffect } from 'react';
 
