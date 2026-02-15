@@ -1,7 +1,7 @@
 'use client';
 // Test commit - responsive design updates
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Coin {
   id: string;
@@ -59,6 +59,12 @@ export default function Home() {
   const [europeanMapCanvas, setEuropeanMapCanvas] = useState<HTMLCanvasElement | null>(null);
   const [europeanOriginalImageData, setEuropeanOriginalImageData] = useState<ImageData | null>(null);
   const [textBoxValue, setTextBoxValue] = useState('');
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const isTextLoadedRef = useRef(false);
+  const initialTextRef = useRef('');
   const [selectedEuropeanPower, setSelectedEuropeanPower] = useState<string | null>(null);
   const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
@@ -94,15 +100,6 @@ export default function Home() {
     }
   }, []);
 
-  // Save text box value to database with debouncing (500ms delay)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      saveTextNote(textBoxValue);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [textBoxValue]);
-
   const fetchColorMappings = async () => {
     try {
       const response = await fetch('/api/map-points');
@@ -132,10 +129,15 @@ export default function Home() {
       const response = await fetch('/api/text-note');
       if (response.ok) {
         const data = await response.json();
-        setTextBoxValue(data.text || '');
+        const text = data.text || '';
+        setTextBoxValue(text);
+        initialTextRef.current = text;
       }
     } catch (error) {
       console.error('Error fetching text note:', error);
+    } finally {
+      // Mark as loaded regardless of success/failure
+      isTextLoadedRef.current = true;
     }
   };
 
@@ -151,6 +153,29 @@ export default function Home() {
     } catch (error) {
       console.error('Error saving text note:', error);
     }
+  };
+
+  const handleManualSave = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    try {
+      await saveTextNote(textBoxValue);
+      initialTextRef.current = textBoxValue;
+      setHasUnsavedChanges(false);
+      setSaveSuccess(true);
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTextChange = (newText: string) => {
+    setTextBoxValue(newText);
+    setHasUnsavedChanges(newText !== initialTextRef.current);
+    setSaveSuccess(false);
   };
 
   const highlightEuropeanOnMap = (categoryNames: string[] | null) => {
@@ -1566,31 +1591,67 @@ export default function Home() {
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
             {/* Text display/edit area - Box only in edit mode */}
-            <div className="mb-6">
+            <div className="mb-8">
               {isAuthenticated ? (
-                <textarea
-                  value={textBoxValue}
-                  onChange={(e) => setTextBoxValue(e.target.value)}
-                  placeholder="Type here (edit mode enabled)..."
-                  rows={4}
-                  className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none border-purple-200 bg-white bg-opacity-50 text-gray-400 placeholder-gray-300 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 focus:text-gray-500"
-                  style={{
-                    fontFamily: 'Georgia, serif',
-                    fontStyle: 'italic',
-                    lineHeight: '1.6'
-                  }}
-                />
-              ) : (
-                <div
-                  className="text-gray-400 whitespace-pre-wrap"
-                  style={{
-                    fontFamily: 'Georgia, serif',
-                    fontStyle: 'italic',
-                    lineHeight: '1.6'
-                  }}
-                >
-                  {textBoxValue || ''}
+                <div>
+                  <textarea
+                    value={textBoxValue}
+                    onChange={(e) => handleTextChange(e.target.value)}
+                    placeholder="Type here (edit mode enabled)..."
+                    rows={8}
+                    className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none border-purple-200 bg-white bg-opacity-50 text-gray-400 placeholder-gray-300 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 focus:text-gray-500"
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontStyle: 'italic',
+                      lineHeight: '1.8',
+                      fontSize: '1.05rem'
+                    }}
+                  />
+                  <div className="flex items-center gap-3 mt-3">
+                    <button
+                      onClick={handleManualSave}
+                      disabled={!hasUnsavedChanges || isSaving}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                        hasUnsavedChanges && !isSaving
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white cursor-pointer'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </button>
+                    {saveSuccess && (
+                      <span className="text-green-600 text-sm italic">✓ Saved successfully</span>
+                    )}
+                    {hasUnsavedChanges && !isSaving && (
+                      <span className="text-orange-500 text-sm italic">Unsaved changes</span>
+                    )}
+                  </div>
                 </div>
+              ) : (
+                textBoxValue ? (
+                  <div className="prose prose-lg max-w-none">
+                    <div
+                      className={`text-gray-600 whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
+                        !isTextExpanded ? 'line-clamp-3' : ''
+                      }`}
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'italic',
+                        lineHeight: '1.8',
+                        fontSize: '1.05rem',
+                        letterSpacing: '0.01em'
+                      }}
+                    >
+                      {textBoxValue}
+                    </div>
+                    <button
+                      onClick={() => setIsTextExpanded(!isTextExpanded)}
+                      className="mt-2 text-sm text-purple-600 hover:text-purple-800 italic transition-colors duration-200"
+                    >
+                      {isTextExpanded ? '← Show less' : 'Read more →'}
+                    </button>
+                  </div>
+                ) : null
               )}
             </div>
 
