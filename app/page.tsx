@@ -729,7 +729,7 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
-              💰 Ram & Dhruvan Coin Collection
+              Ram & Dhruvan Coin Collection
             </h1>
 
             {/* Tab Navigation */}
