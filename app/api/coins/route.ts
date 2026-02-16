@@ -19,6 +19,7 @@ interface Coin {
   numberAndNotes: string;
   obverse: string;
   reverse: string;
+  date: string;
 }
 
 // Helper function to read coins from KV
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       numberAndNotes: body.numberAndNotes?.trim() || '',
       obverse: body.obverse?.trim() || '',
       reverse: body.reverse?.trim() || '',
+      date: body.date?.trim() || '',
     };
 
     coins.push(newCoin);
