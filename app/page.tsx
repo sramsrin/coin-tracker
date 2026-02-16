@@ -548,6 +548,13 @@ export default function Home() {
       return sortDirection === 'asc' ? aSlot - bSlot : bSlot - aSlot;
     }
 
+    // Special handling for date field (numeric year sorting)
+    if (sortField === 'date') {
+      const aYear = parseInt(aValue) || 0;
+      const bYear = parseInt(bValue) || 0;
+      return sortDirection === 'asc' ? aYear - bYear : bYear - aYear;
+    }
+
     // Try to parse as numbers for numeric sorting
     const aNum = parseFloat(aValue);
     const bNum = parseFloat(bValue);
