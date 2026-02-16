@@ -669,6 +669,7 @@ export default function Home() {
           numberAndNotes: '',
           obverse: '',
           reverse: '',
+          date: '',
         });
         // Refresh coins list
         fetchCoins();
