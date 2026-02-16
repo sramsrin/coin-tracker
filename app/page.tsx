@@ -1732,6 +1732,12 @@ export default function Home() {
               ) : (
                 textBoxValue ? (
                   <div className="prose prose-lg max-w-none">
+                    <button
+                      onClick={() => setIsTextExpanded(!isTextExpanded)}
+                      className="mb-2 text-sm text-purple-600 hover:text-purple-800 italic transition-colors duration-200"
+                    >
+                      {isTextExpanded ? '← Show less' : 'Read more →'}
+                    </button>
                     <div
                       className={`text-gray-600 whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
                         !isTextExpanded ? 'line-clamp-3' : ''
@@ -1746,12 +1752,6 @@ export default function Home() {
                     >
                       {textBoxValue}
                     </div>
-                    <button
-                      onClick={() => setIsTextExpanded(!isTextExpanded)}
-                      className="mt-2 text-sm text-purple-600 hover:text-purple-800 italic transition-colors duration-200"
-                    >
-                      {isTextExpanded ? '← Show less' : 'Read more →'}
-                    </button>
                   </div>
                 ) : (
                   <div className="text-gray-400 italic text-center py-6">
