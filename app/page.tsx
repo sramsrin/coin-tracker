@@ -19,6 +19,7 @@ interface Coin {
   numberAndNotes: string;
   obverse: string;
   reverse: string;
+  date: string;
 }
 
 type SortField = keyof Coin;
@@ -89,6 +90,7 @@ export default function Home() {
     numberAndNotes: '',
     obverse: '',
     reverse: '',
+    date: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1020,6 +1022,18 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="text"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g., 1850, 1800-1820, 19th century"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 KM Number
               </label>
               <input
@@ -1284,6 +1298,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Index</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Value</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Currency</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Date</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
@@ -1301,6 +1316,7 @@ export default function Home() {
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.date}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">
                                           {coin.numistaLink ? (
@@ -1341,6 +1357,9 @@ export default function Home() {
                     <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Currency {sortField === 'currency' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
+                    <th onClick={() => handleSort('date')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                      Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -1375,6 +1394,7 @@ export default function Home() {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{coin.date}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         {coin.numistaLink ? (
@@ -1479,6 +1499,16 @@ export default function Home() {
                       type="text"
                       value={editFormData.currency || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, currency: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input
+                      type="text"
+                      value={editFormData.date || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                      placeholder="e.g., 1850, 1800-1820, 19th century"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
                   </div>
