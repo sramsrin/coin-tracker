@@ -23,7 +23,9 @@
       "Bash(lsof:*)",
       "Bash(ls:*)",
       "Bash(npm run build:*)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "Bash(python3:*)",
+      "Bash(xargs kill:*)"
     ]
   }
 }
