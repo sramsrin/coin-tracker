@@ -34,7 +34,9 @@ export async function POST() {
         updatedCount++;
         return {
           ...coin,
-          subsection: 'Other'
+          section: 'Other',
+          subsection: 'Madurai',
+          subsubsection: ''
         };
       }
       return coin;
