@@ -129,6 +129,13 @@ export default function Home() {
     }
   }, [selectedSection, selectedSubsection, selectedState, selectedEuropeanCategory, selectedEuropeanPower]);
 
+  // Auto-scroll to top when filters are applied and switching to collection tab
+  useEffect(() => {
+    if (activeTab === 'collection' && (selectedSection || selectedSubsection || selectedState)) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeTab, selectedSection, selectedSubsection, selectedState]);
+
   const fetchColorMappings = async () => {
     try {
       const response = await fetch('/api/map-points');
@@ -1260,7 +1267,37 @@ export default function Home() {
             <p className="text-gray-500 text-center py-8">No coins in your collection yet. Add one above!</p>
           ) : groupBySection ? (
             <div className="p-6 pt-0">
-              {Object.keys(groupedCoins).sort().filter(section => !selectedSection || section === selectedSection).map((section) => (
+              {/* Active Filters Banner */}
+              {(selectedSection || selectedSubsection || selectedState) && (
+                <div className="mb-4 p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-semibold text-blue-800">Filtered view: </span>
+                      <span className="text-blue-700">
+                        {selectedSection && `${selectedSection}`}
+                        {selectedSubsection && ` > ${selectedSubsection}`}
+                        {selectedState && ` > ${selectedState}`}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedSection(null);
+                        setSelectedSubsection(null);
+                        setSelectedState(null);
+                      }}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium"
+                    >
+                      Clear Filter
+                    </button>
+                  </div>
+                </div>
+              )}
+              {(() => {
+                console.log('Collection view filters - Section:', selectedSection, 'Subsection:', selectedSubsection, 'State:', selectedState);
+                const sectionsToShow = Object.keys(groupedCoins).sort().filter(section => !selectedSection || section === selectedSection);
+                console.log('Sections to show:', sectionsToShow);
+                return sectionsToShow;
+              })().map((section) => (
                 <div
                   key={section}
                   id={`section-${section.replace(/\s+/g, '-').toLowerCase()}`}
@@ -1269,7 +1306,12 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-pink-300">
                     {section}
                   </h3>
-                  {sortSubsections(section, Object.keys(groupedCoins[section])).filter(subsection => !selectedSubsection || subsection === selectedSubsection).map((subsection) => {
+                  {(() => {
+                    const allSubsections = sortSubsections(section, Object.keys(groupedCoins[section]));
+                    const filteredSubsections = allSubsections.filter(subsection => !selectedSubsection || subsection === selectedSubsection);
+                    console.log('Section:', section, '| All subsections:', allSubsections, '| Filtered subsections:', filteredSubsections, '| Filter value:', selectedSubsection);
+                    return filteredSubsections;
+                  })().map((subsection) => {
                     const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
                     return (
                       <div
@@ -1281,7 +1323,12 @@ export default function Home() {
                           <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                           {subsection} ({agencyCoins} coins)
                         </h4>
-                        {Object.keys(groupedCoins[section][subsection]).sort().filter(subsubsection => !selectedState || subsubsection === selectedState).map((subsubsection) => {
+                        {(() => {
+                          const allSubsubsections = Object.keys(groupedCoins[section][subsection]).sort();
+                          const filteredSubsubsections = allSubsubsections.filter(subsubsection => !selectedState || subsubsection === selectedState);
+                          console.log('Subsection:', subsection, '| All subsubsections:', allSubsubsections, '| Filtered:', filteredSubsubsections, '| Filter value:', selectedState);
+                          return filteredSubsubsections;
+                        })().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'Indian Kingdoms';
                           const isMadrasPresidencyTerritories = section === 'British India Pre 1835' && subsection === 'Annexed kingdoms';
@@ -1808,9 +1855,32 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{section}</div>
-                      <div className={`text-xs mt-1 ${selectedSection === section ? 'text-purple-200' : 'text-gray-500'}`}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          console.log('Section link clicked:', section);
+                          // Clear all selections first
+                          setSelectedSection(null);
+                          setSelectedSubsection(null);
+                          setSelectedState(null);
+                          setSelectedEuropeanCategory(null);
+                          setSelectedEuropeanPower(null);
+                          // Then set the specific section
+                          setTimeout(() => {
+                            console.log('Setting filters - Section:', section);
+                            setSelectedSection(section);
+                            setActiveTab('collection');
+                            setGroupBySection(true);
+                          }, 0);
+                        }}
+                        className={`text-xs mt-1 block underline hover:no-underline ${
+                          selectedSection === section ? 'text-purple-200' : 'text-blue-600'
+                        }`}
+                      >
                         {sectionCoins} coin{sectionCoins !== 1 ? 's' : ''}
-                      </div>
+                      </a>
                     </button>
                   );
                 })}
@@ -1856,29 +1926,9 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            // Clear all selections first
-                            setSelectedSection(null);
-                            setSelectedSubsection(null);
-                            setSelectedState(null);
-                            // Then set the specific ones we need
-                            setTimeout(() => {
-                              setSelectedSection('Indian Kingdoms');
-                              setSelectedSubsection(subsection);
-                              setActiveTab('collection');
-                              setGroupBySection(true);
-                            }, 0);
-                          }}
-                          className={`text-xs mt-1 block underline hover:no-underline ${
-                            selectedSubsection === subsection ? 'text-purple-200' : 'text-blue-600'
-                          }`}
-                        >
+                        <div className={`text-xs mt-1 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
                           {coinCount} coin{coinCount !== 1 ? 's' : ''}
-                        </a>
+                        </div>
                       </button>
                     );
                   })}
@@ -1916,31 +1966,9 @@ export default function Home() {
                           }`}
                         >
                           <div className="text-sm font-semibold">{state}</div>
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              const currentSubsection = selectedSubsection;
-                              // Clear all selections first
-                              setSelectedSection(null);
-                              setSelectedSubsection(null);
-                              setSelectedState(null);
-                              // Then set the specific ones we need
-                              setTimeout(() => {
-                                setSelectedSection('Indian Kingdoms');
-                                setSelectedSubsection(currentSubsection);
-                                setSelectedState(state);
-                                setActiveTab('collection');
-                                setGroupBySection(true);
-                              }, 0);
-                            }}
-                            className={`text-xs mt-1 block underline hover:no-underline ${
-                              selectedState === state ? 'text-purple-200' : 'text-blue-600'
-                            }`}
-                          >
+                          <div className={`text-xs mt-1 ${selectedState === state ? 'text-purple-200' : 'text-gray-500'}`}>
                             {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}
-                          </a>
+                          </div>
                         </button>
                       );
                     })}
@@ -2205,23 +2233,9 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTab('collection');
-                          setTimeout(() => {
-                            const element = document.getElementById(
-                              `subsection-european-trading-companies-${subsection.replace(/\s+/g, '-').toLowerCase()}`
-                            );
-                            element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          }, 100);
-                        }}
-                        className={`text-xs mt-1 underline hover:no-underline ${
-                          selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-pink-600 hover:text-pink-800'
-                        }`}
-                      >
-                        {coinCount} coin{coinCount !== 1 ? 's' : ''} →
-                      </button>
+                      <div className={`text-xs mt-1 ${selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
+                        {coinCount} coin{coinCount !== 1 ? 's' : ''}
+                      </div>
                     </button>
                   );
                 })}
