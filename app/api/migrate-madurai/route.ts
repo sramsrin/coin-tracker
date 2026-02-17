@@ -38,7 +38,7 @@ export async function POST() {
     // Find and update Madurai coins
     let updatedCount = 0;
     const updatedCoins = coins.map(coin => {
-      if (coin.subsubsection === 'Madurai' && coin.section === 'Indian Kingdoms') {
+      if (coin.subsubsection === 'Madurai' && coin.section === 'British India Princely States') {
         updatedCount++;
         return {
           ...coin,
