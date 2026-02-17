@@ -1860,11 +1860,18 @@ export default function Home() {
                           href="#"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedSection('Indian Kingdoms');
-                            setSelectedSubsection(subsection);
+                            e.preventDefault();
+                            // Clear all selections first
+                            setSelectedSection(null);
+                            setSelectedSubsection(null);
                             setSelectedState(null);
-                            setActiveTab('collection');
-                            setGroupBySection(true);
+                            // Then set the specific ones we need
+                            setTimeout(() => {
+                              setSelectedSection('Indian Kingdoms');
+                              setSelectedSubsection(subsection);
+                              setActiveTab('collection');
+                              setGroupBySection(true);
+                            }, 0);
                           }}
                           className={`text-xs mt-1 block underline hover:no-underline ${
                             selectedSubsection === subsection ? 'text-purple-200' : 'text-blue-600'
@@ -1913,11 +1920,20 @@ export default function Home() {
                             href="#"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedSection('Indian Kingdoms');
-                              setSelectedSubsection(selectedSubsection);
-                              setSelectedState(state);
-                              setActiveTab('collection');
-                              setGroupBySection(true);
+                              e.preventDefault();
+                              const currentSubsection = selectedSubsection;
+                              // Clear all selections first
+                              setSelectedSection(null);
+                              setSelectedSubsection(null);
+                              setSelectedState(null);
+                              // Then set the specific ones we need
+                              setTimeout(() => {
+                                setSelectedSection('Indian Kingdoms');
+                                setSelectedSubsection(currentSubsection);
+                                setSelectedState(state);
+                                setActiveTab('collection');
+                                setGroupBySection(true);
+                              }, 0);
                             }}
                             className={`text-xs mt-1 block underline hover:no-underline ${
                               selectedState === state ? 'text-purple-200' : 'text-blue-600'
