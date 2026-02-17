@@ -1855,32 +1855,6 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{section}</div>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          console.log('Section link clicked:', section);
-                          // Clear all selections first
-                          setSelectedSection(null);
-                          setSelectedSubsection(null);
-                          setSelectedState(null);
-                          setSelectedEuropeanCategory(null);
-                          setSelectedEuropeanPower(null);
-                          // Then set the specific section
-                          setTimeout(() => {
-                            console.log('Setting filters - Section:', section);
-                            setSelectedSection(section);
-                            setActiveTab('collection');
-                            setGroupBySection(true);
-                          }, 0);
-                        }}
-                        className={`text-xs mt-1 block underline hover:no-underline ${
-                          selectedSection === section ? 'text-purple-200' : 'text-blue-600'
-                        }`}
-                      >
-                        {sectionCoins} coin{sectionCoins !== 1 ? 's' : ''}
-                      </a>
                     </button>
                   );
                 })}
