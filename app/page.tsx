@@ -382,44 +382,39 @@ export default function Home() {
         const mapping = colorMappings.find(m => m.state === stateName);
         if (!mapping) return null;
         const [r, g, b] = mapping.color.split(',').map(Number);
-        // Pack RGB into a single 32-bit integer for fast comparison
-        return (r << 16) | (g << 8) | b;
+        return { r, g, b };
       })
-      .filter(Boolean) as number[];
+      .filter(Boolean) as { r: number; g: number; b: number }[];
 
     if (targetColors.length === 0) return;
 
-    // OPTIMIZED: Use Uint32Array for 4x faster pixel access
+    // Get image data and highlight the matching colors
     const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
-    const buf = new ArrayBuffer(imageData.data.length);
-    const buf8 = new Uint8ClampedArray(buf);
-    const data32 = new Uint32Array(buf);
+    const data = imageData.data;
 
-    // Copy original data
-    buf8.set(imageData.data);
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
 
-    // Process as 32-bit words (4x faster than byte-by-byte)
-    const len = data32.length;
-    for (let i = 0; i < len; i++) {
-      const pixel = data32[i];
-      const rgb = pixel & 0x00FFFFFF; // Mask out alpha channel
+      // Check if this pixel matches any target color
+      const matchesTarget = targetColors.some(
+        target => target.r === r && target.g === g && target.b === b
+      );
 
-      if (targetColors.includes(rgb)) {
-        // Highlighted - brighten significantly
-        const r = Math.min(255, ((pixel & 0xFF) * 1.8 + 100) | 0);
-        const g = Math.min(255, (((pixel >> 8) & 0xFF) * 1.8 + 100) | 0);
-        const b = Math.min(255, (((pixel >> 16) & 0xFF) * 1.8 + 100) | 0);
-        data32[i] = 0xFF000000 | (b << 16) | (g << 8) | r;
+      if (matchesTarget) {
+        // Highlighted state - keep original color at full brightness
+        data[i] = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
       } else {
-        // Dimmed - reduce brightness
-        const r = ((pixel & 0xFF) * 0.4) | 0;
-        const g = (((pixel >> 8) & 0xFF) * 0.4) | 0;
-        const b = (((pixel >> 16) & 0xFF) * 0.4) | 0;
-        data32[i] = 0xFF000000 | (b << 16) | (g << 8) | r;
+        // Non-highlighted area - dim it (reduce brightness by 60%)
+        data[i] = Math.floor(r * 0.4);
+        data[i + 1] = Math.floor(g * 0.4);
+        data[i + 2] = Math.floor(b * 0.4);
       }
     }
 
-    imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
   };
 
