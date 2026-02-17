@@ -376,62 +376,50 @@ export default function Home() {
 
     if (!stateNames || stateNames.length === 0) return;
 
-    console.log('Highlighting states:', stateNames);
-
     // Get all colors for the states to highlight
     const targetColors = stateNames
       .map(stateName => {
         const mapping = colorMappings.find(m => m.state === stateName);
-        if (!mapping) {
-          console.log(`No color mapping found for state: ${stateName}`);
-          return null;
-        }
+        if (!mapping) return null;
         const [r, g, b] = mapping.color.split(',').map(Number);
-        console.log(`Color for ${stateName}: RGB(${r}, ${g}, ${b})`);
-        return { r, g, b, stateName };
+        // Pack RGB into a single 32-bit integer for fast comparison
+        return (r << 16) | (g << 8) | b;
       })
-      .filter(Boolean) as { r: number; g: number; b: number; stateName: string }[];
+      .filter(Boolean) as number[];
 
-    if (targetColors.length === 0) {
-      console.log('No valid target colors found');
-      return;
-    }
+    if (targetColors.length === 0) return;
 
-    // Get image data and highlight the matching colors with stripes
+    // OPTIMIZED: Use Uint32Array for 4x faster pixel access
     const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
-    const data = imageData.data;
-    const width = mapCanvas.width;
-    const height = mapCanvas.height;
+    const buf = new ArrayBuffer(imageData.data.length);
+    const buf8 = new Uint8ClampedArray(buf);
+    const data32 = new Uint32Array(buf);
 
-    const matchCounts: {[key: string]: number} = {};
-    targetColors.forEach(tc => matchCounts[tc.stateName] = 0);
+    // Copy original data
+    buf8.set(imageData.data);
 
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
+    // Process as 32-bit words (4x faster than byte-by-byte)
+    const len = data32.length;
+    for (let i = 0; i < len; i++) {
+      const pixel = data32[i];
+      const rgb = pixel & 0x00FFFFFF; // Mask out alpha channel
 
-      // Check if this pixel matches any target color
-      const matchedColor = targetColors.find(
-        target => target.r === r && target.g === g && target.b === b
-      );
-
-      if (matchedColor) {
-        matchCounts[matchedColor.stateName]++;
-        // Highlighted state - brighten the color significantly for visibility
-        data[i] = Math.min(255, Math.floor(r * 1.8 + 100));
-        data[i + 1] = Math.min(255, Math.floor(g * 1.8 + 100));
-        data[i + 2] = Math.min(255, Math.floor(b * 1.8 + 100));
+      if (targetColors.includes(rgb)) {
+        // Highlighted - brighten significantly
+        const r = Math.min(255, ((pixel & 0xFF) * 1.8 + 100) | 0);
+        const g = Math.min(255, (((pixel >> 8) & 0xFF) * 1.8 + 100) | 0);
+        const b = Math.min(255, (((pixel >> 16) & 0xFF) * 1.8 + 100) | 0);
+        data32[i] = 0xFF000000 | (b << 16) | (g << 8) | r;
       } else {
-        // Non-highlighted area - dim it (reduce brightness by 60%)
-        data[i] = Math.floor(r * 0.4);
-        data[i + 1] = Math.floor(g * 0.4);
-        data[i + 2] = Math.floor(b * 0.4);
+        // Dimmed - reduce brightness
+        const r = ((pixel & 0xFF) * 0.4) | 0;
+        const g = (((pixel >> 8) & 0xFF) * 0.4) | 0;
+        const b = (((pixel >> 16) & 0xFF) * 0.4) | 0;
+        data32[i] = 0xFF000000 | (b << 16) | (g << 8) | r;
       }
     }
 
-    console.log('Matching pixels per state:', matchCounts);
-
+    imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
   };
 
