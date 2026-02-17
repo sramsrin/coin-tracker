@@ -1321,7 +1321,7 @@ export default function Home() {
                       >
                         <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
                           <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
-                          {subsection}
+                          {subsection} ({agencyCoins} coins)
                         </h4>
                         {(() => {
                           const allSubsubsections = Object.keys(groupedCoins[section][subsection]).sort();
@@ -1343,7 +1343,7 @@ export default function Home() {
                               {showStateHeader && (
                                 <h5 className="text-md font-medium text-gray-600 mb-2 flex items-center">
                                   <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
-                                  {subsubsection}
+                                  {subsubsection} ({stateCoins.length} coins)
                                 </h5>
                               )}
                               <div className="overflow-x-auto">
@@ -2449,26 +2449,7 @@ export default function Home() {
                             : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
                         }`}
                       >
-                        <div className="text-sm font-semibold mb-2">{subsection}</div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveTab('collection');
-                            setTimeout(() => {
-                              const element = document.getElementById(
-                                `subsection-${selectedSection.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`
-                              );
-                              element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 100);
-                          }}
-                          className={`text-xs underline hover:no-underline ${
-                            selectedSubsection === subsection
-                              ? 'text-purple-200 hover:text-purple-100'
-                              : 'text-pink-600 hover:text-pink-800'
-                          }`}
-                        >
-                          {subsectionCoins} coin{subsectionCoins !== 1 ? 's' : ''} →
-                        </button>
+                        <div className="text-sm font-semibold">{subsection}</div>
                       </button>
                     );
                   })}
