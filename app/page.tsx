@@ -1840,9 +1840,7 @@ export default function Home() {
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     ));
-                    const mappedCount = subsectionStates.filter(state =>
-                      colorMappings.some(m => m.state === state)
-                    ).length;
+                    const coinCount = coins.filter(c => c.section === 'Indian Kingdoms' && c.subsection === subsection).length;
 
                     return (
                       <button
@@ -1858,9 +1856,19 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        <div className={`text-xs mt-1 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
-                          {mappedCount}/{subsectionStates.length} mapped
-                        </div>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveTab('collection');
+                            setGroupBySection(true);
+                          }}
+                          className={`text-xs mt-1 block underline hover:no-underline ${
+                            selectedSubsection === subsection ? 'text-purple-200' : 'text-blue-600'
+                          }`}
+                        >
+                          {coinCount} coin{coinCount !== 1 ? 's' : ''}
+                        </a>
                       </button>
                     );
                   })}
