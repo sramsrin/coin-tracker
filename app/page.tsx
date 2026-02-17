@@ -1906,10 +1906,19 @@ export default function Home() {
                           }`}
                         >
                           <div className="text-sm font-semibold">{state}</div>
-                          <div className={`text-xs mt-1 ${selectedState === state ? 'text-purple-200' : 'text-gray-500'}`}>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveTab('collection');
+                              setGroupBySection(true);
+                            }}
+                            className={`text-xs mt-1 block underline hover:no-underline ${
+                              selectedState === state ? 'text-purple-200' : 'text-blue-600'
+                            }`}
+                          >
                             {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}
-                            {isMapped && <span> • Mapped</span>}
-                          </div>
+                          </a>
                         </button>
                       );
                     })}
