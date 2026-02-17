@@ -1747,7 +1747,6 @@ export default function Home() {
                   })()}
                   {(() => {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
-                    if (!section) return null;
 
                     // Calculate coin count for current context
                     const filteredCoins = coins.filter(coin => {
@@ -1768,23 +1767,25 @@ export default function Home() {
                           setSelectedState(null);
                           setSelectedEuropeanCategory(null);
                           setSelectedEuropeanPower(null);
-                          // Then set the specific context
+                          // Then set the specific context if not Introduction
                           setTimeout(() => {
-                            if (section) setSelectedSection(section);
-                            if (subsection) {
-                              if (section === 'Indian Kingdoms') {
-                                setSelectedSubsection(subsection);
-                              } else if (section === 'European Trading Companies') {
-                                setSelectedEuropeanCategory(subsection);
-                              } else {
-                                setSelectedSubsection(subsection);
+                            if (section) {
+                              setSelectedSection(section);
+                              if (subsection) {
+                                if (section === 'Indian Kingdoms') {
+                                  setSelectedSubsection(subsection);
+                                } else if (section === 'European Trading Companies') {
+                                  setSelectedEuropeanCategory(subsection);
+                                } else {
+                                  setSelectedSubsection(subsection);
+                                }
                               }
-                            }
-                            if (subsubsection) {
-                              if (section === 'Indian Kingdoms') {
-                                setSelectedState(subsubsection);
-                              } else if (section === 'European Trading Companies') {
-                                setSelectedEuropeanPower(subsubsection);
+                              if (subsubsection) {
+                                if (section === 'Indian Kingdoms') {
+                                  setSelectedState(subsubsection);
+                                } else if (section === 'European Trading Companies') {
+                                  setSelectedEuropeanPower(subsubsection);
+                                }
                               }
                             }
                             setActiveTab('collection');
@@ -1793,7 +1794,7 @@ export default function Home() {
                         }}
                         className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm transition-colors duration-200"
                       >
-                        {filteredCoins.length} coin{filteredCoins.length !== 1 ? 's' : ''} →
+                        View {filteredCoins.length} coin{filteredCoins.length !== 1 ? 's' : ''}
                       </a>
                     );
                   })()}
