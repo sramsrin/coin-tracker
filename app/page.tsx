@@ -1736,13 +1736,12 @@ export default function Home() {
                     if (!section) {
                       return <span className="text-purple-600">📝 Introduction</span>;
                     }
-                    let parts = [`Section: ${section}`];
+                    let parts = [section];
                     if (subsection) {
-                      parts.push(`Subsection: ${subsection}`);
+                      parts.push(subsection);
                     }
                     if (subsubsection) {
-                      const label = section === 'Indian Kingdoms' ? 'State' : 'Region';
-                      parts.push(`${label}: ${subsubsection}`);
+                      parts.push(subsubsection);
                     }
                     return <span className="text-purple-600">📝 {parts.join(' → ')}</span>;
                   })()}
