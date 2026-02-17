@@ -1807,7 +1807,7 @@ export default function Home() {
                     value={textBoxValue}
                     onChange={(e) => handleTextChange(e.target.value)}
                     placeholder="Type here (edit mode enabled)..."
-                    rows={8}
+                    rows={4}
                     className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none border-purple-200 bg-white bg-opacity-50 text-gray-400 placeholder-gray-300 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 focus:text-gray-500"
                     style={{
                       fontFamily: 'Georgia, serif',
