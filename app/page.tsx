@@ -1893,7 +1893,13 @@ export default function Home() {
                   'British India Uniform Coinage',
                   'European Trading Companies'
                 ];
-                const otherSections = allSections.filter(s => !colonialSections.includes(s));
+                const otherGroupSections = [
+                  'European Overseas',
+                  'Older Indian Kingdoms'
+                ];
+                const remainingSections = allSections.filter(s =>
+                  !colonialSections.includes(s) && !otherGroupSections.includes(s)
+                );
 
                 const renderSectionButton = (section: string) => (
                   <button
@@ -1933,7 +1939,7 @@ export default function Home() {
 
                 return (
                   <div className="space-y-4">
-                    {/* 1600-1947 Colonial Era Box */}
+                    {/* India: 1600-1947 Colonial Era Box */}
                     <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50/30">
                       <h4 className="text-sm font-bold text-purple-800 mb-3">India: 1600-1947</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1941,10 +1947,20 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* Other Sections */}
-                    {otherSections.length > 0 && (
+                    {/* Other Box */}
+                    {otherGroupSections.some(s => allSections.includes(s)) && (
+                      <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50/30">
+                        <h4 className="text-sm font-bold text-gray-800 mb-3">Other</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {otherGroupSections.filter(s => allSections.includes(s)).map(renderSectionButton)}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Remaining Sections (if any) */}
+                    {remainingSections.length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {otherSections.map(renderSectionButton)}
+                        {remainingSections.map(renderSectionButton)}
                       </div>
                     )}
                   </div>
