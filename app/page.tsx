@@ -75,6 +75,7 @@ export default function Home() {
   const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [showAddCoinForm, setShowAddCoinForm] = useState(false);
+  const [isHighlighting, setIsHighlighting] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -374,48 +375,61 @@ export default function Home() {
     // Restore original image
     ctx.putImageData(originalImageData, 0, 0);
 
-    if (!stateNames || stateNames.length === 0) return;
-
-    // Get all colors for the states to highlight
-    const targetColors = stateNames
-      .map(stateName => {
-        const mapping = colorMappings.find(m => m.state === stateName);
-        if (!mapping) return null;
-        const [r, g, b] = mapping.color.split(',').map(Number);
-        return { r, g, b };
-      })
-      .filter(Boolean) as { r: number; g: number; b: number }[];
-
-    if (targetColors.length === 0) return;
-
-    // Get image data and highlight the matching colors
-    const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
-    const data = imageData.data;
-
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-
-      // Check if this pixel matches any target color
-      const matchesTarget = targetColors.some(
-        target => target.r === r && target.g === g && target.b === b
-      );
-
-      if (matchesTarget) {
-        // Highlighted state - brighten to make it pop
-        data[i] = Math.min(255, Math.floor(r * 1.5));
-        data[i + 1] = Math.min(255, Math.floor(g * 1.5));
-        data[i + 2] = Math.min(255, Math.floor(b * 1.5));
-      } else {
-        // Non-highlighted area - dim it (reduce brightness by 60%)
-        data[i] = Math.floor(r * 0.4);
-        data[i + 1] = Math.floor(g * 0.4);
-        data[i + 2] = Math.floor(b * 0.4);
-      }
+    if (!stateNames || stateNames.length === 0) {
+      setIsHighlighting(false);
+      return;
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    // Show loading spinner
+    setIsHighlighting(true);
+
+    // Use setTimeout to allow UI to update with loading spinner
+    setTimeout(() => {
+      // Get all colors for the states to highlight
+      const targetColors = stateNames
+        .map(stateName => {
+          const mapping = colorMappings.find(m => m.state === stateName);
+          if (!mapping) return null;
+          const [r, g, b] = mapping.color.split(',').map(Number);
+          return { r, g, b };
+        })
+        .filter(Boolean) as { r: number; g: number; b: number }[];
+
+      if (targetColors.length === 0) {
+        setIsHighlighting(false);
+        return;
+      }
+
+      // Get image data and highlight the matching colors
+      const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        // Check if this pixel matches any target color
+        const matchesTarget = targetColors.some(
+          target => target.r === r && target.g === g && target.b === b
+        );
+
+        if (matchesTarget) {
+          // Highlighted state - brighten to make it pop
+          data[i] = Math.min(255, Math.floor(r * 1.5));
+          data[i + 1] = Math.min(255, Math.floor(g * 1.5));
+          data[i + 2] = Math.min(255, Math.floor(b * 1.5));
+        } else {
+          // Non-highlighted area - dim it (reduce brightness by 60%)
+          data[i] = Math.floor(r * 0.4);
+          data[i + 1] = Math.floor(g * 0.4);
+          data[i + 2] = Math.floor(b * 0.4);
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      setIsHighlighting(false);
+    }, 50);
   };
 
   // Highlight state(s) when selection changes
@@ -1999,6 +2013,15 @@ export default function Home() {
             {/* Map Section */}
             <div className="mb-6">
               <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
+                  {/* Loading Spinner Overlay */}
+                  {isHighlighting && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-white font-semibold">Loading map...</p>
+                      </div>
+                    </div>
+                  )}
                   {/* Zoom Controls - Only in Edit Mode */}
                   {isAuthenticated && (
                     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
