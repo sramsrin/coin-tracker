@@ -1860,6 +1860,9 @@ export default function Home() {
                           href="#"
                           onClick={(e) => {
                             e.stopPropagation();
+                            setSelectedSection('Indian Kingdoms');
+                            setSelectedSubsection(subsection);
+                            setSelectedState(null);
                             setActiveTab('collection');
                             setGroupBySection(true);
                           }}
@@ -1910,6 +1913,9 @@ export default function Home() {
                             href="#"
                             onClick={(e) => {
                               e.stopPropagation();
+                              setSelectedSection('Indian Kingdoms');
+                              setSelectedSubsection(selectedSubsection);
+                              setSelectedState(state);
                               setActiveTab('collection');
                               setGroupBySection(true);
                             }}
