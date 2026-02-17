@@ -1935,7 +1935,7 @@ export default function Home() {
                   <div className="space-y-4">
                     {/* 1600-1947 Colonial Era Box */}
                     <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50/30">
-                      <h4 className="text-sm font-bold text-purple-800 mb-3">1600-1947</h4>
+                      <h4 className="text-sm font-bold text-purple-800 mb-3">India: 1600-1947</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         {colonialSections.filter(s => allSections.includes(s)).map(renderSectionButton)}
                       </div>

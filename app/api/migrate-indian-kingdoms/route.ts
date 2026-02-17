@@ -34,7 +34,8 @@ export async function POST() {
       });
     }
 
-    let renamedCount = 0;
+    let renamedAnnexedCount = 0;
+    let renamedOtherCount = 0;
     let movedCount = 0;
 
     const updatedCoins = coins.map(coin => {
@@ -43,7 +44,7 @@ export async function POST() {
       // 1. Rename "Annexed Kingdoms" to "Indian Kingdoms"
       if (updated.section === 'Annexed Kingdoms') {
         updated.section = 'Indian Kingdoms';
-        renamedCount++;
+        renamedAnnexedCount++;
       }
 
       // 2. Move Delhi Sultanate from "Other" to "Indian Kingdoms"
@@ -58,6 +59,12 @@ export async function POST() {
         movedCount++;
       }
 
+      // 4. Rename remaining "Other" to "European Overseas"
+      if (updated.section === 'Other') {
+        updated.section = 'European Overseas';
+        renamedOtherCount++;
+      }
+
       return updated;
     });
 
@@ -69,8 +76,9 @@ export async function POST() {
       message: 'Migration completed successfully',
       details: {
         totalCoins: coins.length,
-        renamedToIndianKingdoms: renamedCount,
-        movedToIndianKingdoms: movedCount
+        renamedAnnexedToIndianKingdoms: renamedAnnexedCount,
+        movedToIndianKingdoms: movedCount,
+        renamedOtherToEuropeanOverseas: renamedOtherCount
       }
     });
   } catch (error) {
