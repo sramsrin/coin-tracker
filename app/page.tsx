@@ -406,9 +406,6 @@ export default function Home() {
     const matchCounts: {[key: string]: number} = {};
     targetColors.forEach(tc => matchCounts[tc.stateName] = 0);
 
-    // Track highlighted pixels for stripe drawing
-    const highlightedPixels: {x: number, y: number}[] = [];
-
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
@@ -421,15 +418,10 @@ export default function Home() {
 
       if (matchedColor) {
         matchCounts[matchedColor.stateName]++;
-        const pixelIndex = i / 4;
-        const x = pixelIndex % width;
-        const y = Math.floor(pixelIndex / width);
-        highlightedPixels.push({x, y});
-
-        // Highlighted state - keep original color at full brightness
-        data[i] = r;
-        data[i + 1] = g;
-        data[i + 2] = b;
+        // Highlighted state - brighten the color significantly for visibility
+        data[i] = Math.min(255, Math.floor(r * 1.8 + 100));
+        data[i + 1] = Math.min(255, Math.floor(g * 1.8 + 100));
+        data[i + 2] = Math.min(255, Math.floor(b * 1.8 + 100));
       } else {
         // Non-highlighted area - dim it (reduce brightness by 60%)
         data[i] = Math.floor(r * 0.4);
@@ -441,27 +433,6 @@ export default function Home() {
     console.log('Matching pixels per state:', matchCounts);
 
     ctx.putImageData(imageData, 0, 0);
-
-    // Draw diagonal stripes over highlighted areas for better visibility
-    if (highlightedPixels.length > 0) {
-      // Create a set for faster lookup
-      const highlightedSet = new Set(highlightedPixels.map(p => `${p.x},${p.y}`));
-
-      // Draw white diagonal stripes over highlighted pixels
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'; // Semi-transparent white
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          // Check if this pixel is highlighted
-          if (highlightedSet.has(`${x},${y}`)) {
-            // Draw diagonal stripe pattern (every 6 pixels diagonally)
-            if ((x + y) % 6 === 0 || (x + y) % 6 === 1) {
-              ctx.fillRect(x, y, 1, 1);
-            }
-          }
-        }
-      }
-    }
   };
 
   // Highlight state(s) when selection changes
