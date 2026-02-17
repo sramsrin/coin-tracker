@@ -1204,7 +1204,7 @@ export default function Home() {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Annexed Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Indian Kingdoms';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -1344,7 +1344,7 @@ export default function Home() {
                         })().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Annexed Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Indian Kingdoms';
                           const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
 
                           return (
@@ -1884,46 +1884,72 @@ export default function Home() {
             {/* Section Selector */}
             <div className="mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Section</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort().map(section => {
-                  const sectionCoins = coins.filter(c => c.section === section).length;
-                  return (
-                    <button
-                      key={section}
-                      onClick={() => {
-                        if (selectedSection === section) {
-                          setSelectedSection(null);
-                          setSelectedSubsection(null);
-                          setSelectedState(null);
-                          setSelectedEuropeanCategory(null);
-                          setSelectedEuropeanPower(null);
-                        } else {
-                          setSelectedSection(section);
-                          setSelectedSubsection(null);
-                          setSelectedState(null);
-                          setSelectedEuropeanCategory(null);
-                          setSelectedEuropeanPower(null);
-                          // Set map mode based on section
-                          if (section === 'British India Princely States') {
-                            setMapMode('princely');
-                          } else if (section === 'European Trading Companies') {
-                            setMapMode('european');
-                          }
+
+              {(() => {
+                const allSections = Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort();
+                const colonialSections = [
+                  'British India Presidencies',
+                  'British India Princely States',
+                  'British India Uniform Coinage',
+                  'European Trading Companies'
+                ];
+                const otherSections = allSections.filter(s => !colonialSections.includes(s));
+
+                const renderSectionButton = (section: string) => (
+                  <button
+                    key={section}
+                    onClick={() => {
+                      if (selectedSection === section) {
+                        setSelectedSection(null);
+                        setSelectedSubsection(null);
+                        setSelectedState(null);
+                        setSelectedEuropeanCategory(null);
+                        setSelectedEuropeanPower(null);
+                      } else {
+                        setSelectedSection(section);
+                        setSelectedSubsection(null);
+                        setSelectedState(null);
+                        setSelectedEuropeanCategory(null);
+                        setSelectedEuropeanPower(null);
+                        // Set map mode based on section
+                        if (section === 'British India Princely States') {
+                          setMapMode('princely');
+                        } else if (section === 'European Trading Companies') {
+                          setMapMode('european');
                         }
-                        setZoom(1);
-                        setPan({ x: 0, y: 0 });
-                      }}
-                      className={`px-4 py-3 rounded-lg transition text-left ${
-                        selectedSection === section
-                          ? 'bg-purple-600 text-white shadow-lg'
-                          : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
-                      }`}
-                    >
-                      <div className="text-sm font-semibold">{section}</div>
-                    </button>
-                  );
-                })}
-              </div>
+                      }
+                      setZoom(1);
+                      setPan({ x: 0, y: 0 });
+                    }}
+                    className={`px-4 py-3 rounded-lg transition text-left ${
+                      selectedSection === section
+                        ? 'bg-purple-600 text-white shadow-lg'
+                        : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">{section}</div>
+                  </button>
+                );
+
+                return (
+                  <div className="space-y-4">
+                    {/* 1600-1947 Colonial Era Box */}
+                    <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50/30">
+                      <h4 className="text-sm font-bold text-purple-800 mb-3">1600-1947</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {colonialSections.filter(s => allSections.includes(s)).map(renderSectionButton)}
+                      </div>
+                    </div>
+
+                    {/* Other Sections */}
+                    {otherSections.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {otherSections.map(renderSectionButton)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Main Content */}

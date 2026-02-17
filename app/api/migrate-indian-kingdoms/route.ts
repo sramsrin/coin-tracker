@@ -34,39 +34,28 @@ export async function POST() {
       });
     }
 
-    let renamedSectionsCount = 0;
-    let movedAnnexedKingdomsCount = 0;
+    let renamedCount = 0;
+    let movedCount = 0;
 
     const updatedCoins = coins.map(coin => {
       let updated = { ...coin };
 
-      // 1. Rename "Indian Kingdoms" to "British India Princely States"
-      if (updated.section === 'Indian Kingdoms') {
-        updated.section = 'British India Princely States';
-        renamedSectionsCount++;
+      // 1. Rename "Annexed Kingdoms" to "Indian Kingdoms"
+      if (updated.section === 'Annexed Kingdoms') {
+        updated.section = 'Indian Kingdoms';
+        renamedCount++;
       }
 
-      // 2. Rename "British India Post 1835" to "British India Uniform Coinage"
-      if (updated.section === 'British India Post 1835') {
-        updated.section = 'British India Uniform Coinage';
-        renamedSectionsCount++;
+      // 2. Move Delhi Sultanate from "Other" to "Indian Kingdoms"
+      if (updated.section === 'Other' && updated.subsection === 'Delhi Sultanate') {
+        updated.section = 'Indian Kingdoms';
+        movedCount++;
       }
 
-      // 3. Rename "British India Pre 1835" to "British India Presidencies"
-      if (updated.section === 'British India Pre 1835') {
-        updated.section = 'British India Presidencies';
-        renamedSectionsCount++;
-      }
-
-      // 4. Move "Annexed kingdoms" subsection to its own "Indian Kingdoms" section
-      if (updated.subsection === 'Annexed kingdoms') {
-        movedAnnexedKingdomsCount++;
-        return {
-          ...updated,
-          section: 'Indian Kingdoms',
-          subsection: updated.subsubsection || '',
-          subsubsection: ''
-        };
+      // 3. Move Chola Dynasty from "Other" to "Indian Kingdoms"
+      if (updated.section === 'Other' && updated.subsection === 'Chola Dynasty') {
+        updated.section = 'Indian Kingdoms';
+        movedCount++;
       }
 
       return updated;
@@ -80,8 +69,8 @@ export async function POST() {
       message: 'Migration completed successfully',
       details: {
         totalCoins: coins.length,
-        renamedSections: renamedSectionsCount,
-        movedAnnexedKingdoms: movedAnnexedKingdomsCount
+        renamedToIndianKingdoms: renamedCount,
+        movedToIndianKingdoms: movedCount
       }
     });
   } catch (error) {
