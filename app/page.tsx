@@ -1204,7 +1204,7 @@ export default function Home() {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Older Indian Kingdoms';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -1344,7 +1344,7 @@ export default function Home() {
                         })().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Older Indian Kingdoms';
                           const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
 
                           return (

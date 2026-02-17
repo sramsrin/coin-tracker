@@ -40,8 +40,8 @@ export async function POST() {
     const updatedCoins = coins.map(coin => {
       let updated = { ...coin };
 
-      // 1. Rename "Indian Kingdoms" to "British India Princely States"
-      if (updated.section === 'Indian Kingdoms') {
+      // 1. Rename "Older Indian Kingdoms" to "British India Princely States"
+      if (updated.section === 'Older Indian Kingdoms') {
         updated.section = 'British India Princely States';
         renamedSectionsCount++;
       }
@@ -58,12 +58,12 @@ export async function POST() {
         renamedSectionsCount++;
       }
 
-      // 4. Move "Annexed kingdoms" subsection to its own "Indian Kingdoms" section
+      // 4. Move "Annexed kingdoms" subsection to its own "Older Indian Kingdoms" section
       if (updated.subsection === 'Annexed kingdoms') {
         movedAnnexedKingdomsCount++;
         return {
           ...updated,
-          section: 'Indian Kingdoms',
+          section: 'Older Indian Kingdoms',
           subsection: updated.subsubsection || '',
           subsubsection: ''
         };

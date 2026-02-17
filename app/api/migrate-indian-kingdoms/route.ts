@@ -41,21 +41,21 @@ export async function POST() {
     const updatedCoins = coins.map(coin => {
       let updated = { ...coin };
 
-      // 1. Rename "Annexed Kingdoms" to "Indian Kingdoms"
+      // 1. Rename "Annexed Kingdoms" to "Older Indian Kingdoms"
       if (updated.section === 'Annexed Kingdoms') {
-        updated.section = 'Indian Kingdoms';
+        updated.section = 'Older Indian Kingdoms';
         renamedAnnexedCount++;
       }
 
-      // 2. Move Delhi Sultanate from "Other" to "Indian Kingdoms"
+      // 2. Move Delhi Sultanate from "Other" to "Older Indian Kingdoms"
       if (updated.section === 'Other' && updated.subsection === 'Delhi Sultanate') {
-        updated.section = 'Indian Kingdoms';
+        updated.section = 'Older Indian Kingdoms';
         movedCount++;
       }
 
-      // 3. Move Chola Dynasty from "Other" to "Indian Kingdoms"
+      // 3. Move Chola Dynasty from "Other" to "Older Indian Kingdoms"
       if (updated.section === 'Other' && updated.subsection === 'Chola Dynasty') {
-        updated.section = 'Indian Kingdoms';
+        updated.section = 'Older Indian Kingdoms';
         movedCount++;
       }
 
