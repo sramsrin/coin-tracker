@@ -1900,9 +1900,6 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        <div className={`text-xs mt-1 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
-                          {coinCount} coin{coinCount !== 1 ? 's' : ''}
-                        </div>
                       </button>
                     );
                   })}
@@ -1940,9 +1937,6 @@ export default function Home() {
                           }`}
                         >
                           <div className="text-sm font-semibold">{state}</div>
-                          <div className={`text-xs mt-1 ${selectedState === state ? 'text-purple-200' : 'text-gray-500'}`}>
-                            {stateCoins.length} coin{stateCoins.length !== 1 ? 's' : ''}
-                          </div>
                         </button>
                       );
                     })}
@@ -2207,9 +2201,6 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      <div className={`text-xs mt-1 ${selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-gray-500'}`}>
-                        {coinCount} coin{coinCount !== 1 ? 's' : ''}
-                      </div>
                     </button>
                   );
                 })}
