@@ -1730,7 +1730,7 @@ export default function Home() {
             <div className="sticky top-0 z-50 bg-white pb-6 mb-2 -mt-6 -mx-6 px-6 pt-6 shadow-sm">
               {/* Context Label */}
               <div className="mb-3 px-2">
-                <div className="text-sm font-semibold text-gray-700">
+                <div className="text-sm font-semibold text-gray-700 flex items-center gap-3">
                   {(() => {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
                     if (!section) {
@@ -1744,6 +1744,58 @@ export default function Home() {
                       parts.push(subsubsection);
                     }
                     return <span className="text-purple-600">📝 {parts.join(' → ')}</span>;
+                  })()}
+                  {(() => {
+                    const { section, subsection, subsubsection } = getCurrentSelectionContext();
+                    if (!section) return null;
+
+                    // Calculate coin count for current context
+                    const filteredCoins = coins.filter(coin => {
+                      if (section && coin.section !== section) return false;
+                      if (subsection && coin.subsection !== subsection) return false;
+                      if (subsubsection && coin.subsubsection !== subsubsection) return false;
+                      return true;
+                    });
+
+                    return (
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Clear all selections first
+                          setSelectedSection(null);
+                          setSelectedSubsection(null);
+                          setSelectedState(null);
+                          setSelectedEuropeanCategory(null);
+                          setSelectedEuropeanPower(null);
+                          // Then set the specific context
+                          setTimeout(() => {
+                            if (section) setSelectedSection(section);
+                            if (subsection) {
+                              if (section === 'Indian Kingdoms') {
+                                setSelectedSubsection(subsection);
+                              } else if (section === 'European Trading Companies') {
+                                setSelectedEuropeanCategory(subsection);
+                              } else {
+                                setSelectedSubsection(subsection);
+                              }
+                            }
+                            if (subsubsection) {
+                              if (section === 'Indian Kingdoms') {
+                                setSelectedState(subsubsection);
+                              } else if (section === 'European Trading Companies') {
+                                setSelectedEuropeanPower(subsubsection);
+                              }
+                            }
+                            setActiveTab('collection');
+                            setGroupBySection(true);
+                          }, 0);
+                        }}
+                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm transition-colors duration-200"
+                      >
+                        {filteredCoins.length} coin{filteredCoins.length !== 1 ? 's' : ''} →
+                      </a>
+                    );
                   })()}
                 </div>
               </div>
