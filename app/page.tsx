@@ -423,7 +423,7 @@ export default function Home() {
       } else if (selectedSubsection) {
         // Get all states in this subsection (when "All" is selected)
         statesToHighlight = coins
-          .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+          .filter(c => c.section === 'Indian Kingdoms' && c.subsection === selectedSubsection)
           .map(c => c.subsubsection)
           .filter(Boolean);
       }
@@ -1183,8 +1183,8 @@ export default function Home() {
                         {sortSubsections(section, Object.keys(groupedCoins[section])).map((subsection) => {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
-                          const isPrincelyStates = section === 'Indian Princely States';
-                          const isMadrasPresidencyTerritories = section === 'British India Presidencies' && subsection === 'Madras Presidency - Subsumed Kingdoms';
+                          const isPrincelyStates = section === 'Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'British India Pre 1835' && subsection === 'Annexed kingdoms';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -1283,8 +1283,8 @@ export default function Home() {
                         </h4>
                         {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
-                          const isPrincelyStates = section === 'Indian Princely States';
-                          const isMadrasPresidencyTerritories = section === 'British India Presidencies' && subsection === 'Madras Presidency - Subsumed Kingdoms';
+                          const isPrincelyStates = section === 'Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'British India Pre 1835' && subsection === 'Annexed kingdoms';
                           const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
 
                           return (
@@ -1694,7 +1694,7 @@ export default function Home() {
                       parts.push(`Subsection: ${subsection}`);
                     }
                     if (subsubsection) {
-                      const label = section === 'Indian Princely States' ? 'State' : 'Region';
+                      const label = section === 'Indian Kingdoms' ? 'State' : 'Region';
                       parts.push(`${label}: ${subsubsection}`);
                     }
                     return <span className="text-purple-600">📝 {parts.join(' → ')}</span>;
@@ -1792,7 +1792,7 @@ export default function Home() {
                           setSelectedEuropeanCategory(null);
                           setSelectedEuropeanPower(null);
                           // Set map mode based on section
-                          if (section === 'Indian Princely States') {
+                          if (section === 'Indian Kingdoms') {
                             setMapMode('princely');
                           } else if (section === 'European Trading Companies') {
                             setMapMode('european');
@@ -1821,7 +1821,7 @@ export default function Home() {
             <div>
 
             {/* Princely States Mode */}
-            {selectedSection === 'Indian Princely States' && (<>
+            {selectedSection === 'Indian Kingdoms' && (<>
 
             {/* Agency Selector and Selected State */}
             <div className="mb-6">
@@ -1830,13 +1830,13 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {Array.from(new Set(
                     coins
-                      .filter(c => c.section === 'Indian Princely States')
+                      .filter(c => c.section === 'Indian Kingdoms')
                       .map(c => c.subsection)
                       .filter(Boolean)
                   )).sort().map(subsection => {
                     const subsectionStates = Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States' && c.subsection === subsection)
+                        .filter(c => c.section === 'Indian Kingdoms' && c.subsection === subsection)
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     ));
@@ -1876,12 +1876,12 @@ export default function Home() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States' && c.subsection === selectedSubsection)
+                        .filter(c => c.section === 'Indian Kingdoms' && c.subsection === selectedSubsection)
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     )).sort().map(state => {
                       const stateCoins = coins.filter(
-                        c => c.section === 'Indian Princely States' && c.subsubsection === state
+                        c => c.section === 'Indian Kingdoms' && c.subsubsection === state
                       );
                       const isMapped = colorMappings.some(m => m.state === state);
 
@@ -2092,7 +2092,7 @@ export default function Home() {
                 })()}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
                   {colorMappings
-                    .filter(m => coins.some(c => c.section === 'Indian Princely States' && c.subsubsection === m.state))
+                    .filter(m => coins.some(c => c.section === 'Indian Kingdoms' && c.subsubsection === m.state))
                     .sort((a, b) => a.state.localeCompare(b.state))
                     .map(mapping => {
                       const hasDuplicate = colorMappings.filter(m => m.color === mapping.color).length > 1;
@@ -2405,7 +2405,7 @@ export default function Home() {
             </>)}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'Indian Princely States' && selectedSection !== 'European Trading Companies' && (
+            {selectedSection && selectedSection !== 'Indian Kingdoms' && selectedSection !== 'European Trading Companies' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -2478,7 +2478,7 @@ export default function Home() {
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {ambiguousStates.states.map(state => {
                     const stateCoins = coins.filter(
-                      c => c.section === 'Indian Princely States' && c.subsubsection === state
+                      c => c.section === 'Indian Kingdoms' && c.subsubsection === state
                     );
                     return (
                       <button
@@ -2559,7 +2559,7 @@ export default function Home() {
                   <datalist id="all-states-list">
                     {Array.from(new Set(
                       coins
-                        .filter(c => c.section === 'Indian Princely States')
+                        .filter(c => c.section === 'Indian Kingdoms')
                         .map(c => c.subsubsection)
                         .filter(Boolean)
                     )).sort().map(state => (
