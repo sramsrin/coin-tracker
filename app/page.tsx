@@ -376,22 +376,34 @@ export default function Home() {
 
     if (!stateNames || stateNames.length === 0) return;
 
+    console.log('Highlighting states:', stateNames);
+
     // Get all colors for the states to highlight
     const targetColors = stateNames
       .map(stateName => {
         const mapping = colorMappings.find(m => m.state === stateName);
-        if (!mapping) return null;
+        if (!mapping) {
+          console.log(`No color mapping found for state: ${stateName}`);
+          return null;
+        }
         const [r, g, b] = mapping.color.split(',').map(Number);
-        return { r, g, b };
+        console.log(`Color for ${stateName}: RGB(${r}, ${g}, ${b})`);
+        return { r, g, b, stateName };
       })
-      .filter(Boolean) as { r: number; g: number; b: number }[];
+      .filter(Boolean) as { r: number; g: number; b: number; stateName: string }[];
 
-    if (targetColors.length === 0) return;
+    if (targetColors.length === 0) {
+      console.log('No valid target colors found');
+      return;
+    }
 
     // Get image data and highlight the matching colors with stripes
     const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
     const data = imageData.data;
     const width = mapCanvas.width;
+
+    const matchCounts: {[key: string]: number} = {};
+    targetColors.forEach(tc => matchCounts[tc.stateName] = 0);
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
@@ -399,11 +411,12 @@ export default function Home() {
       const b = data[i + 2];
 
       // Check if this pixel matches any target color
-      const matchesTarget = targetColors.some(
+      const matchedColor = targetColors.find(
         target => target.r === r && target.g === g && target.b === b
       );
 
-      if (matchesTarget) {
+      if (matchedColor) {
+        matchCounts[matchedColor.stateName]++;
         // Highlighted state - keep original color at full brightness
         data[i] = r;
         data[i + 1] = g;
@@ -415,6 +428,8 @@ export default function Home() {
         data[i + 2] = Math.floor(b * 0.4);
       }
     }
+
+    console.log('Matching pixels per state:', matchCounts);
 
     ctx.putImageData(imageData, 0, 0);
   };
