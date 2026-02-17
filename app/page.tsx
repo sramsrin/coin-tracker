@@ -1321,7 +1321,7 @@ export default function Home() {
                       >
                         <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
                           <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
-                          {subsection} ({agencyCoins} coins)
+                          {subsection}
                         </h4>
                         {(() => {
                           const allSubsubsections = Object.keys(groupedCoins[section][subsection]).sort();
@@ -1343,7 +1343,7 @@ export default function Home() {
                               {showStateHeader && (
                                 <h5 className="text-md font-medium text-gray-600 mb-2 flex items-center">
                                   <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
-                                  {subsubsection} ({stateCoins.length} coins)
+                                  {subsubsection}
                                 </h5>
                               )}
                               <div className="overflow-x-auto">
