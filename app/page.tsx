@@ -401,9 +401,13 @@ export default function Home() {
     const imageData = ctx.getImageData(0, 0, mapCanvas.width, mapCanvas.height);
     const data = imageData.data;
     const width = mapCanvas.width;
+    const height = mapCanvas.height;
 
     const matchCounts: {[key: string]: number} = {};
     targetColors.forEach(tc => matchCounts[tc.stateName] = 0);
+
+    // Track highlighted pixels for stripe drawing
+    const highlightedPixels: {x: number, y: number}[] = [];
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
@@ -417,6 +421,11 @@ export default function Home() {
 
       if (matchedColor) {
         matchCounts[matchedColor.stateName]++;
+        const pixelIndex = i / 4;
+        const x = pixelIndex % width;
+        const y = Math.floor(pixelIndex / width);
+        highlightedPixels.push({x, y});
+
         // Highlighted state - keep original color at full brightness
         data[i] = r;
         data[i + 1] = g;
@@ -432,6 +441,27 @@ export default function Home() {
     console.log('Matching pixels per state:', matchCounts);
 
     ctx.putImageData(imageData, 0, 0);
+
+    // Draw diagonal stripes over highlighted areas for better visibility
+    if (highlightedPixels.length > 0) {
+      // Create a set for faster lookup
+      const highlightedSet = new Set(highlightedPixels.map(p => `${p.x},${p.y}`));
+
+      // Draw white diagonal stripes over highlighted pixels
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'; // Semi-transparent white
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          // Check if this pixel is highlighted
+          if (highlightedSet.has(`${x},${y}`)) {
+            // Draw diagonal stripe pattern (every 6 pixels diagonally)
+            if ((x + y) % 6 === 0 || (x + y) % 6 === 1) {
+              ctx.fillRect(x, y, 1, 1);
+            }
+          }
+        }
+      }
+    }
   };
 
   // Highlight state(s) when selection changes
