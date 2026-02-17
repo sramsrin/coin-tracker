@@ -27,10 +27,18 @@ export async function POST() {
     // Read all coins
     const coins = await kv.get<Coin[]>(COINS_KEY) || [];
 
+    // Debug: Find all Madurai coins
+    const maduraiCoins = coins.filter(coin =>
+      coin.subsubsection === 'Madurai' ||
+      coin.subsection === 'Madurai' ||
+      (coin.section && coin.section.toLowerCase().includes('madurai'))
+    );
+    console.log('Found Madurai coins:', maduraiCoins);
+
     // Find and update Madurai coins
     let updatedCount = 0;
     const updatedCoins = coins.map(coin => {
-      if (coin.subsubsection === 'Madurai' && coin.subsection === 'Annexed kingdoms') {
+      if (coin.subsubsection === 'Madurai' && coin.section === 'Indian Kingdoms') {
         updatedCount++;
         return {
           ...coin,
@@ -48,7 +56,13 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       message: `Moved ${updatedCount} Madurai coins from "Annexed kingdoms" to "Other"`,
-      updatedCount
+      updatedCount,
+      foundMaduraiCoins: maduraiCoins.length,
+      maduraiCoins: maduraiCoins.map(c => ({
+        section: c.section,
+        subsection: c.subsection,
+        subsubsection: c.subsubsection
+      }))
     });
   } catch (error) {
     console.error('Migration error:', error);
