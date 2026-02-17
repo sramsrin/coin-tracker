@@ -1260,7 +1260,7 @@ export default function Home() {
             <p className="text-gray-500 text-center py-8">No coins in your collection yet. Add one above!</p>
           ) : groupBySection ? (
             <div className="p-6 pt-0">
-              {Object.keys(groupedCoins).sort().map((section) => (
+              {Object.keys(groupedCoins).sort().filter(section => !selectedSection || section === selectedSection).map((section) => (
                 <div
                   key={section}
                   id={`section-${section.replace(/\s+/g, '-').toLowerCase()}`}
@@ -1269,7 +1269,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-pink-300">
                     {section}
                   </h3>
-                  {sortSubsections(section, Object.keys(groupedCoins[section])).map((subsection) => {
+                  {sortSubsections(section, Object.keys(groupedCoins[section])).filter(subsection => !selectedSubsection || subsection === selectedSubsection).map((subsection) => {
                     const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
                     return (
                       <div
@@ -1281,7 +1281,7 @@ export default function Home() {
                           <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                           {subsection} ({agencyCoins} coins)
                         </h4>
-                        {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
+                        {Object.keys(groupedCoins[section][subsection]).sort().filter(subsubsection => !selectedState || subsubsection === selectedState).map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'Indian Kingdoms';
                           const isMadrasPresidencyTerritories = section === 'British India Pre 1835' && subsection === 'Annexed kingdoms';
