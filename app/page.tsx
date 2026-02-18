@@ -2127,18 +2127,18 @@ export default function Home() {
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
-                        let x, y;
-                        if (isAuthenticated) {
-                          // Edit mode - adjust for zoom and pan
-                          const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
-                          const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
-                          x = Math.floor((clickX - pan.x) / zoom);
-                          y = Math.floor((clickY - pan.y) / zoom);
-                        } else {
-                          // View mode - simple click without zoom adjustment
-                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
-                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
-                        }
+                        // Get click position in canvas pixel coordinates
+                        // rect.width/height already include zoom transform from CSS
+                        const canvasX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                        const canvasY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+                        // Convert pan from screen pixels to canvas pixels
+                        const panCanvasX = pan.x * (canvas.width / rect.width);
+                        const panCanvasY = pan.y * (canvas.height / rect.height);
+
+                        // Reverse the pan to get original image coordinates
+                        const x = Math.floor(canvasX - panCanvasX);
+                        const y = Math.floor(canvasY - panCanvasY);
 
                         const ctx = canvas.getContext('2d');
                         if (ctx && originalImageData) {
@@ -2387,16 +2387,18 @@ export default function Home() {
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
-                        let x, y;
-                        if (isAuthenticated) {
-                          const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
-                          const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
-                          x = Math.floor((clickX - pan.x) / zoom);
-                          y = Math.floor((clickY - pan.y) / zoom);
-                        } else {
-                          x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
-                          y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
-                        }
+                        // Get click position in canvas pixel coordinates
+                        // rect.width/height already include zoom transform from CSS
+                        const canvasX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                        const canvasY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+                        // Convert pan from screen pixels to canvas pixels
+                        const panCanvasX = pan.x * (canvas.width / rect.width);
+                        const panCanvasY = pan.y * (canvas.height / rect.height);
+
+                        // Reverse the pan to get original image coordinates
+                        const x = Math.floor(canvasX - panCanvasX);
+                        const y = Math.floor(canvasY - panCanvasY);
 
                         const ctx = canvas.getContext('2d');
                         if (ctx && europeanOriginalImageData) {
