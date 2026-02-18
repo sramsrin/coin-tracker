@@ -179,10 +179,14 @@ export default function Home() {
   const [ambiguousStates, setAmbiguousStates] = useState<{color: string, states: string[]} | null>(null);
   // Zoom and pan removed - using simple pointer cursor instead
   // Pan state removed - using simple pointer cursor instead
-  const [mapMode, setMapMode] = useState<'princely' | 'european'>('princely');
+  const [mapMode, setMapMode] = useState<'princely' | 'european' | 'presidencies'>('princely');
   const [europeanColorMappings, setEuropeanColorMappings] = useState<{state: string, color: string}[]>([]);
   const [europeanMapCanvas, setEuropeanMapCanvas] = useState<HTMLCanvasElement | null>(null);
   const [europeanOriginalImageData, setEuropeanOriginalImageData] = useState<ImageData | null>(null);
+  const [presidenciesColorMappings, setPresidenciesColorMappings] = useState<{state: string, color: string}[]>([]);
+  const [presidenciesMapCanvas, setPresidenciesMapCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [presidenciesOriginalImageData, setPresidenciesOriginalImageData] = useState<ImageData | null>(null);
+  const [selectedPresidency, setSelectedPresidency] = useState<string | null>(null);
   const [textBoxValue, setTextBoxValue] = useState('');
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -223,6 +227,7 @@ export default function Home() {
     fetchCoins();
     fetchColorMappings();
     fetchEuropeanColorMappings();
+    fetchPresidenciesColorMappings();
     fetchTextNote();
 
     // Restore authentication from localStorage
@@ -252,7 +257,7 @@ export default function Home() {
       // On first load, just update the previous selection ref
       previousSelectionRef.current = getCurrentSelectionContext();
     }
-  }, [selectedSection, selectedSubsection, selectedState, selectedEuropeanCategory, selectedEuropeanPower]);
+  }, [selectedSection, selectedSubsection, selectedState, selectedEuropeanCategory, selectedEuropeanPower, selectedPresidency]);
 
   // Auto-scroll to top when filters are applied and switching to collection tab
   useEffect(() => {
@@ -285,10 +290,22 @@ export default function Home() {
     }
   };
 
+  const fetchPresidenciesColorMappings = async () => {
+    try {
+      const response = await fetch('/api/presidencies-map-points');
+      if (response.ok) {
+        const data = await response.json();
+        setPresidenciesColorMappings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching presidencies color mappings:', error);
+    }
+  };
+
   // Helper to get current selection context
   const getCurrentSelectionContext = () => {
     let section = selectedSection;
-    let subsection = selectedSubsection || selectedEuropeanCategory;
+    let subsection = selectedSubsection || selectedEuropeanCategory || selectedPresidency;
     let subsubsection = selectedState || selectedEuropeanPower;
 
     return { section, subsection, subsubsection };
@@ -575,6 +592,74 @@ export default function Home() {
       highlightStateOnMap(statesToHighlight.length > 0 ? statesToHighlight : null);
     }
   }, [selectedState, selectedSubsection, colorMappings, mapCanvas, originalImageData, coins, activeTab]);
+
+  const highlightPresidencyOnMap = (presidencyNames: string[] | null) => {
+    if (!presidenciesMapCanvas || !presidenciesOriginalImageData) return;
+
+    const ctx = presidenciesMapCanvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.putImageData(presidenciesOriginalImageData, 0, 0);
+
+    if (!presidencyNames || presidencyNames.length === 0) {
+      setIsHighlighting(false);
+      return;
+    }
+
+    setIsHighlighting(true);
+
+    setTimeout(() => {
+      const targetColors = presidencyNames
+        .flatMap(name => {
+          const mappings = presidenciesColorMappings.filter(m => m.state === name);
+          return mappings.map(mapping => {
+            const [r, g, b] = mapping.color.split(',').map(Number);
+            return { r, g, b };
+          });
+        });
+
+      if (targetColors.length === 0) {
+        setIsHighlighting(false);
+        return;
+      }
+
+      const imageData = ctx.getImageData(0, 0, presidenciesMapCanvas.width, presidenciesMapCanvas.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        const matchesTarget = targetColors.some(
+          target => target.r === r && target.g === g && target.b === b
+        );
+
+        if (matchesTarget) {
+          data[i] = Math.min(255, Math.floor(r * 1.5));
+          data[i + 1] = Math.min(255, Math.floor(g * 1.5));
+          data[i + 2] = Math.min(255, Math.floor(b * 1.5));
+        } else {
+          data[i] = Math.floor(r * 0.4);
+          data[i + 1] = Math.floor(g * 0.4);
+          data[i + 2] = Math.floor(b * 0.4);
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      setIsHighlighting(false);
+    }, 50);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'map' && mapMode === 'presidencies') {
+      if (selectedPresidency) {
+        highlightPresidencyOnMap([selectedPresidency]);
+      } else {
+        highlightPresidencyOnMap(null);
+      }
+    }
+  }, [selectedPresidency, presidenciesColorMappings, presidenciesMapCanvas, presidenciesOriginalImageData, activeTab, mapMode]);
 
   const fetchCoins = async () => {
     try {
@@ -997,6 +1082,47 @@ export default function Home() {
       await fetchEuropeanColorMappings();
     } catch (error) {
       console.error('Error deleting European mapping:', error);
+    }
+  };
+
+  const handleSavePresidenciesMapping = async () => {
+    if (!editingMapping || !mappingFormState.trim()) return;
+
+    try {
+      if (editingMapping.state !== mappingFormState.trim()) {
+        await fetch(`/api/presidencies-map-points?state=${encodeURIComponent(editingMapping.state)}`, {
+          method: 'DELETE',
+        });
+      }
+
+      await fetch('/api/presidencies-map-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          state: mappingFormState.trim(),
+          color: editingMapping.color
+        })
+      });
+
+      await fetchPresidenciesColorMappings();
+      setShowMappingModal(false);
+      setEditingMapping(null);
+      setMappingFormState('');
+    } catch (error) {
+      console.error('Error saving presidencies mapping:', error);
+    }
+  };
+
+  const handleDeletePresidenciesMapping = async (state: string) => {
+    if (!confirm(`Delete mapping for ${state}?`)) return;
+
+    try {
+      await fetch(`/api/presidencies-map-points?state=${encodeURIComponent(state)}`, {
+        method: 'DELETE',
+      });
+      await fetchPresidenciesColorMappings();
+    } catch (error) {
+      console.error('Error deleting presidencies mapping:', error);
     }
   };
 
@@ -2027,17 +2153,21 @@ export default function Home() {
                         setSelectedState(null);
                         setSelectedEuropeanCategory(null);
                         setSelectedEuropeanPower(null);
+                        setSelectedPresidency(null);
                       } else {
                         setSelectedSection(section);
                         setSelectedSubsection(null);
                         setSelectedState(null);
                         setSelectedEuropeanCategory(null);
                         setSelectedEuropeanPower(null);
+                        setSelectedPresidency(null);
                         // Set map mode based on section
                         if (section === 'British India Princely States') {
                           setMapMode('princely');
                         } else if (section === 'European Trading Companies') {
                           setMapMode('european');
+                        } else if (section === 'British India Presidencies') {
+                          setMapMode('presidencies');
                         }
                       }
                     }}
@@ -2509,8 +2639,157 @@ export default function Home() {
 
             </>)}
 
+            {/* British India Presidencies Mode */}
+            {selectedSection === 'British India Presidencies' && (<>
+
+            {/* Presidency Selector */}
+            <div className="mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Presidency</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {Array.from(new Set(
+                  coins
+                    .filter(c => c.section === 'British India Presidencies')
+                    .map(c => c.subsection)
+                    .filter(Boolean)
+                )).sort().map(subsection => {
+                  const coinCount = coins.filter(c =>
+                    c.section === 'British India Presidencies' &&
+                    c.subsection === subsection
+                  ).length;
+                  const isMapped = presidenciesColorMappings.some(m => m.state === subsection);
+
+                  return (
+                    <button
+                      key={subsection}
+                      onClick={() => {
+                        setSelectedPresidency(selectedPresidency === subsection ? null : subsection);
+                      }}
+                      className={`px-4 py-3 rounded-lg transition text-left ${
+                        selectedPresidency === subsection
+                          ? 'bg-purple-600 text-white shadow-lg'
+                          : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                      }`}
+                    >
+                      <div className="text-sm font-semibold">{subsection}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Presidencies Map Section */}
+            <div className="mb-6">
+              <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
+                  {isHighlighting && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-white font-semibold">Loading map...</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative overflow-hidden">
+                    <canvas
+                      key="presidencies-map-canvas"
+                      ref={(canvas) => {
+                        if (canvas && !canvas.dataset.presidenciesInitialized) {
+                          canvas.dataset.presidenciesInitialized = 'true';
+                          setPresidenciesMapCanvas(canvas);
+                          const ctx = canvas.getContext('2d');
+                          const img = new window.Image();
+                          img.onload = () => {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx?.drawImage(img, 0, 0);
+                            const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
+                            if (imageData) {
+                              setPresidenciesOriginalImageData(imageData);
+                            }
+                          };
+                          img.onerror = () => {
+                            console.error('Failed to load Presidencies map image');
+                          };
+                          img.src = '/maps/presidencies-map.png';
+                        }
+                      }}
+                      onClick={(e) => {
+                        const canvas = e.currentTarget;
+                        const rect = canvas.getBoundingClientRect();
+                        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+
+                        const ctx = canvas.getContext('2d');
+                        if (ctx && presidenciesOriginalImageData) {
+                          if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+                            const index = (y * canvas.width + x) * 4;
+                            const pixel = presidenciesOriginalImageData.data;
+                            const color = `${pixel[index]},${pixel[index + 1]},${pixel[index + 2]}`;
+
+                            const mappings = presidenciesColorMappings.filter(m => m.color === color);
+
+                            if (mappings.length >= 1) {
+                              // Select the presidency (use first match since multiple colors map to same presidency)
+                              setSelectedPresidency(mappings[0].state);
+                            } else {
+                              console.log('Clicked color:', color, 'at', x, y);
+                              if (isAuthenticated) {
+                                setEditingMapping({ state: '', color });
+                                setMappingFormState('');
+                                setShowMappingModal(true);
+                              }
+                            }
+                          }
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+            {/* Presidencies Mapping Management - Admin Only */}
+            {isAuthenticated && (
+              <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Manage Presidency Mappings</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
+                  {presidenciesColorMappings
+                    .filter((m, i, arr) => arr.findIndex(a => a.state === m.state) === i)
+                    .sort((a, b) => a.state.localeCompare(b.state))
+                    .map(mapping => (
+                      <div key={mapping.state} className="border rounded p-3 flex items-center justify-between border-gray-300">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{mapping.state}</div>
+                          <div className="text-xs text-gray-500">RGB({mapping.color})</div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMapping(mapping);
+                              setMappingFormState(mapping.state);
+                              setShowMappingModal(true);
+                            }}
+                            className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded text-xs"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeletePresidenciesMapping(mapping.state)}
+                            className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            </>)}
+
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && (
+            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -2620,6 +2899,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-gray-800 mb-4">
                 {editingMapping.state ? 'Edit Mapping' : 'Add New Mapping'}
                 {mapMode === 'european' && <span className="text-sm font-normal text-gray-500 ml-2">(European Map)</span>}
+                {mapMode === 'presidencies' && <span className="text-sm font-normal text-gray-500 ml-2">(Presidencies Map)</span>}
               </h3>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2631,14 +2911,14 @@ export default function Home() {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {mapMode === 'european' ? 'Region Name' : 'State Name'}
+                  {mapMode === 'european' ? 'Region Name' : mapMode === 'presidencies' ? 'Presidency Name' : 'State Name'}
                 </label>
                 <input
                   list="all-states-list"
                   value={mappingFormState}
                   onChange={(e) => setMappingFormState(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  placeholder={mapMode === 'european' ? 'Select or type region name...' : 'Select or type state name...'}
+                  placeholder={mapMode === 'european' ? 'Select or type region name...' : mapMode === 'presidencies' ? 'Select or type presidency name...' : 'Select or type state name...'}
                   autoFocus
                 />
                 {mapMode === 'princely' && (
@@ -2668,6 +2948,18 @@ export default function Home() {
                     ))}
                   </datalist>
                 )}
+                {mapMode === 'presidencies' && (
+                  <datalist id="all-states-list">
+                    {Array.from(new Set(
+                      coins
+                        .filter(c => c.section === 'British India Presidencies')
+                        .map(c => c.subsection)
+                        .filter(Boolean)
+                    )).sort().map(presidency => (
+                      <option key={presidency} value={presidency} />
+                    ))}
+                  </datalist>
+                )}
               </div>
               <div className="flex gap-3">
                 <button
@@ -2681,7 +2973,7 @@ export default function Home() {
                   Cancel
                 </button>
                 <button
-                  onClick={mapMode === 'european' ? handleSaveEuropeanMapping : handleSaveMapping}
+                  onClick={mapMode === 'european' ? handleSaveEuropeanMapping : mapMode === 'presidencies' ? handleSavePresidenciesMapping : handleSaveMapping}
                   disabled={!mappingFormState.trim()}
                   className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
