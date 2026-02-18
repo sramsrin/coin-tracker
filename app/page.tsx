@@ -509,15 +509,15 @@ export default function Home() {
 
     // Use setTimeout to allow UI to update with loading spinner
     setTimeout(() => {
-      // Get all colors for the states to highlight
+      // Get all colors for the states to highlight (including stripe/boundary variants)
       const targetColors = stateNames
-        .map(stateName => {
-          const mapping = colorMappings.find(m => m.state === stateName);
-          if (!mapping) return null;
-          const [r, g, b] = mapping.color.split(',').map(Number);
-          return { r, g, b };
-        })
-        .filter(Boolean) as { r: number; g: number; b: number }[];
+        .flatMap(stateName => {
+          const mappings = colorMappings.filter(m => m.state === stateName);
+          return mappings.map(mapping => {
+            const [r, g, b] = mapping.color.split(',').map(Number);
+            return { r, g, b };
+          });
+        });
 
       if (targetColors.length === 0) {
         setIsHighlighting(false);
@@ -2285,6 +2285,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
                   {colorMappings
                     .filter(m => coins.some(c => c.section === 'British India Princely States' && c.subsubsection === m.state))
+                    .filter((m, i, arr) => arr.findIndex(a => a.state === m.state) === i)
                     .sort((a, b) => a.state.localeCompare(b.state))
                     .map(mapping => {
                       const hasDuplicate = colorMappings.filter(m => m.color === mapping.color).length > 1;
