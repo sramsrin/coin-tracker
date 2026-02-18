@@ -10,7 +10,7 @@ export async function POST() {
     let sivagangaiCount = 0;
 
     const updated = coins.map(coin => {
-      if (coin.section === 'Older Indian Kingdoms' && coin.subsection === 'Madurai') {
+      if ((coin.section === 'Older Indian Kingdoms' || coin.section === 'European Overseas') && coin.subsection === 'Madurai') {
         maduraiCount++;
         return {
           ...coin,
