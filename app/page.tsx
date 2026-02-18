@@ -623,6 +623,13 @@ export default function Home() {
         return;
       }
 
+      // Annexed district colors (Arcot, Madurai, Sivagangai) - turn white when highlighted
+      const annexedColors = [
+        {r:0,g:190,b:180}, {r:0,g:140,b:130}, {r:0,g:100,b:95},       // Arcot
+        {r:220,g:120,b:50}, {r:170,g:85,b:30}, {r:160,g:80,b:30},     // Madurai
+        {r:50,g:140,b:220}, {r:30,g:100,b:170}, {r:30,g:90,b:160},    // Ramnad/Sivagangai
+      ];
+
       const imageData = ctx.getImageData(0, 0, presidenciesMapCanvas.width, presidenciesMapCanvas.height);
       const data = imageData.data;
 
@@ -631,15 +638,26 @@ export default function Home() {
         const g = data[i + 1];
         const b = data[i + 2];
 
+        const isAnnexed = annexedColors.some(
+          c => c.r === r && c.g === g && c.b === b
+        );
+
         const matchesTarget = targetColors.some(
           target => target.r === r && target.g === g && target.b === b
         );
 
-        if (matchesTarget) {
+        if (isAnnexed && matchesTarget) {
+          // Annexed districts → white
+          data[i] = 255;
+          data[i + 1] = 255;
+          data[i + 2] = 255;
+        } else if (matchesTarget) {
+          // Presidency fill/border → brighten
           data[i] = Math.min(255, Math.floor(r * 1.5));
           data[i + 1] = Math.min(255, Math.floor(g * 1.5));
           data[i + 2] = Math.min(255, Math.floor(b * 1.5));
         } else {
+          // Everything else → dim
           data[i] = Math.floor(r * 0.4);
           data[i + 1] = Math.floor(g * 0.4);
           data[i + 2] = Math.floor(b * 0.4);
