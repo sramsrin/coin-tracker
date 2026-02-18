@@ -3,6 +3,132 @@
 
 import { useState, useEffect, useRef } from 'react';
 
+// Single Blog Card Component
+function BlogCard({ url }: { url: string }) {
+  const [metadata, setMetadata] = useState<{ title: string; description: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Extract domain for display
+  let domain = '';
+  let isBlogger = false;
+  try {
+    const urlObject = new URL(url);
+    domain = urlObject.hostname;
+    isBlogger = domain.includes('blogspot.com') || domain.includes('blogger.com');
+  } catch {
+    domain = '';
+  }
+
+  // Fetch metadata when component mounts
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMetadata(data);
+        }
+      } catch (error) {
+        console.error('Error fetching metadata:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMetadata();
+  }, [url]);
+
+  return (
+    <div className="border border-purple-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col">
+      <div className="p-3 flex-1">
+        {/* Icon */}
+        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-md flex items-center justify-center mb-2 mx-auto">
+          {isBlogger ? (
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21.976 24H2.026C.9 24 0 23.1 0 21.976V2.026C0 .9.9 0 2.025 0H22.05C23.1 0 24 .9 24 2.025v19.95C24 23.1 23.1 24 21.976 24zM12 3.975H9c-2.775 0-5.025 2.25-5.025 5.025v6c0 2.774 2.25 5.024 5.025 5.024h6c2.774 0 5.024-2.25 5.024-5.024v-3.975c0-.6-.45-1.05-1.05-1.05H18c-.524 0-.976-.45-.976-.976 0-2.776-2.25-5.026-5.024-5.026zm3.074 12h-6c-.525 0-.976-.45-.976-.975s.45-.976.976-.976h6c.525 0 .976.45.976.976s-.45.976-.976.976zm-2.55-3.024h-3.45c-.525 0-.976-.45-.976-.976s.45-.975.975-.975h3.45c.526 0 .976.45.976.975s-.45.976-.975.976z"/>
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          )}
+        </div>
+
+        {/* Content */}
+        <h3 className="text-xs font-semibold text-gray-900 mb-2 line-clamp-3 text-center min-h-[2.5rem]">
+          {isLoading ? (
+            <span className="text-gray-400 italic">Loading...</span>
+          ) : (
+            metadata?.title || 'Blog Post'
+          )}
+        </h3>
+      </div>
+
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-center text-xs text-white bg-purple-600 hover:bg-purple-700 py-2 transition-colors"
+      >
+        Read
+      </a>
+
+      {/* Bottom accent bar */}
+      <div className="h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
+    </div>
+  );
+}
+
+// BlogPreview Component for section introductions
+function BlogPreview({ url }: { url: string }) {
+  if (!url || url.trim() === '') {
+    return null;
+  }
+
+  // Check if it contains multiple URLs (separated by newlines or commas)
+  const urls = url.split(/[\n,]/).map(u => u.trim()).filter(u => u.length > 0);
+
+  // Check if any of them are valid URLs
+  const validUrls = urls.filter(u => {
+    try {
+      new URL(u);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  if (validUrls.length === 0) {
+    // If no valid URLs, show as plain text (backwards compatibility)
+    return (
+      <div
+        className="text-gray-600 whitespace-pre-wrap leading-relaxed"
+        style={{
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'italic',
+          lineHeight: '1.8',
+          fontSize: '1.05rem',
+          letterSpacing: '0.01em'
+        }}
+      >
+        {url}
+      </div>
+    );
+  }
+
+  // Limit to 5 posts
+  const displayUrls = validUrls.slice(0, 5);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      {displayUrls.map((blogUrl, index) => (
+        <BlogCard key={index} url={blogUrl} />
+      ))}
+    </div>
+  );
+}
+
 interface Coin {
   id: string;
   index: string;
@@ -1814,19 +1940,30 @@ export default function Home() {
 
               {isAuthenticated ? (
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Blog Links (up to 5, one per line or comma-separated)
+                  </label>
                   <textarea
                     value={textBoxValue}
                     onChange={(e) => handleTextChange(e.target.value)}
-                    placeholder="Type here (edit mode enabled)..."
-                    rows={4}
-                    className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none border-purple-200 bg-white bg-opacity-50 text-gray-400 placeholder-gray-300 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 focus:text-gray-500"
+                    placeholder="https://yourblog.blogspot.com/post1&#10;https://yourblog.blogspot.com/post2&#10;https://yourblog.blogspot.com/post3"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 border-purple-200 bg-white bg-opacity-50 text-gray-700 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 resize-none"
                     style={{
                       fontFamily: 'Georgia, serif',
                       fontStyle: 'italic',
-                      lineHeight: '1.8',
-                      fontSize: '1.05rem'
+                      fontSize: '0.95rem'
                     }}
                   />
+                  <p className="text-xs text-gray-500 mt-1 italic">
+                    💡 Tip: Enter one URL per line, or separate with commas. Maximum 5 posts.
+                  </p>
+                  {textBoxValue && (
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                      <BlogPreview url={textBoxValue} />
+                    </div>
+                  )}
                   <div className="flex items-center gap-3 mt-3">
                     <button
                       onClick={handleManualSave}
@@ -1850,26 +1987,7 @@ export default function Home() {
               ) : (
                 textBoxValue ? (
                   <div className="prose prose-lg max-w-none">
-                    <button
-                      onClick={() => setIsTextExpanded(!isTextExpanded)}
-                      className="mb-2 text-sm text-purple-600 hover:text-purple-800 italic transition-colors duration-200"
-                    >
-                      {isTextExpanded ? '← Show less' : 'Read more →'}
-                    </button>
-                    <div
-                      className={`text-gray-600 whitespace-pre-wrap leading-relaxed transition-all duration-300 ${
-                        !isTextExpanded ? 'line-clamp-3' : ''
-                      }`}
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        fontStyle: 'italic',
-                        lineHeight: '1.8',
-                        fontSize: '1.05rem',
-                        letterSpacing: '0.01em'
-                      }}
-                    >
-                      {textBoxValue}
-                    </div>
+                    <BlogPreview url={textBoxValue} />
                   </div>
                 ) : (
                   <div className="text-gray-400 italic text-center py-6">
