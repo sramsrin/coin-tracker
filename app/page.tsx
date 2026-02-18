@@ -51,10 +51,8 @@ export default function Home() {
   const [editingMapping, setEditingMapping] = useState<{state: string, color: string} | null>(null);
   const [mappingFormState, setMappingFormState] = useState('');
   const [ambiguousStates, setAmbiguousStates] = useState<{color: string, states: string[]} | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 });
+  // Zoom and pan removed - using simple pointer cursor instead
+  // Pan state removed - using simple pointer cursor instead
   const [mapMode, setMapMode] = useState<'princely' | 'european'>('princely');
   const [europeanColorMappings, setEuropeanColorMappings] = useState<{state: string, color: string}[]>([]);
   const [europeanMapCanvas, setEuropeanMapCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -1924,8 +1922,6 @@ export default function Home() {
                           setMapMode('european');
                         }
                       }
-                      setZoom(1);
-                      setPan({ x: 0, y: 0 });
                     }}
                     className={`px-4 py-3 rounded-lg transition text-left ${
                       selectedSection === section
@@ -2064,39 +2060,8 @@ export default function Home() {
                       </div>
                     </div>
                   )}
-                  {/* Zoom Controls - Only in Edit Mode */}
-                  {isAuthenticated && (
-                    <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-                      <button
-                        onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
-                        title="Zoom In"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => setZoom(Math.max(zoom / 1.2, 0.5))}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
-                        title="Zoom Out"
-                      >
-                        −
-                      </button>
-                      <button
-                        onClick={() => {
-                          setZoom(1);
-                          setPan({ x: 0, y: 0 });
-                        }}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300"
-                        title="Reset Zoom"
-                      >
-                        ⟲
-                      </button>
-                      <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300">
-                        {Math.round(zoom * 100)}%
-                      </div>
-                    </div>
-                  )}
-                  <div className="relative overflow-hidden" style={{ cursor: isAuthenticated && isPanning ? 'grabbing' : isAuthenticated ? 'grab' : 'pointer' }}>
+                  {/* Zoom controls removed - using simple pointer cursor */}
+                  <div className="relative overflow-hidden">
                     <canvas
                       key="princely-map-canvas"
                       ref={(canvas) => {
@@ -2122,23 +2087,12 @@ export default function Home() {
                         }
                       }}
                       onClick={(e) => {
-                        if (isAuthenticated && isPanning) return; // Don't click while panning in edit mode
-
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
-                        // Get click position in canvas pixel coordinates
-                        // rect.width/height already include zoom transform from CSS
-                        const canvasX = (e.clientX - rect.left) * (canvas.width / rect.width);
-                        const canvasY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-                        // Convert pan from screen pixels to canvas pixels
-                        const panCanvasX = pan.x * (canvas.width / rect.width);
-                        const panCanvasY = pan.y * (canvas.height / rect.height);
-
-                        // Reverse the pan to get original image coordinates
-                        const x = Math.floor(canvasX - panCanvasX);
-                        const y = Math.floor(canvasY - panCanvasY);
+                        // Simple coordinate conversion - no zoom/pan transforms
+                        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
 
                         const ctx = canvas.getContext('2d');
                         if (ctx && originalImageData) {
@@ -2171,38 +2125,7 @@ export default function Home() {
                           }
                         }
                       }}
-                      onMouseDown={(e) => {
-                        if (isAuthenticated) {
-                          setIsPanning(true);
-                          setLastPanPosition({ x: e.clientX, y: e.clientY });
-                        }
-                      }}
-                      onMouseMove={(e) => {
-                        if (isAuthenticated && isPanning) {
-                          const dx = e.clientX - lastPanPosition.x;
-                          const dy = e.clientY - lastPanPosition.y;
-                          setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-                          setLastPanPosition({ x: e.clientX, y: e.clientY });
-                        }
-                      }}
-                      onMouseUp={() => {
-                        if (isAuthenticated) setIsPanning(false);
-                      }}
-                      onMouseLeave={() => {
-                        if (isAuthenticated) setIsPanning(false);
-                      }}
-                      onWheel={(e) => {
-                        if (isAuthenticated) {
-                          e.preventDefault();
-                          const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                          setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
-                        }
-                      }}
-                      style={isAuthenticated ? {
-                        transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                        transformOrigin: '0 0',
-                        transition: isPanning ? 'none' : 'transform 0.1s ease-out'
-                      } : {}}
+                      style={{ cursor: 'pointer' }}
                       className="w-full h-auto"
                     />
                   </div>
@@ -2325,39 +2248,8 @@ export default function Home() {
               {/* European Map Section */}
               <div>
                 <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 relative">
-                  {/* Zoom Controls - Only in Edit Mode */}
-                  {isAuthenticated && (
-                    <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-                      <button
-                        onClick={() => setZoom(Math.min(zoom * 1.2, 5))}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
-                        title="Zoom In"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => setZoom(Math.max(zoom / 1.2, 0.5))}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center font-bold text-xl border border-gray-300"
-                        title="Zoom Out"
-                      >
-                        −
-                      </button>
-                      <button
-                        onClick={() => {
-                          setZoom(1);
-                          setPan({ x: 0, y: 0 });
-                        }}
-                        className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300"
-                        title="Reset Zoom"
-                      >
-                        ⟲
-                      </button>
-                      <div className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center text-xs border border-gray-300">
-                        {Math.round(zoom * 100)}%
-                      </div>
-                    </div>
-                  )}
-                  <div className="relative overflow-hidden" style={{ cursor: isAuthenticated && isPanning ? 'grabbing' : isAuthenticated ? 'grab' : 'pointer' }}>
+                  {/* Zoom controls removed - using simple pointer cursor */}
+                  <div className="relative overflow-hidden">
                     <canvas
                       key="european-map-canvas"
                       ref={(canvas) => {
@@ -2382,23 +2274,12 @@ export default function Home() {
                         }
                       }}
                       onClick={(e) => {
-                        if (isAuthenticated && isPanning) return;
-
                         const canvas = e.currentTarget;
                         const rect = canvas.getBoundingClientRect();
 
-                        // Get click position in canvas pixel coordinates
-                        // rect.width/height already include zoom transform from CSS
-                        const canvasX = (e.clientX - rect.left) * (canvas.width / rect.width);
-                        const canvasY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-                        // Convert pan from screen pixels to canvas pixels
-                        const panCanvasX = pan.x * (canvas.width / rect.width);
-                        const panCanvasY = pan.y * (canvas.height / rect.height);
-
-                        // Reverse the pan to get original image coordinates
-                        const x = Math.floor(canvasX - panCanvasX);
-                        const y = Math.floor(canvasY - panCanvasY);
+                        // Simple coordinate conversion - no zoom/pan transforms
+                        const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                        const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
 
                         const ctx = canvas.getContext('2d');
                         if (ctx && europeanOriginalImageData) {
@@ -2427,38 +2308,7 @@ export default function Home() {
                           }
                         }
                       }}
-                      onMouseDown={(e) => {
-                        if (isAuthenticated) {
-                          setIsPanning(true);
-                          setLastPanPosition({ x: e.clientX, y: e.clientY });
-                        }
-                      }}
-                      onMouseMove={(e) => {
-                        if (isAuthenticated && isPanning) {
-                          const dx = e.clientX - lastPanPosition.x;
-                          const dy = e.clientY - lastPanPosition.y;
-                          setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-                          setLastPanPosition({ x: e.clientX, y: e.clientY });
-                        }
-                      }}
-                      onMouseUp={() => {
-                        if (isAuthenticated) setIsPanning(false);
-                      }}
-                      onMouseLeave={() => {
-                        if (isAuthenticated) setIsPanning(false);
-                      }}
-                      onWheel={(e) => {
-                        if (isAuthenticated) {
-                          e.preventDefault();
-                          const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                          setZoom(prev => Math.max(0.5, Math.min(5, prev * delta)));
-                        }
-                      }}
-                      style={isAuthenticated ? {
-                        transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                        transformOrigin: '0 0',
-                        transition: isPanning ? 'none' : 'transform 0.1s ease-out'
-                      } : {}}
+                      style={{ cursor: 'pointer' }}
                       className="w-full h-auto"
                     />
                   </div>
