@@ -16,7 +16,7 @@ export async function POST() {
     // Add Arcot color mapping
     const arcotMapping: ColorMapping = {
       state: 'Arcot',
-      color: '180,120,200'
+      color: '0,190,180'
     };
 
     // Remove existing Arcot mapping if any
