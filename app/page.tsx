@@ -834,15 +834,25 @@ export default function Home() {
   });
 
   // Helper function to extract start year from subsection name (e.g., "William IV (1830-1837)" -> 1830)
-  const extractYear = (subsection: string): number => {
+  // Falls back to earliest coin date in the subsection if no year in the name
+  const extractYear = (subsection: string, coins?: Coin[]): number => {
     const match = subsection.match(/\((\d{4})/);
-    return match ? parseInt(match[1]) : 9999; // Return high number if no year found
+    if (match) return parseInt(match[1]);
+    if (coins && coins.length > 0) {
+      const years = coins.map(c => parseInt(c.date)).filter(y => !isNaN(y));
+      if (years.length > 0) return Math.min(...years);
+    }
+    return 9999;
   };
 
   // Helper function to sort subsections (by date for British India, alphabetically for others)
-  const sortSubsections = (section: string, subsections: string[]): string[] => {
-    if (section === 'British India') {
-      return subsections.sort((a, b) => extractYear(a) - extractYear(b));
+  const sortSubsections = (section: string, subsections: string[], sectionData?: Record<string, Record<string, Coin[]>>): string[] => {
+    if (section.startsWith('British India')) {
+      return subsections.sort((a, b) => {
+        const coinsA = sectionData ? Object.values(sectionData[a] || {}).flat() : [];
+        const coinsB = sectionData ? Object.values(sectionData[b] || {}).flat() : [];
+        return extractYear(a, coinsA) - extractYear(b, coinsB);
+      });
     }
     return subsections.sort();
   };
@@ -1468,7 +1478,7 @@ export default function Home() {
                         </span>
                       </a>
                       <ul className="space-y-2">
-                        {sortSubsections(section, Object.keys(groupedCoins[section])).map((subsection) => {
+                        {sortSubsections(section, Object.keys(groupedCoins[section]), groupedCoins[section]).map((subsection) => {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'British India Princely States';
@@ -1588,7 +1598,7 @@ export default function Home() {
                     {section}
                   </h3>
                   {(() => {
-                    const allSubsections = sortSubsections(section, Object.keys(groupedCoins[section]));
+                    const allSubsections = sortSubsections(section, Object.keys(groupedCoins[section]), groupedCoins[section]);
                     const filteredSubsections = allSubsections.filter(subsection => !selectedSubsection || subsection === selectedSubsection);
                     console.log('Section:', section, '| All subsections:', allSubsections, '| Filtered subsections:', filteredSubsections, '| Filter value:', selectedSubsection);
                     return filteredSubsections;
@@ -2811,12 +2821,15 @@ export default function Home() {
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {Array.from(new Set(
-                    coins
-                      .filter(c => c.section === selectedSection)
-                      .map(c => c.subsection)
-                      .filter(Boolean)
-                  )).sort().map(subsection => {
+                  {(() => {
+                    const subsections = Array.from(new Set(
+                      coins
+                        .filter(c => c.section === selectedSection)
+                        .map(c => c.subsection)
+                        .filter(Boolean)
+                    ));
+                    return sortSubsections(selectedSection, subsections, groupedCoins[selectedSection]);
+                  })().map(subsection => {
                     const subsectionCoins = coins.filter(c =>
                       c.section === selectedSection && c.subsection === subsection
                     ).length;
