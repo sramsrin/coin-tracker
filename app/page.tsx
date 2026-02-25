@@ -900,11 +900,10 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Auto-assign the next index
-    const nextIndex = getNextIndex();
+    // Use overridden index or auto-assign the next index
     const coinData = {
       ...formData,
-      index: nextIndex
+      index: formData.index || getNextIndex()
     };
 
     try {
@@ -1239,12 +1238,15 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Add New Coin</h2>
-          <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold">Next Index:</span>{' '}
-              <span className="text-pink-700 font-bold">{getNextIndex()}</span>
-              <span className="text-gray-500 text-xs ml-2">(Page {getNextIndex().split('.')[0]}, Slot {getNextIndex().split('.')[1]})</span>
-            </p>
+          <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md flex items-center gap-3">
+            <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Index:</label>
+            <input
+              type="text"
+              value={formData.index || getNextIndex()}
+              onChange={(e) => setFormData({ ...formData, index: e.target.value })}
+              className="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm font-bold text-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+            <span className="text-gray-500 text-xs">(auto: {getNextIndex()})</span>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -1369,7 +1371,16 @@ export default function Home() {
               <input
                 type="url"
                 value={formData.numistaLink}
-                onChange={(e) => setFormData({ ...formData, numistaLink: e.target.value })}
+                onChange={(e) => {
+                  const link = e.target.value;
+                  const updates: Partial<typeof formData> = { numistaLink: link };
+                  // Extract Numista number from URL (e.g., https://en.numista.com/catalogue/pieces12345.html)
+                  const match = link.match(/pieces(\d+)/);
+                  if (match) {
+                    updates.numistaNumber = match[1];
+                  }
+                  setFormData({ ...formData, ...updates });
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="https://en.numista.com/..."
               />
