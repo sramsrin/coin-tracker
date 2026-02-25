@@ -2176,7 +2176,8 @@ export default function Home() {
                 ];
                 const otherGroupSections = [
                   'European Overseas',
-                  'Older Indian Kingdoms'
+                  'Older Indian Kingdoms',
+                  'Other'
                 ];
                 const remainingSections = allSections.filter(s =>
                   !colonialSections.includes(s) && !otherGroupSections.includes(s)
