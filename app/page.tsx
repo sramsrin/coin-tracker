@@ -3000,8 +3000,8 @@ export default function Home() {
 
             </div>
 
-            {/* British Royal Family Tree */}
-            <BritishFamilyTree />
+            {/* British Royal Family Tree - only for Uniform Coinage */}
+            {selectedSection === 'British India Uniform Coinage' && <BritishFamilyTree />}
 
             {/* End Main Content */}
           </div>
