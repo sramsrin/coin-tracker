@@ -757,16 +757,12 @@ export default function Home() {
         return;
       }
 
-      // Annexed district colors (Arcot, Madurai, Sivagangai) - turn white when highlighted
+      // Annexed district colors (Arcot, Madurai, Sivagangai, Tanjore) - turn white when highlighted
       const annexedColors = [
         {r:0,g:190,b:180}, {r:0,g:140,b:130}, {r:0,g:100,b:95},       // Arcot
         {r:220,g:120,b:50}, {r:170,g:85,b:30}, {r:160,g:80,b:30},     // Madurai
         {r:50,g:140,b:220}, {r:30,g:100,b:170}, {r:30,g:90,b:160},    // Ramnad/Sivagangai
-      ];
-
-      // Tanjore district colors - highlight with bright gold for prominence
-      const tanjoreColors = [
-        {r:180,g:80,b:160}, {r:140,g:55,b:125}, {r:110,g:40,b:95},
+        {r:180,g:80,b:160}, {r:140,g:55,b:125}, {r:110,g:40,b:95},    // Tanjore
       ];
 
       const imageData = ctx.getImageData(0, 0, presidenciesMapCanvas.width, presidenciesMapCanvas.height);
@@ -781,21 +777,12 @@ export default function Home() {
           c => c.r === r && c.g === g && c.b === b
         );
 
-        const isTanjore = tanjoreColors.some(
-          c => c.r === r && c.g === g && c.b === b
-        );
-
         const matchesTarget = targetColors.some(
           target => target.r === r && target.g === g && target.b === b
         );
 
-        if (isTanjore && matchesTarget) {
-          // Tanjore → bright gold for prominence
-          data[i] = 255;
-          data[i + 1] = 200;
-          data[i + 2] = 0;
-        } else if (isAnnexed && matchesTarget) {
-          // Other annexed districts → white
+        if (isAnnexed && matchesTarget) {
+          // Annexed districts → white
           data[i] = 255;
           data[i + 1] = 255;
           data[i + 2] = 255;
