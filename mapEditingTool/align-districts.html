@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Madras Presidency District Alignment Tool</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* Controls panel */
+    #controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(20, 20, 40, 0.95);
+      border-bottom: 2px solid #6c5ce7;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    #controls h1 {
+      font-size: 16px;
+      color: #a29bfe;
+      white-space: nowrap;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 12px;
+      color: #b0b0b0;
+      white-space: nowrap;
+    }
+
+    .control-group input[type="range"] {
+      width: 120px;
+      accent-color: #6c5ce7;
+    }
+
+    .control-group .value {
+      font-size: 12px;
+      color: #a29bfe;
+      font-family: monospace;
+      min-width: 50px;
+    }
+
+    button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-zoom {
+      background: #6c5ce7;
+      color: white;
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-zoom:hover { background: #5a4bd1; }
+
+    .btn-export {
+      background: #00b894;
+      color: white;
+    }
+    .btn-export:hover { background: #00a382; }
+
+    .btn-reset {
+      background: #e17055;
+      color: white;
+    }
+    .btn-reset:hover { background: #d05040; }
+
+    /* Info display */
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(20, 20, 40, 0.9);
+      border: 1px solid #6c5ce7;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #info .label { color: #b0b0b0; }
+    #info .val { color: #a29bfe; font-weight: bold; }
+
+    /* Export modal */
+    #export-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 200;
+      background: #2d2d44;
+      border: 2px solid #6c5ce7;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 400px;
+      max-width: 600px;
+    }
+
+    #export-modal h2 {
+      color: #a29bfe;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    #export-modal pre {
+      background: #1a1a2e;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      overflow-x: auto;
+      color: #00b894;
+      line-height: 1.5;
+    }
+
+    #export-modal button {
+      margin-top: 12px;
+    }
+
+    #overlay-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 199;
+    }
+
+    /* Canvas area */
+    #canvas-container {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: scroll;
+      cursor: grab;
+    }
+    #canvas-container:active { cursor: grabbing; }
+
+    #canvas-wrapper {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 200px;
+      padding-right: 200px;
+    }
+
+    #base-canvas {
+      display: block;
+    }
+
+    #overlay-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    /* Instructions */
+    #instructions {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(20, 20, 40, 0.9);
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #999;
+      max-width: 250px;
+    }
+
+    #instructions strong { color: #a29bfe; }
+  </style>
+</head>
+<body>
+
+  <!-- Controls -->
+  <div id="controls">
+    <h1>District Alignment</h1>
+
+    <div class="control-group">
+      <label>Opacity:</label>
+      <input type="range" id="opacity-slider" min="0" max="100" value="50">
+      <span class="value" id="opacity-val">50%</span>
+    </div>
+
+    <div class="control-group">
+      <label>Overlay Zoom:</label>
+      <button class="btn-zoom" id="zoom-out">-</button>
+      <span class="value" id="scale-val">1.00x</span>
+      <button class="btn-zoom" id="zoom-in">+</button>
+    </div>
+
+    <div class="control-group">
+      <label>View Zoom:</label>
+      <input type="range" id="view-zoom-slider" min="10" max="200" value="30">
+      <span class="value" id="view-zoom-val">30%</span>
+    </div>
+
+    <button class="btn-export" id="export-btn">Export Values</button>
+    <button class="btn-reset" id="reset-btn">Reset Position</button>
+  </div>
+
+  <!-- Canvas area -->
+  <div id="canvas-container">
+    <div id="canvas-wrapper">
+      <canvas id="base-canvas"></canvas>
+      <canvas id="overlay-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Info panel -->
+  <div id="info">
+    <div><span class="label">Overlay X: </span><span class="val" id="pos-x">0</span></div>
+    <div><span class="label">Overlay Y: </span><span class="val" id="pos-y">0</span></div>
+    <div><span class="label">Scale: </span><span class="val" id="info-scale">1.00</span></div>
+    <div><span class="label">Overlay Size: </span><span class="val" id="info-size">-</span></div>
+  </div>
+
+  <!-- Instructions -->
+  <div id="instructions">
+    <strong>Drag</strong> the overlay to move it<br>
+    <strong>Scroll</strong> on overlay to zoom it<br>
+    <strong>+/-</strong> buttons for precise zoom<br>
+    <strong>View Zoom</strong> slider to zoom whole view<br>
+    <strong>Opacity</strong> slider to see through overlay
+  </div>
+
+  <!-- Export modal -->
+  <div id="overlay-bg"></div>
+  <div id="export-modal">
+    <h2>Alignment Values</h2>
+    <pre id="export-data"></pre>
+    <button class="btn-export" id="copy-btn">Copy to Clipboard</button>
+    <button class="btn-reset" id="close-modal">Close</button>
+  </div>
+
+  <script>
+    // --- State ---
+    let overlayX = 1800;  // Initial X position on princely map (pixels)
+    let overlayY = 3000;  // Initial Y position on princely map (pixels)
+    let overlayScale = 8.0; // Scale factor for overlay
+    let overlayOpacity = 0.5;
+    let viewZoom = 0.3;
+
+    // Drag state
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragStartOverlayX = 0;
+    let dragStartOverlayY = 0;
+
+    // Images
+    const baseImg = new Image();
+    const overlayImg = new Image();
+    let baseLoaded = false;
+    let overlayLoaded = false;
+
+    // Canvas elements
+    const baseCanvas = document.getElementById('base-canvas');
+    const overlayCanvas = document.getElementById('overlay-canvas');
+    const baseCtx = baseCanvas.getContext('2d');
+    const overlayCtx = overlayCanvas.getContext('2d');
+    const container = document.getElementById('canvas-container');
+    const wrapper = document.getElementById('canvas-wrapper');
+
+    // --- Load images ---
+    baseImg.onload = () => {
+      baseLoaded = true;
+      console.log(`Base map loaded: ${baseImg.width} x ${baseImg.height}`);
+      if (overlayLoaded) init();
+    };
+
+    overlayImg.onload = () => {
+      overlayLoaded = true;
+      console.log(`Overlay loaded: ${overlayImg.width} x ${overlayImg.height}`);
+      if (baseLoaded) init();
+    };
+
+    baseImg.src = '../public/maps/princely-states.png';
+    overlayImg.src = 'The-Madras-Presidency-with-its-26-districts-1-Anantapur-2-Bellary-3-Chingleput.png';
+
+    function init() {
+      // Set canvas sizes to match base image
+      baseCanvas.width = baseImg.width;
+      baseCanvas.height = baseImg.height;
+      overlayCanvas.width = baseImg.width;
+      overlayCanvas.height = baseImg.height;
+
+      render();
+      updateInfo();
+    }
+
+    function render() {
+      if (!baseLoaded || !overlayLoaded) return;
+
+      // Apply view zoom via CSS
+      const scale = viewZoom;
+      wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.transformOrigin = 'top left';
+
+      // Draw base map
+      baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+      baseCtx.drawImage(baseImg, 0, 0);
+
+      // Draw overlay
+      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      overlayCtx.globalAlpha = overlayOpacity;
+
+      const scaledW = overlayImg.width * overlayScale;
+      const scaledH = overlayImg.height * overlayScale;
+      overlayCtx.drawImage(overlayImg, overlayX, overlayY, scaledW, scaledH);
+
+      overlayCtx.globalAlpha = 1.0;
+
+      // Draw a border around overlay for visibility
+      overlayCtx.strokeStyle = `rgba(108, 92, 231, ${Math.min(overlayOpacity + 0.3, 1.0)})`;
+      overlayCtx.lineWidth = 3;
+      overlayCtx.setLineDash([10, 5]);
+      overlayCtx.strokeRect(overlayX, overlayY, scaledW, scaledH);
+      overlayCtx.setLineDash([]);
+    }
+
+    function updateInfo() {
+      document.getElementById('pos-x').textContent = Math.round(overlayX);
+      document.getElementById('pos-y').textContent = Math.round(overlayY);
+      document.getElementById('info-scale').textContent = overlayScale.toFixed(2);
+      document.getElementById('scale-val').textContent = overlayScale.toFixed(2) + 'x';
+      document.getElementById('opacity-val').textContent = Math.round(overlayOpacity * 100) + '%';
+      document.getElementById('view-zoom-val').textContent = Math.round(viewZoom * 100) + '%';
+
+      if (overlayLoaded) {
+        const w = Math.round(overlayImg.width * overlayScale);
+        const h = Math.round(overlayImg.height * overlayScale);
+        document.getElementById('info-size').textContent = `${w} x ${h}`;
+      }
+    }
+
+    // --- Mouse events for dragging ---
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let panStartScrollX = 0;
+    let panStartScrollY = 0;
+
+    overlayCanvas.style.pointerEvents = 'auto';
+
+    container.addEventListener('mousedown', (e) => {
+      // Check if click is on the overlay
+      const rect = wrapper.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) / viewZoom;
+      const my = (e.clientY - rect.top) / viewZoom;
+
+      const scaledW = overlayImg.width * overlayScale;
+      const scaledH = overlayImg.height * overlayScale;
+
+      if (mx >= overlayX && mx <= overlayX + scaledW &&
+          my >= overlayY && my <= overlayY + scaledH) {
+        // Drag the overlay
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragStartOverlayX = overlayX;
+        dragStartOverlayY = overlayY;
+        e.preventDefault();
+      } else {
+        // Pan the view by scrolling the container
+        isPanning = true;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        panStartScrollX = container.scrollLeft;
+        panStartScrollY = container.scrollTop;
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const dx = (e.clientX - dragStartX) / viewZoom;
+        const dy = (e.clientY - dragStartY) / viewZoom;
+        overlayX = dragStartOverlayX + dx;
+        overlayY = dragStartOverlayY + dy;
+        render();
+        updateInfo();
+      } else if (isPanning) {
+        container.scrollLeft = panStartScrollX - (e.clientX - panStartX);
+        container.scrollTop = panStartScrollY - (e.clientY - panStartY);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      isPanning = false;
+    });
+
+    // --- Scroll wheel for overlay zoom ---
+    container.addEventListener('wheel', (e) => {
+      // Check if mouse is over the overlay
+      const rect = wrapper.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) / viewZoom;
+      const my = (e.clientY - rect.top) / viewZoom;
+
+      const scaledW = overlayImg.width * overlayScale;
+      const scaledH = overlayImg.height * overlayScale;
+
+      if (mx >= overlayX && mx <= overlayX + scaledW &&
+          my >= overlayY && my <= overlayY + scaledH) {
+        // Zoom overlay - prevent scroll here
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.2 : 0.2;
+        const oldScale = overlayScale;
+        overlayScale = Math.max(0.5, Math.min(30, overlayScale + delta));
+
+        // Zoom toward mouse position
+        const relX = mx - overlayX;
+        const relY = my - overlayY;
+        const scaleRatio = overlayScale / oldScale;
+        overlayX = mx - relX * scaleRatio;
+        overlayY = my - relY * scaleRatio;
+        render();
+        updateInfo();
+      } else if (e.ctrlKey || e.metaKey) {
+        // Ctrl/Cmd + scroll to zoom the entire view
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.02 : 0.02;
+        viewZoom = Math.max(0.1, Math.min(2.0, viewZoom + delta));
+        document.getElementById('view-zoom-slider').value = Math.round(viewZoom * 100);
+        render();
+        updateInfo();
+      }
+      // Otherwise, allow normal scrolling
+    }, { passive: false });
+
+    // --- Controls ---
+    document.getElementById('opacity-slider').addEventListener('input', (e) => {
+      overlayOpacity = e.target.value / 100;
+      render();
+      updateInfo();
+    });
+
+    document.getElementById('view-zoom-slider').addEventListener('input', (e) => {
+      viewZoom = e.target.value / 100;
+      render();
+      updateInfo();
+    });
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      overlayScale = Math.min(30, overlayScale + 0.2);
+      render();
+      updateInfo();
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      overlayScale = Math.max(0.5, overlayScale - 0.2);
+      render();
+      updateInfo();
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      overlayX = 1800;
+      overlayY = 3000;
+      overlayScale = 8.0;
+      overlayOpacity = 0.5;
+      viewZoom = 0.3;
+      document.getElementById('opacity-slider').value = 50;
+      document.getElementById('view-zoom-slider').value = 30;
+      render();
+      updateInfo();
+    });
+
+    // --- Export ---
+    document.getElementById('export-btn').addEventListener('click', () => {
+      const data = {
+        overlayX: Math.round(overlayX),
+        overlayY: Math.round(overlayY),
+        overlayScale: parseFloat(overlayScale.toFixed(3)),
+        overlayWidth: Math.round(overlayImg.width * overlayScale),
+        overlayHeight: Math.round(overlayImg.height * overlayScale),
+        baseMapSize: `${baseImg.width} x ${baseImg.height}`,
+      };
+
+      const text = `Alignment Values:
+  Overlay Position: (${data.overlayX}, ${data.overlayY})
+  Overlay Scale: ${data.overlayScale}x
+  Overlay Size: ${data.overlayWidth} x ${data.overlayHeight} px
+  Base Map Size: ${data.baseMapSize}
+
+Python usage:
+  overlay_x = ${data.overlayX}
+  overlay_y = ${data.overlayY}
+  overlay_scale = ${data.overlayScale}`;
+
+      document.getElementById('export-data').textContent = text;
+      document.getElementById('export-modal').style.display = 'block';
+      document.getElementById('overlay-bg').style.display = 'block';
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      const text = document.getElementById('export-data').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('copy-btn').textContent = 'Copied!';
+        setTimeout(() => {
+          document.getElementById('copy-btn').textContent = 'Copy to Clipboard';
+        }, 2000);
+      });
+    });
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+      document.getElementById('export-modal').style.display = 'none';
+      document.getElementById('overlay-bg').style.display = 'none';
+    });
+
+    document.getElementById('overlay-bg').addEventListener('click', () => {
+      document.getElementById('export-modal').style.display = 'none';
+      document.getElementById('overlay-bg').style.display = 'none';
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '=' || e.key === '+') {
+        overlayScale = Math.min(30, overlayScale + 0.2);
+        render(); updateInfo();
+      } else if (e.key === '-') {
+        overlayScale = Math.max(0.5, overlayScale - 0.2);
+        render(); updateInfo();
+      } else if (e.key === 'ArrowLeft') {
+        overlayX -= 10; render(); updateInfo();
+      } else if (e.key === 'ArrowRight') {
+        overlayX += 10; render(); updateInfo();
+      } else if (e.key === 'ArrowUp') {
+        overlayY -= 10; render(); updateInfo();
+      } else if (e.key === 'ArrowDown') {
+        overlayY += 10; render(); updateInfo();
+      }
+    });
+  </script>
+</body>
+</html>

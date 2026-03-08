@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Click to get pixel coordinates</title>
+  <style>
+    body { margin: 0; background: #1a1a2e; color: white; font-family: monospace; }
+    #info {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      background: rgba(20,20,40,0.95); padding: 12px 20px;
+      border-bottom: 2px solid #6c5ce7; font-size: 14px;
+    }
+    #info span { color: #a29bfe; font-weight: bold; }
+    #container { padding-top: 50px; }
+    img { cursor: crosshair; }
+  </style>
+</head>
+<body>
+  <div id="info">
+    Click on the map. Coordinates: <span id="coords">-</span> | Color: <span id="color">-</span>
+    <span id="swatch" style="display:inline-block;width:20px;height:20px;vertical-align:middle;margin-left:8px;border:1px solid white;"></span>
+  </div>
+  <div id="container">
+    <canvas id="canvas"></canvas>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    // Scale factor to shrink for display (original is 7051x6581)
+    const DISPLAY_SCALE = 0.5;
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.style.width = (img.width * DISPLAY_SCALE) + 'px';
+      canvas.style.height = (img.height * DISPLAY_SCALE) + 'px';
+      ctx.drawImage(img, 0, 0);
+      document.getElementById('coords').textContent = 'Ready - click on the map';
+    };
+    img.onerror = () => {
+      document.getElementById('coords').textContent = 'ERROR loading image';
+    };
+    img.src = 'test-tanjore-overlay.png';
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = Math.round((e.clientX - rect.left) * scaleX);
+      const y = Math.round((e.clientY - rect.top) * scaleY);
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      document.getElementById('coords').textContent = `${x}, ${y}`;
+      document.getElementById('color').textContent = `RGB(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+      document.getElementById('swatch').style.background = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+    });
+  </script>
+</body>
+</html>

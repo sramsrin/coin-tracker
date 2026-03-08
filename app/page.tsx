@@ -146,6 +146,7 @@ interface Coin {
   obverse: string;
   reverse: string;
   date: string;
+  matchConfidence: 'High' | 'Low';
 }
 
 type SortField = keyof Coin;
@@ -274,8 +275,6 @@ function BritishFamilyTree() {
           <div className="mt-2 p-3 sm:p-4 bg-gray-50 rounded-lg border border-purple-100 overflow-x-auto">
             <div className="flex items-center gap-2 mb-3 text-[10px] sm:text-xs text-gray-400">
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-amber-700 font-medium">&#x1FA99; In collection</span>
-              <span>&middot;</span>
-              <span>Notes visible on desktop</span>
             </div>
             <MonarchNode monarch={ROYAL_TREE} />
           </div>
@@ -354,6 +353,7 @@ export default function Home() {
     obverse: '',
     reverse: '',
     date: '',
+    matchConfidence: 'High' as 'High' | 'Low',
   });
 
   // Load coins on mount and restore authentication
@@ -1068,6 +1068,7 @@ export default function Home() {
           obverse: '',
           reverse: '',
           date: '',
+          matchConfidence: 'High' as 'High' | 'Low',
         });
         // Refresh coins list
         fetchCoins();
@@ -1093,6 +1094,7 @@ export default function Home() {
       numberAndNotes: coin.numberAndNotes,
       obverse: coin.obverse,
       reverse: coin.reverse,
+      matchConfidence: coin.matchConfidence,
     });
   };
 
@@ -1794,7 +1796,6 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -1820,7 +1821,6 @@ export default function Home() {
                                           )}
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -1864,9 +1864,6 @@ export default function Home() {
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -1899,7 +1896,6 @@ export default function Home() {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.book}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
                     </tr>
