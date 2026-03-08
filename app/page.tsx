@@ -1548,6 +1548,19 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Match Confidence
+              </label>
+              <select
+                value={formData.matchConfidence}
+                onChange={(e) => setFormData({ ...formData, matchConfidence: e.target.value as 'High' | 'Low' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              >
+                <option value="High">High</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Number & Notes
               </label>
               <input
@@ -1796,6 +1809,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Confidence</th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
                                     </tr>
                                   </thead>
@@ -1822,6 +1836,11 @@ export default function Home() {
                                           )}
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                            {coin.matchConfidence}
+                                          </span>
+                                        </td>
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>}
                                       </tr>
                                     ))}
@@ -1866,6 +1885,9 @@ export default function Home() {
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
+                    <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                      Match Confidence {sortField === 'matchConfidence' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     {isAuthenticated && (
                       <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                         Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -1903,6 +1925,11 @@ export default function Home() {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.book}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {coin.matchConfidence}
+                        </span>
+                      </td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
@@ -2052,6 +2079,17 @@ export default function Home() {
                       onChange={(e) => setEditFormData({ ...editFormData, book: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Match Confidence</label>
+                    <select
+                      value={editFormData.matchConfidence || 'High'}
+                      onChange={(e) => setEditFormData({ ...editFormData, matchConfidence: e.target.value as 'High' | 'Low' })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="High">High</option>
+                      <option value="Low">Low</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Number & Notes</label>
