@@ -1796,6 +1796,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
+                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -1821,6 +1822,7 @@ export default function Home() {
                                           )}
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>}
                                       </tr>
                                     ))}
                                   </tbody>
@@ -1864,6 +1866,11 @@ export default function Home() {
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
+                    {isAuthenticated && (
+                      <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                        Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                    )}
                     <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -1896,6 +1903,7 @@ export default function Home() {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.book}</td>
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
                     </tr>
