@@ -2,6 +2,9 @@
 """
 Extract district 22 (Tinnevelly) from the Madras Presidency map,
 overlay onto the princely states map with Arcot colors.
+
+District 22 is at the very bottom of the Madras map (southern tip),
+south of Ramnad (17) and Madurai (26), east of Travancore.
 """
 from PIL import Image
 import numpy as np
@@ -27,7 +30,8 @@ GAP_LENGTH = 3
 # --- Load images ---
 madras_path = "/Users/sahanavasanth/Desktop/LavenderCoinApp/mapEditingTool/The-Madras-Presidency-with-its-26-districts-1-Anantapur-2-Bellary-3-Chingleput.png"
 princely_path = "/Users/sahanavasanth/Desktop/LavenderCoinApp/public/maps/princely-states.png"
-output_path = "/Users/sahanavasanth/Desktop/LavenderCoinApp/mapEditingTool/test-tinnevelly-overlay.png"
+test_output_path = "/Users/sahanavasanth/Desktop/LavenderCoinApp/mapEditingTool/test-tinnevelly-overlay.png"
+prod_output_path = "/Users/sahanavasanth/Desktop/LavenderCoinApp/public/maps/princely-states.png"
 
 madras_img = Image.open(madras_path).convert('RGB')
 princely_raw = Image.open(princely_path).convert('RGBA')
@@ -110,9 +114,11 @@ def get_boundary(pixels_set):
     return boundary
 
 # --- Extract district 22 (Tinnevelly) ---
-# Seed point from find_districts.py scan - region #22 with center (321, 607)
+# CORRECT seed point: region #33 from find_districts.py scan
+# Center (229, 779), BBox (199,749)-(264,817) - at the very bottom of the map
 print("\nExtracting district 22 (Tinnevelly)...")
-d22_pixels = flood_fill_gray(madras_pixels, 318, 573, mW, mH)
+print("  Using corrected seed (207, 750) - southernmost district")
+d22_pixels = flood_fill_gray(madras_pixels, 207, 750, mW, mH)
 print(f"  Initial flood fill: {len(d22_pixels)} px")
 
 d22_pixels, a22 = fill_holes_fast(d22_pixels)
@@ -120,20 +126,22 @@ d22_boundary = get_boundary(d22_pixels)
 print(f"  After hole filling: {len(d22_pixels)} px (+{a22} holes filled)")
 print(f"  Boundary: {len(d22_boundary)} px")
 
-# Calculate center for verification
+# Calculate center and bounding box for verification
 if d22_pixels:
     cx = sum(p[0] for p in d22_pixels) / len(d22_pixels)
     cy = sum(p[1] for p in d22_pixels) / len(d22_pixels)
+    min_x = min(p[0] for p in d22_pixels)
+    max_x = max(p[0] for p in d22_pixels)
+    min_y = min(p[1] for p in d22_pixels)
+    max_y = max(p[1] for p in d22_pixels)
     print(f"  Center: ({int(cx)}, {int(cy)})")
+    print(f"  BBox: ({min_x},{min_y})-({max_x},{max_y})")
 
 # --- Draw on map ---
 print("\nDrawing Tinnevelly on princely states map...")
 result_pixels = np.array(princely_img)
 
 def draw_district_hatched(pixels_set, boundary_set, fill_color, stripe_color, border_color):
-    fill_arr = np.array(fill_color)
-    stripe_arr = np.array(stripe_color)
-
     for mx, my in pixels_set:
         px_s = int(OVERLAY_X + mx * OVERLAY_SCALE)
         py_s = int(OVERLAY_Y + my * OVERLAY_SCALE)
@@ -170,6 +178,11 @@ def draw_district_hatched(pixels_set, boundary_set, fill_color, stripe_color, bo
 
 draw_district_hatched(d22_pixels, d22_boundary, TINNEVELLY_COLOR, TINNEVELLY_STRIPE, TINNEVELLY_BOUNDARY)
 
-Image.fromarray(result_pixels).save(output_path)
-print(f"\nSaved to: {output_path}")
+# Save test output
+Image.fromarray(result_pixels).save(test_output_path)
+print(f"\nSaved TEST to: {test_output_path}")
+
+# Also save to production map
+Image.fromarray(result_pixels).save(prod_output_path)
+print(f"Saved PRODUCTION to: {prod_output_path}")
 print(f"  Tinnevelly: RGB{TINNEVELLY_COLOR} with stripes RGB{TINNEVELLY_STRIPE}")

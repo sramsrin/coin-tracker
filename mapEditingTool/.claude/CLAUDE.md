@@ -25,7 +25,7 @@ Seed coordinates for flood-filling each numbered district on the Madras Presiden
 | 16 | North Arcot | (330, 534) | - | - |
 | 19 | South Arcot | (318, 573) | - | - |
 | 21 | Tanjore | (345, 636) | (326, 674) | 2314 |
-| 22 | Tinnevelly | (318, 573) | (321, 606) | 2432 |
+| 22 | Tinnevelly | (207, 750) | (229, 779) | 2753 |
 | 26 | Madurai | scanned auto | ~(150-250, 680-760) | - |
 | 17 | Ramnad | scanned auto | ~(x>200, 720-810) | - |
 
