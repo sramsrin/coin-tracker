@@ -690,10 +690,10 @@ export default function Home() {
         );
 
         if (matchesTarget) {
-          // Highlighted state - brighten to make it pop
-          data[i] = Math.min(255, Math.floor(r * 1.5));
-          data[i + 1] = Math.min(255, Math.floor(g * 1.5));
-          data[i + 2] = Math.min(255, Math.floor(b * 1.5));
+          // Highlighted state - turn white for clarity
+          data[i] = 255;
+          data[i + 1] = 255;
+          data[i + 2] = 255;
         } else {
           // Non-highlighted area - dim it (reduce brightness by 60%)
           data[i] = Math.floor(r * 0.4);
