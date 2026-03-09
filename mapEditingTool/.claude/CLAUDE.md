@@ -25,6 +25,7 @@ Seed coordinates for flood-filling each numbered district on the Madras Presiden
 | 16 | North Arcot | (330, 534) | - | - |
 | 19 | South Arcot | (318, 573) | - | - |
 | 21 | Tanjore | (345, 636) | (326, 674) | 2314 |
+| 22 | Tinnevelly | (318, 573) | (321, 606) | 2432 |
 | 26 | Madurai | scanned auto | ~(150-250, 680-760) | - |
 | 17 | Ramnad | scanned auto | ~(x>200, 720-810) | - |
 
@@ -32,6 +33,7 @@ Seed coordinates for flood-filling each numbered district on the Madras Presiden
 | District | Fill RGB | Stripe RGB | Boundary RGB |
 |---|---|---|---|
 | Arcot (16 & 19) | (0, 190, 180) | (0, 140, 130) | (0, 100, 95) |
+| Tinnevelly (22) | (0, 190, 180) | (0, 140, 130) | (0, 100, 95) |
 | Madurai (26) | (220, 120, 50) | (170, 85, 30) | (160, 80, 30) |
 | Ramnad (17) | (50, 140, 220) | (30, 100, 170) | (30, 90, 160) |
 | Tanjore (21) | (255, 50, 120) | (200, 35, 90) | (155, 25, 65) |
@@ -42,3 +44,4 @@ Seed coordinates for flood-filling each numbered district on the Madras Presiden
 - `extract_arcot_districts.py` - Extracts Arcot districts
 - `extract_madurai_ramnad.py` - Extracts Madurai & Ramnad districts
 - `extract_tanjore.py` - Extracts Tanjore district
+- `extract_tinnevelly.py` - Extracts Tinnevelly district (Arcot colors)
