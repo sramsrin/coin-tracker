@@ -2089,6 +2089,7 @@ export default function Home() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     >
                       <option value="High">High</option>
+                      <option value="Medium">Medium</option>
                       <option value="Low">Low</option>
                     </select>
                   </div>
