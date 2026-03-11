@@ -1810,7 +1810,17 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20" title="High: Issuer and coin match. Medium: Issuer matches but exact coin is uncertain. Low: Even issuer is uncertain.">Confidence</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">
+                                        <span className="relative group">
+                                          Confidence
+                                          <span className="ml-1 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-gray-300 text-gray-600 text-[9px] font-bold cursor-pointer">?</span>
+                                          <span className="hidden group-hover:block absolute z-50 left-0 top-full mt-1 w-56 p-2 bg-gray-800 text-white text-[10px] font-normal rounded shadow-lg leading-relaxed">
+                                            <b>High:</b> Issuer and coin match.<br/>
+                                            <b>Medium:</b> Issuer matches but exact coin is uncertain.<br/>
+                                            <b>Low:</b> Even issuer is uncertain.
+                                          </span>
+                                        </span>
+                                      </th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
                                     </tr>
                                   </thead>
@@ -1886,8 +1896,16 @@ export default function Home() {
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24" title="High: Issuer and coin match. Medium: Issuer matches but exact coin is uncertain. Low: Even issuer is uncertain.">
-                      Match Confidence {sortField === 'matchConfidence' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                      <span className="relative group">
+                        Match Confidence {sortField === 'matchConfidence' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        <span className="ml-1 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-gray-300 text-gray-600 text-[9px] font-bold cursor-pointer">?</span>
+                        <span className="hidden group-hover:block absolute z-50 left-0 top-full mt-1 w-56 p-2 bg-gray-800 text-white text-[10px] font-normal rounded shadow-lg leading-relaxed">
+                          <b>High:</b> Issuer and coin match.<br/>
+                          <b>Medium:</b> Issuer matches but exact coin is uncertain.<br/>
+                          <b>Low:</b> Even issuer is uncertain.
+                        </span>
+                      </span>
                     </th>
                     {isAuthenticated && (
                       <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
