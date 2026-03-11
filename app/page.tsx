@@ -1810,7 +1810,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Confidence</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20" title="High: Issuer and coin match. Medium: Issuer matches but exact coin is uncertain. Low: Even issuer is uncertain.">Confidence</th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
                                     </tr>
                                   </thead>
@@ -1886,7 +1886,7 @@ export default function Home() {
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                    <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24" title="High: Issuer and coin match. Medium: Issuer matches but exact coin is uncertain. Low: Even issuer is uncertain.">
                       Match Confidence {sortField === 'matchConfidence' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     {isAuthenticated && (
