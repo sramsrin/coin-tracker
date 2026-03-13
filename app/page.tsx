@@ -147,6 +147,8 @@ interface Coin {
   reverse: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low';
+  image1Url?: string;
+  image2Url?: string;
 }
 
 type SortField = keyof Coin;
@@ -337,6 +339,17 @@ export default function Home() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [showAddCoinForm, setShowAddCoinForm] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
+  // Image upload state for add form
+  const [addImage1File, setAddImage1File] = useState<File | null>(null);
+  const [addImage2File, setAddImage2File] = useState<File | null>(null);
+  const [addImage1Preview, setAddImage1Preview] = useState<string | null>(null);
+  const [addImage2Preview, setAddImage2Preview] = useState<string | null>(null);
+  // Image upload state for edit form
+  const [editImage1File, setEditImage1File] = useState<File | null>(null);
+  const [editImage2File, setEditImage2File] = useState<File | null>(null);
+  const [editImage1Preview, setEditImage1Preview] = useState<string | null>(null);
+  const [editImage2Preview, setEditImage2Preview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
     section: '',
@@ -1032,6 +1045,25 @@ export default function Home() {
     setShowPasswordInput(false);
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.url;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -1051,7 +1083,31 @@ export default function Home() {
       });
 
       if (response.ok) {
-        // Clear form (index will be auto-assigned on next submission)
+        const newCoin = await response.json();
+
+        // Upload images if selected
+        if (addImage1File || addImage2File) {
+          setIsUploading(true);
+          const imageUpdates: Record<string, string> = {};
+          if (addImage1File) {
+            const url = await uploadImage(addImage1File);
+            if (url) imageUpdates.image1Url = url;
+          }
+          if (addImage2File) {
+            const url = await uploadImage(addImage2File);
+            if (url) imageUpdates.image2Url = url;
+          }
+          if (Object.keys(imageUpdates).length > 0) {
+            await fetch(`/api/coins?id=${newCoin.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...newCoin, ...imageUpdates }),
+            });
+          }
+          setIsUploading(false);
+        }
+
+        // Clear form
         setFormData({
           index: '',
           section: '',
@@ -1070,6 +1126,11 @@ export default function Home() {
           date: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low',
         });
+        // Clear image state
+        setAddImage1File(null);
+        setAddImage2File(null);
+        setAddImage1Preview(null);
+        setAddImage2Preview(null);
         // Refresh coins list
         fetchCoins();
       }
@@ -1080,6 +1141,10 @@ export default function Home() {
 
   const handleEditClick = (coin: Coin) => {
     setEditingCoin(coin);
+    setEditImage1File(null);
+    setEditImage2File(null);
+    setEditImage1Preview(null);
+    setEditImage2Preview(null);
     setEditFormData({
       section: coin.section,
       subsection: coin.subsection,
@@ -1102,6 +1167,19 @@ export default function Home() {
     if (!editingCoin) return;
 
     try {
+      // Upload new images if selected
+      setIsUploading(true);
+      const imageUpdates: Record<string, string> = {};
+      if (editImage1File) {
+        const url = await uploadImage(editImage1File);
+        if (url) imageUpdates.image1Url = url;
+      }
+      if (editImage2File) {
+        const url = await uploadImage(editImage2File);
+        if (url) imageUpdates.image2Url = url;
+      }
+      setIsUploading(false);
+
       const response = await fetch(`/api/coins?id=${editingCoin.id}`, {
         method: 'PUT',
         headers: {
@@ -1110,6 +1188,9 @@ export default function Home() {
         body: JSON.stringify({
           ...editingCoin,
           ...editFormData,
+          // Preserve existing image URLs, override with new uploads
+          image1Url: imageUpdates.image1Url || editingCoin.image1Url || '',
+          image2Url: imageUpdates.image2Url || editingCoin.image2Url || '',
         }),
       });
 
@@ -1117,9 +1198,14 @@ export default function Home() {
         fetchCoins();
         setEditingCoin(null);
         setEditFormData({});
+        setEditImage1File(null);
+        setEditImage2File(null);
+        setEditImage1Preview(null);
+        setEditImage2Preview(null);
       }
     } catch (error) {
       console.error('Error updating coin:', error);
+      setIsUploading(false);
     }
   };
 
@@ -1597,11 +1683,61 @@ export default function Home() {
               />
             </div>
             <div className="md:col-span-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setAddImage1File(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setAddImage1Preview(reader.result as string);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setAddImage1Preview(null);
+                      }
+                    }}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                  />
+                  {addImage1Preview && (
+                    <img src={addImage1Preview} alt="Preview 1" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Image 2 (Reverse)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setAddImage2File(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setAddImage2Preview(reader.result as string);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setAddImage2Preview(null);
+                      }
+                    }}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                  />
+                  {addImage2Preview && (
+                    <img src={addImage2Preview} alt="Preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="md:col-span-3">
               <button
                 type="submit"
-                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
+                disabled={isUploading}
+                className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-pink-400 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
               >
-                Add Coin
+                {isUploading ? 'Uploading...' : 'Add Coin'}
               </button>
             </div>
           </form>
@@ -1822,6 +1958,9 @@ export default function Home() {
                                         </span>
                                       </th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
+                                      {stateCoins.some(c => c.image1Url || c.image2Url) && (
+                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
+                                      )}
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -1853,6 +1992,22 @@ export default function Home() {
                                           </span>
                                         </td>
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>}
+                                        {stateCoins.some(c => c.image1Url || c.image2Url) && (
+                                          <td className="px-3 py-2 text-xs">
+                                            <div className="flex gap-1">
+                                              {coin.image1Url && (
+                                                <a href={coin.image1Url} target="_blank" rel="noopener noreferrer">
+                                                  <img src={coin.image1Url} alt="Obverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                                                </a>
+                                              )}
+                                              {coin.image2Url && (
+                                                <a href={coin.image2Url} target="_blank" rel="noopener noreferrer">
+                                                  <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                                                </a>
+                                              )}
+                                            </div>
+                                          </td>
+                                        )}
                                       </tr>
                                     ))}
                                   </tbody>
@@ -2138,6 +2293,68 @@ export default function Home() {
                       rows={2}
                     />
                   </div>
+                  {/* Image Upload */}
+                  <div className="md:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
+                        {editingCoin.image1Url && !editImage1Preview && (
+                          <div className="mb-2">
+                            <img src={editingCoin.image1Url} alt="Current obverse" className="h-24 rounded border border-gray-200 object-contain" />
+                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setEditImage1File(file);
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => setEditImage1Preview(reader.result as string);
+                              reader.readAsDataURL(file);
+                            } else {
+                              setEditImage1Preview(null);
+                            }
+                          }}
+                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                        />
+                        {editImage1Preview && (
+                          <img src={editImage1Preview} alt="New preview 1" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Image 2 (Reverse)</label>
+                        {editingCoin.image2Url && !editImage2Preview && (
+                          <div className="mb-2">
+                            <img src={editingCoin.image2Url} alt="Current reverse" className="h-24 rounded border border-gray-200 object-contain" />
+                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setEditImage2File(file);
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => setEditImage2Preview(reader.result as string);
+                              reader.readAsDataURL(file);
+                            } else {
+                              setEditImage2Preview(null);
+                            }
+                          }}
+                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                        />
+                        {editImage2Preview && (
+                          <img src={editImage2Preview} alt="New preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Action Buttons */}
@@ -2150,9 +2367,10 @@ export default function Home() {
                   </button>
                   <button
                     onClick={handleEditSubmit}
-                    className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-md transition"
+                    disabled={isUploading}
+                    className="flex-1 px-4 py-2 bg-pink-600 hover:bg-pink-700 disabled:bg-pink-400 text-white font-semibold rounded-md transition"
                   >
-                    Save Changes
+                    {isUploading ? 'Uploading...' : 'Save Changes'}
                   </button>
                   <button
                     onClick={() => {

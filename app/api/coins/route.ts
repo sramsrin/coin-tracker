@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
+import { del } from '@vercel/blob';
 
 const COINS_KEY = 'coins';
 
@@ -20,6 +21,8 @@ interface Coin {
   obverse: string;
   reverse: string;
   date: string;
+  image1Url?: string;
+  image2Url?: string;
 }
 
 // Helper function to read coins from KV
@@ -74,6 +77,8 @@ export async function POST(request: NextRequest) {
       obverse: body.obverse?.trim() || '',
       reverse: body.reverse?.trim() || '',
       date: body.date?.trim() || '',
+      image1Url: body.image1Url?.trim() || '',
+      image2Url: body.image2Url?.trim() || '',
     };
 
     coins.push(newCoin);
@@ -153,6 +158,20 @@ export async function DELETE(request: NextRequest) {
     }
 
     const coins = await readCoins();
+    const coinToDelete = coins.find((coin) => coin.id === id);
+
+    // Clean up blob images if they exist
+    if (coinToDelete) {
+      const urlsToDelete = [coinToDelete.image1Url, coinToDelete.image2Url].filter(Boolean) as string[];
+      if (urlsToDelete.length > 0) {
+        try {
+          await del(urlsToDelete);
+        } catch (blobError) {
+          console.error('Error deleting blob images:', blobError);
+        }
+      }
+    }
+
     const filteredCoins = coins.filter((coin) => coin.id !== id);
     await writeCoins(filteredCoins);
 
