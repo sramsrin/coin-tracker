@@ -2105,8 +2105,26 @@ export default function Home() {
                         </span>
                       </td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
-                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
+                        <div className="flex items-center gap-2">
+                          {coin.image1Url && (
+                            <a href={coin.image1Url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                              <img src={coin.image1Url} alt="Obverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                            </a>
+                          )}
+                          <span className="truncate">{coin.obverse}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
+                        <div className="flex items-center gap-2">
+                          {coin.image2Url && (
+                            <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                              <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                            </a>
+                          )}
+                          <span className="truncate">{coin.reverse}</span>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
