@@ -146,7 +146,7 @@ interface Coin {
   obverse: string;
   reverse: string;
   date: string;
-  matchConfidence: 'High' | 'Medium' | 'Low';
+  matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
 }
@@ -366,7 +366,7 @@ export default function Home() {
     obverse: '',
     reverse: '',
     date: '',
-    matchConfidence: 'High' as 'High' | 'Medium' | 'Low',
+    matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
   });
 
   // Load coins on mount and restore authentication
@@ -1124,7 +1124,7 @@ export default function Home() {
           obverse: '',
           reverse: '',
           date: '',
-          matchConfidence: 'High' as 'High' | 'Medium' | 'Low',
+          matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
         });
         // Clear image state
         setAddImage1File(null);
@@ -1638,12 +1638,13 @@ export default function Home() {
               </label>
               <select
                 value={formData.matchConfidence}
-                onChange={(e) => setFormData({ ...formData, matchConfidence: e.target.value as 'High' | 'Medium' | 'Low' })}
+                onChange={(e) => setFormData({ ...formData, matchConfidence: e.target.value as 'High' | 'Medium' | 'Low' | 'None' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
               >
                 <option value="High">High</option>
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
+                <option value="None">None</option>
               </select>
             </div>
             <div>
@@ -1987,7 +1988,7 @@ export default function Home() {
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.weight}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">
-                                          <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                             {coin.matchConfidence}
                                           </span>
                                         </td>
@@ -2100,7 +2101,7 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.book}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {coin.matchConfidence}
                         </span>
                       </td>
@@ -2276,12 +2277,13 @@ export default function Home() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Match Confidence</label>
                     <select
                       value={editFormData.matchConfidence || 'High'}
-                      onChange={(e) => setEditFormData({ ...editFormData, matchConfidence: e.target.value as 'High' | 'Medium' | 'Low' })}
+                      onChange={(e) => setEditFormData({ ...editFormData, matchConfidence: e.target.value as 'High' | 'Medium' | 'Low' | 'None' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     >
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
                       <option value="Low">Low</option>
+                      <option value="None">None</option>
                     </select>
                   </div>
                   <div>

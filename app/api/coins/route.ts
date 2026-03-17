@@ -21,6 +21,7 @@ interface Coin {
   obverse: string;
   reverse: string;
   date: string;
+  matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
 }
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
       obverse: body.obverse?.trim() || '',
       reverse: body.reverse?.trim() || '',
       date: body.date?.trim() || '',
+      matchConfidence: body.matchConfidence || 'High',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
     };
