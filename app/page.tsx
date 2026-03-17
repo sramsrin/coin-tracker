@@ -382,7 +382,39 @@ export default function Home() {
     if (savedAuth === 'true') {
       setIsAuthenticated(true);
     }
+
+    // Restore state from URL query parameters
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    const sectionParam = params.get('section');
+    const subsectionParam = params.get('subsection');
+    const stateParam = params.get('state');
+
+    if (tabParam === 'collection' || tabParam === 'map') {
+      setActiveTab(tabParam);
+    }
+    if (sectionParam) {
+      setSelectedSection(sectionParam);
+      if (sectionParam === 'British India Princely States') setMapMode('princely');
+      else if (sectionParam === 'European Trading Companies') setMapMode('european');
+      else if (sectionParam === 'British India Presidencies') setMapMode('presidencies');
+    }
+    if (subsectionParam) setSelectedSubsection(subsectionParam);
+    if (stateParam) setSelectedState(stateParam);
   }, []);
+
+  // Sync state to URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (activeTab !== 'map') params.set('tab', activeTab);
+    if (selectedSection) params.set('section', selectedSection);
+    if (selectedSubsection) params.set('subsection', selectedSubsection);
+    if (selectedState) params.set('state', selectedState);
+
+    const query = params.toString();
+    const newUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+    window.history.replaceState(null, '', newUrl);
+  }, [activeTab, selectedSection, selectedSubsection, selectedState]);
 
   // Fetch text note when selection changes (with auto-save)
   useEffect(() => {
