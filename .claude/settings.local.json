@@ -68,7 +68,9 @@
       "Bash(done)",
       "Write",
       "Edit",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(git -C /Users/sahanavasanth/Desktop/LavenderCoinApp log --oneline -20)",
+      "Bash(vercel env pull:*)"
     ]
   }
 }
