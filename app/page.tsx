@@ -40,43 +40,32 @@ function BlogCard({ url }: { url: string }) {
   }, [url]);
 
   return (
-    <div className="border border-purple-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col">
-      <div className="p-3 flex-1">
-        {/* Icon */}
-        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-md flex items-center justify-center mb-2 mx-auto">
-          {isBlogger ? (
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21.976 24H2.026C.9 24 0 23.1 0 21.976V2.026C0 .9.9 0 2.025 0H22.05C23.1 0 24 .9 24 2.025v19.95C24 23.1 23.1 24 21.976 24zM12 3.975H9c-2.775 0-5.025 2.25-5.025 5.025v6c0 2.774 2.25 5.024 5.025 5.024h6c2.774 0 5.024-2.25 5.024-5.024v-3.975c0-.6-.45-1.05-1.05-1.05H18c-.524 0-.976-.45-.976-.976 0-2.776-2.25-5.026-5.024-5.026zm3.074 12h-6c-.525 0-.976-.45-.976-.975s.45-.976.976-.976h6c.525 0 .976.45.976.976s-.45.976-.976.976zm-2.55-3.024h-3.45c-.525 0-.976-.45-.976-.976s.45-.975.975-.975h3.45c.526 0 .976.45.976.975s-.45.976-.975.976z"/>
-            </svg>
-          ) : (
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-          )}
-        </div>
-
-        {/* Content */}
-        <h3 className="text-xs font-semibold text-gray-900 mb-2 line-clamp-3 text-center min-h-[2.5rem]">
-          {isLoading ? (
-            <span className="text-gray-400 italic">Loading...</span>
-          ) : (
-            metadata?.title || 'Blog Post'
-          )}
-        </h3>
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="border border-purple-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center p-2 gap-1 min-w-0"
+    >
+      <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded flex items-center justify-center flex-shrink-0">
+        {isBlogger ? (
+          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21.976 24H2.026C.9 24 0 23.1 0 21.976V2.026C0 .9.9 0 2.025 0H22.05C23.1 0 24 .9 24 2.025v19.95C24 23.1 23.1 24 21.976 24zM12 3.975H9c-2.775 0-5.025 2.25-5.025 5.025v6c0 2.774 2.25 5.024 5.025 5.024h6c2.774 0 5.024-2.25 5.024-5.024v-3.975c0-.6-.45-1.05-1.05-1.05H18c-.524 0-.976-.45-.976-.976 0-2.776-2.25-5.026-5.024-5.026zm3.074 12h-6c-.525 0-.976-.45-.976-.975s.45-.976.976-.976h6c.525 0 .976.45.976.976s-.45.976-.976.976zm-2.55-3.024h-3.45c-.525 0-.976-.45-.976-.976s.45-.975.975-.975h3.45c.526 0 .976.45.976.975s-.45.976-.975.976z"/>
+          </svg>
+        ) : (
+          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          </svg>
+        )}
       </div>
-
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block text-center text-xs text-white bg-purple-600 hover:bg-purple-700 py-2 transition-colors"
-      >
-        Read
-      </a>
-
-      {/* Bottom accent bar */}
-      <div className="h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
-    </div>
+      <span className="text-[10px] font-medium text-gray-800 line-clamp-2 text-center leading-tight min-w-0">
+        {isLoading ? (
+          <span className="text-gray-400 italic">...</span>
+        ) : (
+          metadata?.title || 'Blog Post'
+        )}
+      </span>
+      <div className="h-0.5 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
+    </a>
   );
 }
 
@@ -339,6 +328,7 @@ export default function Home() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [showAddCoinForm, setShowAddCoinForm] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
+  const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
   // Image upload state for add form
   const [addImage1File, setAddImage1File] = useState<File | null>(null);
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
@@ -401,6 +391,20 @@ export default function Home() {
     }
     if (subsectionParam) setSelectedSubsection(subsectionParam);
     if (stateParam) setSelectedState(stateParam);
+
+    // Fetch 3 most recent blog posts (excluding the fixed intro ones)
+    const fetchRecentBlogs = async () => {
+      try {
+        const response = await fetch('/api/recent-blogs?count=3&exclude=about-our-coin-collection,how-did-joint-stock-limited-company');
+        if (response.ok) {
+          const data = await response.json();
+          setRecentBlogUrls(data.posts.map((p: { url: string }) => p.url));
+        }
+      } catch (error) {
+        console.error('Error fetching recent blogs:', error);
+      }
+    };
+    fetchRecentBlogs();
   }, []);
 
   // Sync state to URL query parameters
@@ -2495,11 +2499,9 @@ export default function Home() {
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            {/* Text display/edit area - Sticky at top */}
-            <div className="sticky top-0 z-50 bg-white pb-6 mb-2 -mt-6 -mx-6 px-6 pt-6 shadow-sm">
-              {/* Context Label */}
-              <div className="mb-3 px-2">
-                <div className="text-sm font-semibold text-gray-700 flex items-center gap-3">
+            {/* Context Label - sticky */}
+            <div className="sticky top-0 z-50 bg-white py-2 px-2 -mt-6 -mx-6 px-6 pt-4 pb-2 shadow-sm">
+              <div className="text-sm font-semibold text-gray-700 flex items-center gap-3">
                   {(() => {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
                     if (!section) {
@@ -2568,8 +2570,10 @@ export default function Home() {
                     );
                   })()}
                 </div>
-              </div>
+            </div>
 
+            {/* Text display/edit area */}
+            <div className="pb-6 mb-2 pt-4">
               {isAuthenticated ? (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2617,15 +2621,34 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                textBoxValue ? (
-                  <div className="prose prose-lg max-w-none">
-                    <BlogPreview url={textBoxValue} />
-                  </div>
-                ) : (
-                  <div className="text-gray-400 italic text-center py-6">
-                    No description available for this selection.
-                  </div>
-                )
+                (() => {
+                  const isIntro = !getCurrentSelectionContext().section;
+                  if (isIntro && (textBoxValue || recentBlogUrls.length > 0)) {
+                    // Introduction: show fixed intro blogs + 3 most recent from blog
+                    const introUrls = textBoxValue
+                      ? textBoxValue.split(/[\n,]/).map(u => u.trim()).filter(u => { try { new URL(u); return true; } catch { return false; } })
+                      : [];
+                    const combined = [...introUrls, ...recentBlogUrls];
+                    return (
+                      <div className="flex gap-2 overflow-x-auto">
+                        {combined.map((blogUrl, index) => (
+                          <div key={`${blogUrl}-${index}`} className="flex-shrink-0 w-28">
+                            <BlogCard url={blogUrl} />
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return textBoxValue ? (
+                    <div className="prose prose-lg max-w-none">
+                      <BlogPreview url={textBoxValue} />
+                    </div>
+                  ) : (
+                    <div className="text-gray-400 italic text-center py-6">
+                      No description available for this selection.
+                    </div>
+                  );
+                })()
               )}
             </div>
 
