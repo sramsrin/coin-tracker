@@ -391,6 +391,10 @@ export default function Home() {
     }
     if (subsectionParam) setSelectedSubsection(subsectionParam);
     if (stateParam) setSelectedState(stateParam);
+    if (params.get('view') === 'all') {
+      setGroupBySection(false);
+      setActiveTab('collection');
+    }
 
     // Fetch 3 most recent blog posts (excluding the fixed intro ones)
     const fetchRecentBlogs = async () => {
@@ -414,11 +418,12 @@ export default function Home() {
     if (selectedSection) params.set('section', selectedSection);
     if (selectedSubsection) params.set('subsection', selectedSubsection);
     if (selectedState) params.set('state', selectedState);
+    if (!groupBySection) params.set('view', 'all');
 
     const query = params.toString();
     const newUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
     window.history.replaceState(null, '', newUrl);
-  }, [activeTab, selectedSection, selectedSubsection, selectedState]);
+  }, [activeTab, selectedSection, selectedSubsection, selectedState, groupBySection]);
 
   // Fetch text note when selection changes (with auto-save)
   useEffect(() => {
@@ -2067,6 +2072,12 @@ export default function Home() {
                     <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Index {sortField === 'index' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
+                    <th onClick={() => handleSort('subsection')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                      Subsection {sortField === 'subsection' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th onClick={() => handleSort('subsubsection')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                      State {sortField === 'subsubsection' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th onClick={() => handleSort('faceValue')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Face Value {sortField === 'faceValue' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2121,6 +2132,8 @@ export default function Home() {
                       >
                         {coin.index}
                       </td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{coin.subsection}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{coin.subsubsection}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.date}</td>
