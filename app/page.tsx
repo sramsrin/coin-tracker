@@ -136,6 +136,8 @@ interface Coin {
   reverse: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
+  purchasePrice: string;
+  purchaseSource: string;
   image1Url?: string;
   image2Url?: string;
 }
@@ -357,6 +359,8 @@ export default function Home() {
     reverse: '',
     date: '',
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
+    purchasePrice: '',
+    purchaseSource: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1166,6 +1170,8 @@ export default function Home() {
           reverse: '',
           date: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
+          purchasePrice: '',
+          purchaseSource: '',
         });
         // Clear image state
         setAddImage1File(null);
@@ -1201,6 +1207,8 @@ export default function Home() {
       obverse: coin.obverse,
       reverse: coin.reverse,
       matchConfidence: coin.matchConfidence,
+      purchasePrice: coin.purchasePrice,
+      purchaseSource: coin.purchaseSource,
     });
   };
 
@@ -1700,6 +1708,30 @@ export default function Home() {
                 placeholder="Notes..."
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Purchase Price
+              </label>
+              <input
+                type="text"
+                value={formData.purchasePrice}
+                onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g. $10"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Purchase Source
+              </label>
+              <input
+                type="text"
+                value={formData.purchaseSource}
+                onChange={(e) => setFormData({ ...formData, purchaseSource: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g. eBay, dealer name"
+              />
+            </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Obverse
@@ -2115,6 +2147,16 @@ export default function Home() {
                         Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
                       </th>
                     )}
+                    {isAuthenticated && (
+                      <th onClick={() => handleSort('purchasePrice')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                        Price {sortField === 'purchasePrice' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                    )}
+                    {isAuthenticated && (
+                      <th onClick={() => handleSort('purchaseSource')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                        Source {sortField === 'purchaseSource' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                    )}
                     <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2155,6 +2197,8 @@ export default function Home() {
                         </span>
                       </td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
                         <div className="flex items-center gap-2">
                           {coin.image1Url && (
@@ -2342,6 +2386,26 @@ export default function Home() {
                       value={editFormData.numberAndNotes || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, numberAndNotes: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
+                    <input
+                      type="text"
+                      value={editFormData.purchasePrice || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, purchasePrice: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="e.g. $10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Source</label>
+                    <input
+                      type="text"
+                      value={editFormData.purchaseSource || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, purchaseSource: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="e.g. eBay, dealer name"
                     />
                   </div>
                   <div className="md:col-span-3">
