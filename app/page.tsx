@@ -2047,10 +2047,13 @@ export default function Home() {
                                           </span>
                                         </span>
                                       </th>
-                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Notes</th>}
+                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Price</th>}
+                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Source</th>}
+                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>}
                                       {stateCoins.some(c => c.image1Url || c.image2Url) && (
                                         <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
                                       )}
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Book & Notes</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -2081,7 +2084,9 @@ export default function Home() {
                                             {coin.matchConfidence}
                                           </span>
                                         </td>
-                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.numberAndNotes}</td>}
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchasePrice}</td>}
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseSource}</td>}
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>}
                                         {stateCoins.some(c => c.image1Url || c.image2Url) && (
                                           <td className="px-3 py-2 text-xs">
                                             <div className="flex gap-1">
@@ -2098,6 +2103,7 @@ export default function Home() {
                                             </div>
                                           </td>
                                         )}
+                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -2144,9 +2150,6 @@ export default function Home() {
                     <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Weight {sortField === 'weight' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
-                      Book {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th onClick={() => handleSort('matchConfidence')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       <span className="relative group">
                         Match Confidence {sortField === 'matchConfidence' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -2158,11 +2161,6 @@ export default function Home() {
                         </span>
                       </span>
                     </th>
-                    {isAuthenticated && (
-                      <th onClick={() => handleSort('numberAndNotes')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                        Number & Notes {sortField === 'numberAndNotes' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </th>
-                    )}
                     {isAuthenticated && (
                       <th onClick={() => handleSort('purchasePrice')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                         Price {sortField === 'purchasePrice' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -2183,6 +2181,9 @@ export default function Home() {
                     </th>
                     <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                      Book & Notes {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                   </tr>
                 </thead>
@@ -2211,13 +2212,11 @@ export default function Home() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.weight}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.book}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {coin.matchConfidence}
                         </span>
                       </td>
-                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
@@ -2241,6 +2240,7 @@ export default function Home() {
                           <span className="truncate">{coin.reverse}</span>
                         </div>
                       </td>
+                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                     </tr>
                   ))}
                 </tbody>
