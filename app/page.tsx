@@ -138,6 +138,7 @@ interface Coin {
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   purchasePrice: string;
   purchaseSource: string;
+  purchaseDate: string;
   image1Url?: string;
   image2Url?: string;
 }
@@ -361,6 +362,7 @@ export default function Home() {
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
     purchasePrice: '',
     purchaseSource: '',
+    purchaseDate: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1172,6 +1174,7 @@ export default function Home() {
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
           purchasePrice: '',
           purchaseSource: '',
+          purchaseDate: '',
         });
         // Clear image state
         setAddImage1File(null);
@@ -1209,6 +1212,7 @@ export default function Home() {
       matchConfidence: coin.matchConfidence,
       purchasePrice: coin.purchasePrice,
       purchaseSource: coin.purchaseSource,
+      purchaseDate: coin.purchaseDate,
     });
   };
 
@@ -1732,6 +1736,18 @@ export default function Home() {
                 placeholder="e.g. eBay, dealer name"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Purchase Date
+              </label>
+              <input
+                type="text"
+                value={formData.purchaseDate}
+                onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g. March 2026"
+              />
+            </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Obverse
@@ -2157,6 +2173,11 @@ export default function Home() {
                         Source {sortField === 'purchaseSource' && (sortDirection === 'asc' ? '↑' : '↓')}
                       </th>
                     )}
+                    {isAuthenticated && (
+                      <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                        Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                    )}
                     <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2199,6 +2220,7 @@ export default function Home() {
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.numberAndNotes}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
                         <div className="flex items-center gap-2">
                           {coin.image1Url && (
@@ -2406,6 +2428,16 @@ export default function Home() {
                       onChange={(e) => setEditFormData({ ...editFormData, purchaseSource: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       placeholder="e.g. eBay, dealer name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Date</label>
+                    <input
+                      type="text"
+                      value={editFormData.purchaseDate || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, purchaseDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="e.g. March 2026"
                     />
                   </div>
                   <div className="md:col-span-3">
