@@ -997,6 +997,13 @@ export default function Home() {
       return sortDirection === 'asc' ? aYear - bYear : bYear - aYear;
     }
 
+    // Special handling for purchasePrice (strip $ sign for numeric sorting)
+    if (sortField === 'purchasePrice') {
+      const aNum = parseFloat(aValue.replace(/[$,]/g, '')) || 0;
+      const bNum = parseFloat(bValue.replace(/[$,]/g, '')) || 0;
+      return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+    }
+
     // Try to parse as numbers for numeric sorting
     const aNum = parseFloat(aValue);
     const bNum = parseFloat(bValue);
