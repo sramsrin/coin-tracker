@@ -118,6 +118,44 @@ function BlogPreview({ url }: { url: string }) {
   );
 }
 
+/** Book slot is page.slot (e.g. 3.7). Coins not yet shelved use this exact string. */
+const IN_TRANSIT_INDEX = 'In Transit';
+
+function parseBookIndex(index: string): { page: number; slot: number } | null {
+  const parts = index.trim().split('.');
+  if (parts.length !== 2) return null;
+  const page = parseInt(parts[0], 10);
+  const slot = parseInt(parts[1], 10);
+  if (Number.isNaN(page) || Number.isNaN(slot)) return null;
+  return { page, slot };
+}
+
+function isInTransitIndex(index: string): boolean {
+  return index.trim() === IN_TRANSIT_INDEX;
+}
+
+function CoinIndexDisplay({ index }: { index: string }) {
+  if (isInTransitIndex(index)) {
+    return <span className="text-amber-800 font-semibold">{index}</span>;
+  }
+  return <>{index}</>;
+}
+
+function compareIndexForSort(a: string, b: string): number {
+  const aTransit = isInTransitIndex(a);
+  const bTransit = isInTransitIndex(b);
+  if (aTransit && bTransit) return 0;
+  if (aTransit) return 1;
+  if (bTransit) return -1;
+  const ap = parseBookIndex(a);
+  const bp = parseBookIndex(b);
+  if (ap && bp) {
+    if (ap.page !== bp.page) return ap.page - bp.page;
+    return ap.slot - bp.slot;
+  }
+  return a.localeCompare(b);
+}
+
 interface Coin {
   id: string;
   index: string;
@@ -330,6 +368,7 @@ export default function Home() {
   const [selectedEuropeanCategory, setSelectedEuropeanCategory] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [showAddCoinForm, setShowAddCoinForm] = useState(false);
+  const [addCoinInTransit, setAddCoinInTransit] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
   const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
   // Image upload state for add form
@@ -923,17 +962,12 @@ export default function Home() {
   // Get subsubsections for edit form
   const availableEditSubsubsections = getSubsubsectionsForSubsection(editFormData.section || '', editFormData.subsection || '');
 
-  // Calculate next available index
+  // Next book slot (page.slot). Ignores "In Transit" and any non-numeric index.
   const getNextIndex = () => {
-    if (coins.length === 0) return '1.1';
+    const bookCoins = coins.filter((c) => parseBookIndex(c.index) !== null);
+    if (bookCoins.length === 0) return '1.1';
 
-    // Find the highest index
-    const indices = coins.map(coin => {
-      const parts = coin.index.split('.');
-      const page = parseInt(parts[0]) || 0;
-      const slot = parseInt(parts[1]) || 0;
-      return { page, slot };
-    });
+    const indices = bookCoins.map((coin) => parseBookIndex(coin.index)!);
 
     const maxIndex = indices.reduce((max, current) => {
       if (current.page > max.page) return current;
@@ -941,12 +975,10 @@ export default function Home() {
       return max;
     }, { page: 0, slot: 0 });
 
-    // Calculate next index
     if (maxIndex.slot < 12) {
       return `${maxIndex.page}.${maxIndex.slot + 1}`;
-    } else {
-      return `${maxIndex.page + 1}.1`;
     }
+    return `${maxIndex.page + 1}.1`;
   };
 
   const handleSort = (field: SortField) => {
@@ -975,19 +1007,24 @@ export default function Home() {
     const aValue = a[sortField] || '';
     const bValue = b[sortField] || '';
 
-    // Special handling for index field (page.slot format)
+    // Special handling for index field (page.slot format; in-transit sorts after shelved coins)
     if (sortField === 'index') {
-      const aParts = aValue.split('.');
-      const bParts = bValue.split('.');
-      const aPage = parseInt(aParts[0]) || 0;
-      const bPage = parseInt(bParts[0]) || 0;
-      const aSlot = parseInt(aParts[1]) || 0;
-      const bSlot = parseInt(bParts[1]) || 0;
-
-      if (aPage !== bPage) {
-        return sortDirection === 'asc' ? aPage - bPage : bPage - aPage;
+      const ia = String(aValue);
+      const ib = String(bValue);
+      const aTransit = isInTransitIndex(ia);
+      const bTransit = isInTransitIndex(ib);
+      if (aTransit && bTransit) return 0;
+      if (aTransit) return sortDirection === 'asc' ? 1 : -1;
+      if (bTransit) return sortDirection === 'asc' ? -1 : 1;
+      const aParsed = parseBookIndex(ia);
+      const bParsed = parseBookIndex(ib);
+      if (aParsed && bParsed) {
+        if (aParsed.page !== bParsed.page) {
+          return sortDirection === 'asc' ? aParsed.page - bParsed.page : bParsed.page - aParsed.page;
+        }
+        return sortDirection === 'asc' ? aParsed.slot - bParsed.slot : bParsed.slot - aParsed.slot;
       }
-      return sortDirection === 'asc' ? aSlot - bSlot : bSlot - aSlot;
+      return sortDirection === 'asc' ? ia.localeCompare(ib) : ib.localeCompare(ia);
     }
 
     // Special handling for date field (numeric year sorting)
@@ -1128,10 +1165,9 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Use overridden index or auto-assign the next index
     const coinData = {
       ...formData,
-      index: formData.index || getNextIndex()
+      index: addCoinInTransit ? IN_TRANSIT_INDEX : (formData.index?.trim() || getNextIndex()),
     };
 
     try {
@@ -1169,6 +1205,7 @@ export default function Home() {
         }
 
         // Clear form
+        setAddCoinInTransit(false);
         setFormData({
           index: '',
           section: '',
@@ -1210,6 +1247,7 @@ export default function Home() {
     setEditImage1Preview(null);
     setEditImage2Preview(null);
     setEditFormData({
+      index: coin.index,
       section: coin.section,
       subsection: coin.subsection,
       subsubsection: coin.subsubsection,
@@ -1443,6 +1481,9 @@ export default function Home() {
     }
   };
 
+  const unidentifiedCount = coins.filter((c) => c.section === 'Unidentified').length;
+  const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
@@ -1528,15 +1569,33 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Add New Coin</h2>
-          <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md flex items-center gap-3">
-            <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Index:</label>
-            <input
-              type="text"
-              value={formData.index || getNextIndex()}
-              onChange={(e) => setFormData({ ...formData, index: e.target.value })}
-              className="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm font-bold text-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            />
-            <span className="text-gray-500 text-xs">(auto: {getNextIndex()})</span>
+          <div className="mb-4 p-3 bg-pink-50 border border-pink-200 rounded-md space-y-2">
+            <label className="flex items-center gap-2 text-sm text-gray-800 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={addCoinInTransit}
+                onChange={(e) => {
+                  const on = e.target.checked;
+                  setAddCoinInTransit(on);
+                  setFormData((fd) => ({ ...fd, index: on ? IN_TRANSIT_INDEX : '' }));
+                }}
+                className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+              />
+              <span>In transit — use index &quot;{IN_TRANSIT_INDEX}&quot; until the coin is shelved</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">Index:</span>
+              <input
+                type="text"
+                disabled={addCoinInTransit}
+                value={addCoinInTransit ? IN_TRANSIT_INDEX : (formData.index || getNextIndex())}
+                onChange={(e) => setFormData({ ...formData, index: e.target.value })}
+                className="w-28 px-2 py-1 border border-gray-300 rounded-md text-sm font-bold text-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-amber-50 disabled:text-amber-900"
+              />
+              {!addCoinInTransit && (
+                <span className="text-gray-500 text-xs">(next free slot: {getNextIndex()})</span>
+              )}
+            </div>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -1948,7 +2007,19 @@ export default function Home() {
         {/* Coins Table */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="flex justify-between items-center p-6 pb-4">
-            <h2 className="text-2xl font-semibold text-gray-700">Your Collection ({coins.length} coins)</h2>
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold text-gray-700">
+                Your Collection ({coins.length} coins)
+              </h2>
+              <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                <span>
+                  Unidentified: <span className="font-semibold text-gray-700">{unidentifiedCount}</span>
+                </span>
+                <span>
+                  In transit: <span className="font-semibold text-gray-700">{inTransitCount}</span>
+                </span>
+              </div>
+            </div>
             <button
               onClick={() => setGroupBySection(!groupBySection)}
               className="px-4 py-2 bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-md text-sm font-medium transition"
@@ -2077,7 +2148,7 @@ export default function Home() {
                                           className={`px-3 py-2 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                                           onClick={() => isAuthenticated && handleEditClick(coin)}
                                         >
-                                          {coin.index}
+                                          <CoinIndexDisplay index={coin.index} />
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
@@ -2208,7 +2279,7 @@ export default function Home() {
                         className={`px-4 py-3 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                         onClick={() => isAuthenticated && handleEditClick(coin)}
                       >
-                        {coin.index}
+                        <CoinIndexDisplay index={coin.index} />
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.subsection}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.subsubsection}</td>
@@ -2281,7 +2352,36 @@ export default function Home() {
                 </button>
               </div>
               <div className="p-6">
+                {isInTransitIndex(editFormData.index || '') && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <p className="text-sm text-amber-900">
+                      This coin is marked in transit. When you have it in hand, assign the next book slot.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditFormData({ ...editFormData, index: getNextIndex() })
+                      }
+                      className="shrink-0 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-md transition"
+                    >
+                      Assign next index ({getNextIndex()})
+                    </button>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Index</label>
+                    <input
+                      type="text"
+                      value={editFormData.index ?? ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, index: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 font-mono text-sm"
+                      placeholder="e.g. 3.7 or In Transit"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Type <span className="font-medium">{IN_TRANSIT_INDEX}</span> to mark in transit, or use the button above when receiving.
+                    </p>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Section</label>
                     <input
@@ -3445,7 +3545,7 @@ export default function Home() {
               <div className="mb-6 space-y-8">
                 {coins
                   .filter(c => c.section === 'Unidentified')
-                  .sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }))
+                  .sort((a, b) => compareIndexForSort(a.index, b.index))
                   .map(coin => (
                     <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
                       {/* Images */}
@@ -3464,7 +3564,7 @@ export default function Home() {
                       {/* Details */}
                       <div className="p-6 space-y-2">
                         <div className="flex items-center gap-3 mb-3">
-                          <span className="text-lg font-bold text-gray-800">#{coin.index}</span>
+                          <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
                           <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
                           {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
                           <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
