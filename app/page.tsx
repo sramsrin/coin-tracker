@@ -156,6 +156,42 @@ function compareIndexForSort(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+const TARGET_STATES_BY_AGENCY: Record<string, string[]> = {
+  'Rajputana Agency': ['Dholpur', 'Dungarpur', 'Jaisalmer', 'Kotah', 'Sirohi'],
+  'Central India Agency': ['Bajranggarh', 'Bijawar', 'Chhatarpur', 'Datia', 'Indergadh', 'Jhabua', 'Orchha', 'Panna', 'Rewa'],
+  'Western India States Agency': [
+    'Ambliara', 'Bajana', 'Balwan', 'Baria', 'Bilkha', 'Bindraban', 'Broach', 'Chhota-Udaipur',
+    'Gondal', 'Jasdan', 'Khadal', 'Mangrol', 'Mengani', 'Muli', 'Palitana', 'Rajkot', 'Sayala',
+    'Vithalgadh', 'Wankaner', 'Cooch-Behar',
+  ],
+  'Punjab States Agency': ['Faridkot', 'Jind', 'Kapurthala', 'Malerkotla', 'Patiala'],
+  'Punjab Hill States': ['Chamba', 'Jubbal', 'Sirmur'],
+  'Deccan States Agency': ['Jamkhandi', 'Kolhapur', 'Miraj Senior'],
+  'Eastern States Agency': ['Bamra'],
+  'Kashmir Residency': ['Jammu and Kashmir'],
+  'North-East/Bengal Context': ['Manipur', 'Tripura'],
+  'Baluchistan/Sind Frontier': ['Kalat', 'Khairpur'],
+  'Mixed/Uncertain Classification': [
+    'Farrukhabad', 'Garhwal', 'Janjira', 'Kaithal', 'Nagpur', 'Nawalgarh', 'Rampur', 'Rohilkhand',
+    'Chuda', 'Coorg',
+  ],
+};
+
+function normalizeStateKey(value: string): string {
+  const lower = value.trim().toLowerCase();
+  const aliases: Record<string, string> = {
+    awadh: 'oudh',
+    coochbehar: 'coochbehar',
+    'cooch-behar': 'coochbehar',
+    bikanir: 'bikaner',
+    sivaganga: 'sivagangai',
+    pratabgarh: 'pratapgarh',
+    pudukkottai: 'pudukottai',
+  };
+  const raw = lower.replace(/[^a-z0-9]/g, '');
+  return aliases[raw] || raw;
+}
+
 interface Coin {
   id: string;
   index: string;
@@ -332,7 +368,7 @@ export default function Home() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deletePasswordError, setDeletePasswordError] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
-  const [activeTab, setActiveTab] = useState<'collection' | 'map'>('map');
+  const [activeTab, setActiveTab] = useState<'collection' | 'map' | 'targets'>('map');
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [selectedSubsection, setSelectedSubsection] = useState<string | null>(null);
   const [colorMappings, setColorMappings] = useState<{state: string, color: string}[]>([]);
@@ -425,7 +461,7 @@ export default function Home() {
     const subsectionParam = params.get('subsection');
     const stateParam = params.get('state');
 
-    if (tabParam === 'collection' || tabParam === 'map') {
+    if (tabParam === 'collection' || tabParam === 'map' || tabParam === 'targets') {
       setActiveTab(tabParam);
     }
     if (sectionParam) {
@@ -1483,6 +1519,21 @@ export default function Home() {
 
   const unidentifiedCount = coins.filter((c) => c.section === 'Unidentified').length;
   const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
+  const identifiedCount = Math.max(0, coins.length - unidentifiedCount - inTransitCount);
+  const ownedPrincelyStateKeys = new Set(
+    coins
+      .filter((coin) => coin.section === 'British India Princely States')
+      .flatMap((coin) => [coin.subsubsection, coin.subsection])
+      .filter((value): value is string => Boolean(value && value.trim()))
+      .map((value) => normalizeStateKey(value))
+  );
+  const unresolvedTargetsByAgency = Object.entries(TARGET_STATES_BY_AGENCY)
+    .map(([agency, states]) => ({
+      agency,
+      states: states.filter((state) => !ownedPrincelyStateKeys.has(normalizeStateKey(state))),
+    }))
+    .filter((entry) => entry.states.length > 0);
+  const totalRemainingTargets = unresolvedTargetsByAgency.reduce((sum, entry) => sum + entry.states.length, 0);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 p-4 sm:p-8">
@@ -1514,6 +1565,16 @@ export default function Home() {
                 }`}
               >
                 📊 Collection
+              </button>
+              <button
+                onClick={() => setActiveTab('targets')}
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
+                  activeTab === 'targets'
+                    ? 'bg-pink-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-pink-50'
+                }`}
+              >
+                🎯 Targets
               </button>
             </div>
           </div>
@@ -2012,6 +2073,17 @@ export default function Home() {
                 Your Collection ({coins.length} coins)
               </h2>
               <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                <span>
+                  Identified:{' '}
+                  <a
+                    href="https://en.numista.com/echanges/profil.php?id=403952"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-pink-700 hover:text-pink-800 underline"
+                  >
+                    {identifiedCount}
+                  </a>
+                </span>
                 <span>
                   Unidentified: <span className="font-semibold text-gray-700">{unidentifiedCount}</span>
                 </span>
@@ -2717,6 +2789,49 @@ export default function Home() {
           </div>
         )}
           </>
+        )}
+
+        {activeTab === 'targets' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold text-gray-700">Princely States Target Tracker</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Remaining states from your agency target list. This updates automatically when you add a coin in
+                <span className="font-medium text-gray-700"> British India Princely States</span>.
+              </p>
+              <p className="text-sm text-pink-700 font-semibold mt-2">
+                Remaining targets: {totalRemainingTargets}
+              </p>
+            </div>
+
+            {unresolvedTargetsByAgency.length === 0 ? (
+              <div className="p-6 rounded-lg border border-green-200 bg-green-50 text-green-800 font-medium">
+                All target states completed. Great work!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {unresolvedTargetsByAgency.map((group) => (
+                  <div key={group.agency} className="border border-pink-100 rounded-lg p-4 bg-pink-50/30">
+                    <h3 className="font-semibold text-gray-800 mb-2">
+                      {group.agency} ({group.states.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {group.states
+                        .sort((a, b) => a.localeCompare(b))
+                        .map((state) => (
+                          <span
+                            key={`${group.agency}-${state}`}
+                            className="px-2 py-1 rounded-md bg-white border border-pink-200 text-xs text-gray-700"
+                          >
+                            {state}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Map Tab */}
