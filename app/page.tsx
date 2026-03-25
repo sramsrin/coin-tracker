@@ -1517,7 +1517,7 @@ export default function Home() {
     }
   };
 
-  const unidentifiedCount = coins.filter((c) => c.section === 'Unidentified').length;
+  const unidentifiedCount = coins.filter((c) => c.section === 'Unidentified South Indian Lot').length;
   const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
   const identifiedCount = Math.max(0, coins.length - unidentifiedCount - inTransitCount);
   const ownedPrincelyStateKeys = new Set(
@@ -2085,7 +2085,7 @@ export default function Home() {
                   </a>
                 </span>
                 <span>
-                  Unidentified: <span className="font-semibold text-gray-700">{unidentifiedCount}</span>
+                  Unidentified South Indian Lot: <span className="font-semibold text-gray-700">{unidentifiedCount}</span>
                 </span>
                 <span>
                   In transit: <span className="font-semibold text-gray-700">{inTransitCount}</span>
@@ -3006,7 +3006,7 @@ export default function Home() {
                   'European Overseas',
                   'Older Indian Kingdoms',
                   'Other',
-                  'Unidentified'
+                  'Unidentified South Indian Lot'
                 ];
                 const remainingSections = allSections.filter(s =>
                   !colonialSections.includes(s) && !otherGroupSections.includes(s)
@@ -3655,11 +3655,11 @@ export default function Home() {
 
             </>)}
 
-            {/* Unidentified Section - Image-focused card layout */}
-            {selectedSection === 'Unidentified' && (
+            {/* Unidentified South Indian Lot Section - Image-focused card layout */}
+            {selectedSection === 'Unidentified South Indian Lot' && (
               <div className="mb-6 space-y-8">
                 {coins
-                  .filter(c => c.section === 'Unidentified')
+                  .filter(c => c.section === 'Unidentified South Indian Lot')
                   .sort((a, b) => compareIndexForSort(a.index, b.index))
                   .map(coin => (
                     <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
@@ -3708,7 +3708,7 @@ export default function Home() {
             )}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Unidentified' && (
+            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Unidentified South Indian Lot' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
