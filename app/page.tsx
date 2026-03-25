@@ -407,6 +407,10 @@ export default function Home() {
   const [addCoinInTransit, setAddCoinInTransit] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
   const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
+  const [lotDescription, setLotDescription] = useState('');
+  const [lotDescriptionInitial, setLotDescriptionInitial] = useState('');
+  const [lotDescriptionSaving, setLotDescriptionSaving] = useState(false);
+  const [lotDescriptionSaveSuccess, setLotDescriptionSaveSuccess] = useState(false);
   // Image upload state for add form
   const [addImage1File, setAddImage1File] = useState<File | null>(null);
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
@@ -647,6 +651,47 @@ export default function Home() {
     setTextBoxValue(newText);
     setHasUnsavedChanges(newText !== initialTextRef.current);
     setSaveSuccess(false);
+  };
+
+  // Lot description fetch/save for Unidentified South Indian Lot section
+  const fetchLotDescription = async (subsection: string) => {
+    try {
+      const params = new URLSearchParams();
+      params.append('section', 'Unidentified South Indian Lot');
+      params.append('subsection', subsection);
+      const response = await fetch(`/api/section-notes?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.text || '';
+        setLotDescription(text);
+        setLotDescriptionInitial(text);
+      }
+    } catch (error) {
+      console.error('Error fetching lot description:', error);
+    }
+  };
+
+  const saveLotDescription = async (subsection: string) => {
+    setLotDescriptionSaving(true);
+    setLotDescriptionSaveSuccess(false);
+    try {
+      await fetch('/api/section-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          section: 'Unidentified South Indian Lot',
+          subsection,
+          text: lotDescription,
+        }),
+      });
+      setLotDescriptionInitial(lotDescription);
+      setLotDescriptionSaveSuccess(true);
+      setTimeout(() => setLotDescriptionSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error saving lot description:', error);
+    } finally {
+      setLotDescriptionSaving(false);
+    }
   };
 
   const highlightEuropeanOnMap = (categoryNames: string[] | null) => {
@@ -3655,55 +3700,143 @@ export default function Home() {
 
             </>)}
 
-            {/* Unidentified South Indian Lot Section - Image-focused card layout */}
+            {/* Unidentified South Indian Lot Section */}
             {selectedSection === 'Unidentified South Indian Lot' && (
-              <div className="mb-6 space-y-8">
-                {coins
-                  .filter(c => c.section === 'Unidentified South Indian Lot')
-                  .sort((a, b) => compareIndexForSort(a.index, b.index))
-                  .map(coin => (
-                    <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-                      {/* Images */}
-                      <div className="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50 justify-center items-center">
-                        {coin.image1Url && (
-                          <a href={coin.image1Url} target="_blank" rel="noopener noreferrer" className="block">
-                            <img src={coin.image1Url} alt="Obverse" className="rounded-lg shadow-md max-h-64 object-contain hover:opacity-90 transition" />
-                          </a>
-                        )}
-                        {coin.image2Url && (
-                          <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
-                            <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-64 object-contain hover:opacity-90 transition" />
-                          </a>
-                        )}
-                      </div>
-                      {/* Details */}
-                      <div className="p-6 space-y-2">
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
-                          <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
-                          {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {coin.matchConfidence}
-                          </span>
+              <div className="mb-6">
+                {/* Lot selector */}
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Lot</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+                  {Array.from(new Set(
+                    coins
+                      .filter(c => c.section === 'Unidentified South Indian Lot')
+                      .map(c => c.subsection)
+                      .filter(Boolean)
+                  )).sort().map(lot => {
+                    const lotCoinCount = coins.filter(c => c.section === 'Unidentified South Indian Lot' && c.subsection === lot).length;
+                    return (
+                      <button
+                        key={lot}
+                        onClick={() => {
+                          if (selectedSubsection === lot) {
+                            setSelectedSubsection(null);
+                            setLotDescription('');
+                            setLotDescriptionInitial('');
+                          } else {
+                            setSelectedSubsection(lot);
+                            fetchLotDescription(lot);
+                          }
+                        }}
+                        className={`px-4 py-3 rounded-lg transition text-left ${
+                          selectedSubsection === lot
+                            ? 'bg-purple-600 text-white shadow-lg'
+                            : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                        }`}
+                      >
+                        <div className="text-sm font-semibold">{lot}</div>
+                        <div className={`text-xs ${selectedSubsection === lot ? 'text-purple-200' : 'text-gray-500'}`}>
+                          {lotCoinCount} coin{lotCoinCount !== 1 ? 's' : ''}
                         </div>
-                        {coin.obverse && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Obverse:</span> <span className="text-gray-600">{coin.obverse}</span></div>
-                        )}
-                        {coin.reverse && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Reverse:</span> <span className="text-gray-600">{coin.reverse}</span></div>
-                        )}
-                        {coin.weight && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
-                        )}
-                        {coin.numistaLink && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Numista:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
-                        )}
-                        {coin.numberAndNotes && (
-                          <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
-                        )}
-                      </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Lot description + coins */}
+                {selectedSubsection && (
+                  <div className="space-y-6">
+                    {/* Lot description */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">About {selectedSubsection}</h4>
+                      {isAuthenticated ? (
+                        <div>
+                          <textarea
+                            value={lotDescription}
+                            onChange={(e) => setLotDescription(e.target.value)}
+                            placeholder={`Describe what ${selectedSubsection} contains...`}
+                            rows={3}
+                            className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 border-purple-200 bg-white text-gray-700 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 resize-none"
+                            style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem' }}
+                          />
+                          <div className="flex items-center gap-3 mt-2">
+                            <button
+                              onClick={() => saveLotDescription(selectedSubsection)}
+                              disabled={lotDescription === lotDescriptionInitial || lotDescriptionSaving}
+                              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                lotDescription !== lotDescriptionInitial && !lotDescriptionSaving
+                                  ? 'bg-purple-600 hover:bg-purple-700 text-white cursor-pointer'
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              {lotDescriptionSaving ? 'Saving...' : 'Save'}
+                            </button>
+                            {lotDescriptionSaveSuccess && (
+                              <span className="text-green-600 text-sm italic">Saved</span>
+                            )}
+                            {lotDescription !== lotDescriptionInitial && !lotDescriptionSaving && (
+                              <span className="text-orange-500 text-sm italic">Unsaved changes</span>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        lotDescription ? (
+                          <p className="text-gray-600 italic" style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem' }}>{lotDescription}</p>
+                        ) : (
+                          <p className="text-gray-400 italic text-sm">No description yet.</p>
+                        )
+                      )}
                     </div>
-                  ))}
+
+                    {/* Coin cards */}
+                    <div className="space-y-8">
+                      {coins
+                        .filter(c => c.section === 'Unidentified South Indian Lot' && c.subsection === selectedSubsection)
+                        .sort((a, b) => compareIndexForSort(a.index, b.index))
+                        .map(coin => (
+                          <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                            {/* Images */}
+                            <div className="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50 justify-center items-center">
+                              {coin.image1Url && (
+                                <a href={coin.image1Url} target="_blank" rel="noopener noreferrer" className="block">
+                                  <img src={coin.image1Url} alt="Obverse" className="rounded-lg shadow-md max-h-64 object-contain hover:opacity-90 transition" />
+                                </a>
+                              )}
+                              {coin.image2Url && (
+                                <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
+                                  <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-64 object-contain hover:opacity-90 transition" />
+                                </a>
+                              )}
+                            </div>
+                            {/* Details */}
+                            <div className="p-6 space-y-2">
+                              <div className="flex items-center gap-3 mb-3">
+                                <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
+                                <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
+                                {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                  {coin.matchConfidence}
+                                </span>
+                              </div>
+                              {coin.obverse && (
+                                <div className="text-sm"><span className="font-semibold text-gray-700">Obverse:</span> <span className="text-gray-600">{coin.obverse}</span></div>
+                              )}
+                              {coin.reverse && (
+                                <div className="text-sm"><span className="font-semibold text-gray-700">Reverse:</span> <span className="text-gray-600">{coin.reverse}</span></div>
+                              )}
+                              {coin.weight && (
+                                <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
+                              )}
+                              {coin.numistaLink && (
+                                <div className="text-sm"><span className="font-semibold text-gray-700">Numista:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
+                              )}
+                              {coin.numberAndNotes && (
+                                <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
