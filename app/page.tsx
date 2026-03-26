@@ -396,7 +396,7 @@ export default function Home() {
   const isTextLoadedRef = useRef(false);
   const initialTextRef = useRef('');
   const tableScrollRef = useRef<HTMLDivElement>(null);
-  const topScrollRef = useRef<HTMLDivElement>(null);
+  const [tableScrollPct, setTableScrollPct] = useState(0);
   const previousSelectionRef = useRef<{section: string | null, subsection: string | null, subsubsection: string | null}>({
     section: null,
     subsection: null,
@@ -2324,26 +2324,35 @@ export default function Home() {
             </div>
           ) : (
             <>
-            {/* Top scrollbar that syncs with the table */}
-            <div
-              ref={topScrollRef}
-              onScroll={() => {
-                if (tableScrollRef.current && topScrollRef.current) {
-                  tableScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
-                }
-              }}
-              className="overflow-x-auto border border-gray-200 border-b-0 rounded-t-lg"
-            >
-              <div style={{ width: '1400px', height: '1px' }} />
+            {/* Top scroll slider that syncs with the table */}
+            <div className="flex items-center gap-2 mb-1 px-1">
+              <span className="text-xs text-gray-400 select-none">←</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={tableScrollPct}
+                onChange={(e) => {
+                  const el = tableScrollRef.current;
+                  if (el) {
+                    const pct = Number(e.target.value) / 100;
+                    el.scrollLeft = pct * (el.scrollWidth - el.clientWidth);
+                    setTableScrollPct(Number(e.target.value));
+                  }
+                }}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              />
+              <span className="text-xs text-gray-400 select-none">→</span>
             </div>
             <div
               ref={tableScrollRef}
               onScroll={() => {
-                if (topScrollRef.current && tableScrollRef.current) {
-                  topScrollRef.current.scrollLeft = tableScrollRef.current.scrollLeft;
+                const el = tableScrollRef.current;
+                if (el && el.scrollWidth > el.clientWidth) {
+                  setTableScrollPct((el.scrollLeft / (el.scrollWidth - el.clientWidth)) * 100);
                 }
               }}
-              className="overflow-x-auto max-h-[80vh] overflow-y-auto border border-gray-200 rounded-b-lg"
+              className="overflow-x-auto max-h-[80vh] overflow-y-auto border border-gray-200 rounded-lg"
             >
               <table className="min-w-[1400px] w-full">
                 <thead className="bg-pink-100 sticky top-0 z-10">
