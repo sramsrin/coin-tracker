@@ -2321,9 +2321,9 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-pink-100">
+            <div className="overflow-x-auto max-h-[80vh] overflow-y-auto border border-gray-200 rounded-lg">
+              <table className="min-w-[1400px] w-full">
+                <thead className="bg-pink-100 sticky top-0 z-10">
                   <tr>
                     <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Index {sortField === 'index' && (sortDirection === 'asc' ? '↑' : '↓')}
