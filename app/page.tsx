@@ -395,6 +395,8 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const isTextLoadedRef = useRef(false);
   const initialTextRef = useRef('');
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+  const topScrollRef = useRef<HTMLDivElement>(null);
   const previousSelectionRef = useRef<{section: string | null, subsection: string | null, subsubsection: string | null}>({
     section: null,
     subsection: null,
@@ -2321,7 +2323,28 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto max-h-[80vh] overflow-y-auto border border-gray-200 rounded-lg">
+            <>
+            {/* Top scrollbar that syncs with the table */}
+            <div
+              ref={topScrollRef}
+              onScroll={() => {
+                if (tableScrollRef.current && topScrollRef.current) {
+                  tableScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+                }
+              }}
+              className="overflow-x-auto border border-gray-200 border-b-0 rounded-t-lg"
+            >
+              <div style={{ width: '1400px', height: '1px' }} />
+            </div>
+            <div
+              ref={tableScrollRef}
+              onScroll={() => {
+                if (topScrollRef.current && tableScrollRef.current) {
+                  topScrollRef.current.scrollLeft = tableScrollRef.current.scrollLeft;
+                }
+              }}
+              className="overflow-x-auto max-h-[80vh] overflow-y-auto border border-gray-200 rounded-b-lg"
+            >
               <table className="min-w-[1400px] w-full">
                 <thead className="bg-pink-100 sticky top-0 z-10">
                   <tr>
@@ -2448,6 +2471,7 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
 
