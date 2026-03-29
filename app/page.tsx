@@ -1566,7 +1566,7 @@ export default function Home() {
 
   const indeterminateCount = coins.filter((c) => c.section === 'Indeterminate').length;
   const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
-  const identifiedCount = Math.max(0, coins.length - indeterminateCount - inTransitCount);
+  const onNumistaCount = coins.filter((c) => c.numistaLink).length;
   const ownedPrincelyStateKeys = new Set(
     coins
       .filter((coin) => coin.section === 'British India Princely States')
@@ -2121,14 +2121,14 @@ export default function Home() {
               </h2>
               <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-4 gap-y-1">
                 <span>
-                  Identified:{' '}
+                  On Numista:{' '}
                   <a
                     href="https://en.numista.com/echanges/profil.php?id=403952"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold text-pink-700 hover:text-pink-800 underline"
                   >
-                    {identifiedCount}
+                    {onNumistaCount}
                   </a>
                 </span>
                 <span>
