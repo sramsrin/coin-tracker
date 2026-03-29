@@ -3733,61 +3733,100 @@ export default function Home() {
 
             </>)}
 
-            {/* Indeterminate Section */}
-            {selectedSection === 'Indeterminate' && (
-              <div className="mb-6 space-y-8">
-                {coins
-                  .filter(c => c.section === 'Indeterminate')
-                  .sort((a, b) => compareIndexForSort(a.index, b.index))
-                  .map(coin => (
-                    <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-                      {/* Images */}
-                      <div className="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50 justify-center items-center">
-                        {coin.image1Url && (
-                          <a href={coin.image1Url} target="_blank" rel="noopener noreferrer" className="block">
-                            <img src={coin.image1Url} alt="Obverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
-                          </a>
-                        )}
-                        {coin.image2Url && (
-                          <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
-                            <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
-                          </a>
-                        )}
-                      </div>
-                      {/* Details */}
-                      <div className="p-6 space-y-2">
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
-                          {coin.subsection && <span className="text-sm text-purple-600 font-medium">{coin.subsection}</span>}
-                          <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
-                          {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {coin.matchConfidence}
-                          </span>
-                        </div>
-                        {coin.obverse && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Obverse:</span> <span className="text-gray-600">{coin.obverse}</span></div>
-                        )}
-                        {coin.reverse && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Reverse:</span> <span className="text-gray-600">{coin.reverse}</span></div>
-                        )}
-                        {coin.weight && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
-                        )}
-                        {coin.numistaLink && (
-                          <div className="text-sm"><span className="font-semibold text-gray-700">Numista:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
-                        )}
-                        {coin.numberAndNotes && (
-                          <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
-                        )}
+            {/* Indeterminate / Older Indian Kingdoms - image-focused sections */}
+            {(selectedSection === 'Indeterminate' || selectedSection === 'Older Indian Kingdoms') && (
+              <div className="mb-6">
+                {/* Subsection selector */}
+                {(() => {
+                  const subsections = Array.from(new Set(
+                    coins
+                      .filter(c => c.section === selectedSection)
+                      .map(c => c.subsection)
+                      .filter(Boolean)
+                  )).sort();
+                  return subsections.length > 1 ? (
+                    <div className="mb-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Subsection</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {subsections.map(sub => {
+                          const subCoinCount = coins.filter(c => c.section === selectedSection && c.subsection === sub).length;
+                          return (
+                            <button
+                              key={sub}
+                              onClick={() => setSelectedSubsection(selectedSubsection === sub ? null : sub)}
+                              className={`px-4 py-3 rounded-lg transition text-left ${
+                                selectedSubsection === sub
+                                  ? 'bg-purple-600 text-white shadow-lg'
+                                  : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                              }`}
+                            >
+                              <div className="text-sm font-semibold">{sub}</div>
+                              <div className={`text-xs ${selectedSubsection === sub ? 'text-purple-200' : 'text-gray-500'}`}>
+                                {subCoinCount} coin{subCoinCount !== 1 ? 's' : ''}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-                  ))}
+                  ) : null;
+                })()}
+
+                {/* Coin cards */}
+                <div className="space-y-8">
+                  {coins
+                    .filter(c => c.section === selectedSection && (!selectedSubsection || c.subsection === selectedSubsection))
+                    .sort((a, b) => compareIndexForSort(a.index, b.index))
+                    .map(coin => (
+                      <div key={coin.id} className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        {/* Images */}
+                        <div className="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50 justify-center items-center">
+                          {coin.image1Url && (
+                            <a href={coin.image1Url} target="_blank" rel="noopener noreferrer" className="block">
+                              <img src={coin.image1Url} alt="Obverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
+                            </a>
+                          )}
+                          {coin.image2Url && (
+                            <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
+                              <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
+                            </a>
+                          )}
+                        </div>
+                        {/* Details */}
+                        <div className="p-6 space-y-2">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
+                            {coin.subsection && <span className="text-sm text-purple-600 font-medium">{coin.subsection}</span>}
+                            <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
+                            {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                              {coin.matchConfidence}
+                            </span>
+                          </div>
+                          {coin.obverse && (
+                            <div className="text-sm"><span className="font-semibold text-gray-700">Obverse:</span> <span className="text-gray-600">{coin.obverse}</span></div>
+                          )}
+                          {coin.reverse && (
+                            <div className="text-sm"><span className="font-semibold text-gray-700">Reverse:</span> <span className="text-gray-600">{coin.reverse}</span></div>
+                          )}
+                          {coin.weight && (
+                            <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
+                          )}
+                          {coin.numistaLink && (
+                            <div className="text-sm"><span className="font-semibold text-gray-700">Numista:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
+                          )}
+                          {coin.numberAndNotes && (
+                            <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             )}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && (
+            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && selectedSection !== 'Older Indian Kingdoms' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
