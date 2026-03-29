@@ -1566,7 +1566,7 @@ export default function Home() {
 
   const indeterminateCount = coins.filter((c) => c.section === 'Indeterminate').length;
   const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
-  const onNumistaCount = coins.filter((c) => c.numistaLink).length;
+  const onNumistaCount = coins.filter((c) => c.numistaLink && !isInTransitIndex(c.index)).length;
   const ownedPrincelyStateKeys = new Set(
     coins
       .filter((coin) => coin.section === 'British India Princely States')
