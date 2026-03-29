@@ -1868,19 +1868,19 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Numista Number
+                Reference Number
               </label>
               <input
                 type="text"
                 value={formData.numistaNumber}
                 onChange={(e) => setFormData({ ...formData, numistaNumber: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., 12345"
+                placeholder="e.g., N12345"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Numista Link
+                Reference Link
               </label>
               <input
                 type="url"
@@ -1888,10 +1888,10 @@ export default function Home() {
                 onChange={(e) => {
                   const link = e.target.value;
                   const updates: Partial<typeof formData> = { numistaLink: link };
-                  // Extract Numista number from URL (e.g., https://en.numista.com/catalogue/pieces12345.html)
+                  // Extract Numista number from URL and prefix with N
                   const match = link.match(/pieces(\d+)/);
                   if (match) {
-                    updates.numistaNumber = match[1];
+                    updates.numistaNumber = `N${match[1]}`;
                   }
                   setFormData({ ...formData, ...updates });
                 }}
@@ -2391,7 +2391,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Currency</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Date</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Numista#</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Reference#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">
                                         <span className="relative group">
@@ -2532,7 +2532,7 @@ export default function Home() {
                       KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                      Numista # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      Reference # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th onClick={() => handleSort('weight')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Weight {sortField === 'weight' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -2769,7 +2769,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Numista Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Reference Number</label>
                     <input
                       type="text"
                       value={editFormData.numistaNumber || ''}
@@ -2778,7 +2778,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Numista Link</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Reference Link</label>
                     <input
                       type="url"
                       value={editFormData.numistaLink || ''}
@@ -3985,7 +3985,7 @@ export default function Home() {
                             <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
                           )}
                           {coin.numistaLink && (
-                            <div className="text-sm"><span className="font-semibold text-gray-700">Numista:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
+                            <div className="text-sm"><span className="font-semibold text-gray-700">Reference:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
                           )}
                           {coin.numberAndNotes && (
                             <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
