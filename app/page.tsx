@@ -2544,7 +2544,6 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Value</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Currency</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Date</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Reference#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">
@@ -2561,6 +2560,7 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Obverse</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Reverse</th>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Price</th>}
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Source</th>}
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>}
@@ -2579,7 +2579,6 @@ export default function Home() {
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.date}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">
                                           {coin.numistaLink ? (
                                             <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
@@ -2611,6 +2610,7 @@ export default function Home() {
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
+                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchasePrice}</td>}
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseSource}</td>}
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>}
@@ -2682,9 +2682,6 @@ export default function Home() {
                     <th onClick={() => handleSort('date')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                      KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Reference # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2710,6 +2707,9 @@ export default function Home() {
                     </th>
                     <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                      KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     {isAuthenticated && (
                       <th onClick={() => handleSort('purchasePrice')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
@@ -2745,7 +2745,6 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.date}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         {coin.numistaLink ? (
                           <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
@@ -2777,6 +2776,7 @@ export default function Home() {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
