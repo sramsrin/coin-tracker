@@ -2239,18 +2239,16 @@ export default function Home() {
                                     </div>
                                   );
                                 }
-                                if (desc || isAuthenticated) {
+                                if (isAuthenticated) {
                                   return (
                                     <div
-                                      className={`ml-5 mt-0.5 text-[11px] italic text-gray-400 ${isAuthenticated ? 'cursor-pointer hover:text-gray-500' : ''}`}
+                                      className="ml-5 mt-0.5 text-[11px] italic text-gray-400 cursor-pointer hover:text-gray-500"
                                       onClick={() => {
-                                        if (isAuthenticated) {
-                                          setEditingSubsectionDesc(`explore::${descKey}`);
-                                          setEditingSubsectionDescValue(desc || '');
-                                        }
+                                        setEditingSubsectionDesc(`explore::${descKey}`);
+                                        setEditingSubsectionDescValue(desc || '');
                                       }}
                                     >
-                                      {desc || (isAuthenticated ? 'Add description...' : '')}
+                                      {desc || 'Add description...'}
                                     </div>
                                   );
                                 }
@@ -2303,18 +2301,16 @@ export default function Home() {
                                               </div>
                                             );
                                           }
-                                          if (sssDesc || isAuthenticated) {
+                                          if (isAuthenticated) {
                                             return (
                                               <div
-                                                className={`ml-3 mt-0.5 text-[10px] italic text-gray-400 ${isAuthenticated ? 'cursor-pointer hover:text-gray-500' : ''}`}
+                                                className="ml-3 mt-0.5 text-[10px] italic text-gray-400 cursor-pointer hover:text-gray-500"
                                                 onClick={() => {
-                                                  if (isAuthenticated) {
-                                                    setEditingSubsubsectionDesc(`explore::${sssDescKey}`);
-                                                    setEditingSubsubsectionDescValue(sssDesc || '');
-                                                  }
+                                                  setEditingSubsubsectionDesc(`explore::${sssDescKey}`);
+                                                  setEditingSubsubsectionDescValue(sssDesc || '');
                                                 }}
                                               >
-                                                {sssDesc || (isAuthenticated ? 'Add description...' : '')}
+                                                {sssDesc || 'Add description...'}
                                               </div>
                                             );
                                           }
@@ -2462,18 +2458,16 @@ export default function Home() {
                                 </div>
                               );
                             }
-                            if (desc || isAuthenticated) {
+                            if (isAuthenticated) {
                               return (
                                 <div
-                                  className={`ml-4 mt-1 text-xs italic text-gray-400 ${isAuthenticated ? 'cursor-pointer hover:text-gray-500' : ''}`}
+                                  className="ml-4 mt-1 text-xs italic text-gray-400 cursor-pointer hover:text-gray-500"
                                   onClick={() => {
-                                    if (isAuthenticated) {
-                                      setEditingSubsectionDesc(`collection::${descKey}`);
-                                      setEditingSubsectionDescValue(desc || '');
-                                    }
+                                    setEditingSubsectionDesc(`collection::${descKey}`);
+                                    setEditingSubsectionDescValue(desc || '');
                                   }}
                                 >
-                                  {desc || (isAuthenticated ? 'Add description...' : '')}
+                                  {desc || 'Add description...'}
                                 </div>
                               );
                             }
@@ -2533,18 +2527,16 @@ export default function Home() {
                                         </div>
                                       );
                                     }
-                                    if (sssDesc || isAuthenticated) {
+                                    if (isAuthenticated) {
                                       return (
                                         <div
-                                          className={`ml-4 mt-0.5 text-[11px] italic text-gray-400 ${isAuthenticated ? 'cursor-pointer hover:text-gray-500' : ''}`}
+                                          className="ml-4 mt-0.5 text-[11px] italic text-gray-400 cursor-pointer hover:text-gray-500"
                                           onClick={() => {
-                                            if (isAuthenticated) {
-                                              setEditingSubsubsectionDesc(`collection::${sssDescKey}`);
-                                              setEditingSubsubsectionDescValue(sssDesc || '');
-                                            }
+                                            setEditingSubsubsectionDesc(`collection::${sssDescKey}`);
+                                            setEditingSubsubsectionDescValue(sssDesc || '');
                                           }}
                                         >
-                                          {sssDesc || (isAuthenticated ? 'Add description...' : '')}
+                                          {sssDesc || 'Add description...'}
                                         </div>
                                       );
                                     }
@@ -3538,11 +3530,12 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        {subsectionDescriptions[`British India Princely States::${subsection}`] && (
+                        {isAuthenticated && subsectionDescriptions[`British India Princely States::${subsection}`] && (
                           <div className={`text-[11px] italic mt-0.5 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
                             {subsectionDescriptions[`British India Princely States::${subsection}`]}
                           </div>
                         )}
+
                       </button>
                     );
                   })}
@@ -3580,11 +3573,12 @@ export default function Home() {
                           }`}
                         >
                           <div className="text-sm font-semibold">{state}</div>
-                          {selectedSubsection && subsubsectionDescriptions[`British India Princely States::${selectedSubsection}::${state}`] && (
+                          {isAuthenticated && selectedSubsection && subsubsectionDescriptions[`British India Princely States::${selectedSubsection}::${state}`] && (
                             <div className={`text-[11px] italic mt-0.5 ${selectedState === state ? 'text-purple-200' : 'text-gray-400'}`}>
                               {subsubsectionDescriptions[`British India Princely States::${selectedSubsection}::${state}`]}
                             </div>
                           )}
+
                         </button>
                       );
                     })}
@@ -3786,11 +3780,12 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      {subsectionDescriptions[`European Trading Companies::${subsection}`] && (
+                      {isAuthenticated && subsectionDescriptions[`European Trading Companies::${subsection}`] && (
                         <div className={`text-[11px] italic mt-0.5 ${selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
                           {subsectionDescriptions[`European Trading Companies::${subsection}`]}
                         </div>
                       )}
+
                     </button>
                   );
                 })}
@@ -3973,11 +3968,12 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      {subsectionDescriptions[`British India Presidencies::${subsection}`] && (
+                      {isAuthenticated && subsectionDescriptions[`British India Presidencies::${subsection}`] && (
                         <div className={`text-[11px] italic mt-0.5 ${selectedPresidency === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
                           {subsectionDescriptions[`British India Presidencies::${subsection}`]}
                         </div>
                       )}
+
                     </button>
                   );
                 })}
@@ -4223,7 +4219,7 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        {selectedSection && subsectionDescriptions[`${selectedSection}::${subsection}`] && (
+                        {isAuthenticated && selectedSection && subsectionDescriptions[`${selectedSection}::${subsection}`] && (
                           <div className={`text-[11px] italic mt-0.5 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
                             {subsectionDescriptions[`${selectedSection}::${subsection}`]}
                           </div>

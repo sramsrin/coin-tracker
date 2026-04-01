@@ -39,9 +39,25 @@ export async function POST() {
 
     console.log(`Found ${categoriesToUpdate.length} categories to update`);
 
-    // 4. Update coins in those categories
+    // 4. Update coins: apply verified date to matched categories (except Travancore)
+    // AND explicitly remove verified date from Travancore coins
     let updatedCount = 0;
+    let removedCount = 0;
+    
     const updatedCoins = coins.map(coin => {
+      const isTravancore = 
+        (coin.subsection && coin.subsection.toLowerCase().includes('travancore')) ||
+        (coin.subsubsection && coin.subsubsection.toLowerCase().includes('travancore'));
+
+      if (isTravancore) {
+        if (coin.dateVerified) {
+          removedCount++;
+          const { dateVerified, ...rest } = coin;
+          return rest;
+        }
+        return coin;
+      }
+
       const match = categoriesToUpdate.some(cat => {
         const sectionMatch = coin.section === cat.section;
         const subsectionMatch = !cat.subsection || coin.subsection === cat.subsection;
@@ -60,15 +76,16 @@ export async function POST() {
     });
 
     // 5. Save updated coins
-    if (updatedCount > 0) {
+    if (updatedCount > 0 || removedCount > 0) {
       await kv.set(COINS_KEY, updatedCoins);
     }
 
     return NextResponse.json({
       success: true,
       updatedCount,
+      removedCount,
       categoriesFound: categoriesToUpdate.length,
-      message: `Successfully updated ${updatedCount} coins in ${categoriesToUpdate.length} categories`
+      message: `Successfully updated ${updatedCount} coins and removed verified date from ${removedCount} Travancore coins.`
     });
   } catch (error) {
     console.error('Migration error:', error);
