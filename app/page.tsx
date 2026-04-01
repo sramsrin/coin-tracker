@@ -414,9 +414,6 @@ export default function Home() {
   const [lotDescriptionInitial, setLotDescriptionInitial] = useState('');
   const [lotDescriptionSaving, setLotDescriptionSaving] = useState(false);
   const [lotDescriptionSaveSuccess, setLotDescriptionSaveSuccess] = useState(false);
-  const [subsectionDescriptions, setSubsectionDescriptions] = useState<Record<string, string>>({});
-  const [editingSubsectionDesc, setEditingSubsectionDesc] = useState<string | null>(null);
-  const [editingSubsectionDescValue, setEditingSubsectionDescValue] = useState('');
   // Image upload state for add form
   const [addImage1File, setAddImage1File] = useState<File | null>(null);
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
@@ -698,59 +695,6 @@ export default function Home() {
       console.error('Error saving lot description:', error);
     } finally {
       setLotDescriptionSaving(false);
-    }
-  };
-
-  // Subsection descriptions (ghost text) - fetch all on coins load
-  const fetchSubsectionDescriptions = async (coinList: Coin[]) => {
-    try {
-      const pairs = new Set<string>();
-      coinList.forEach(c => {
-        if (c.section && c.subsection) {
-          pairs.add(`${c.section}::${c.subsection}`);
-        }
-      });
-      const results: Record<string, string> = {};
-      await Promise.all(
-        Array.from(pairs).map(async (key) => {
-          const [section, subsection] = key.split('::');
-          const params = new URLSearchParams();
-          params.append('section', section);
-          params.append('subsection', subsection);
-          const response = await fetch(`/api/section-notes?${params.toString()}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.text) {
-              results[key] = data.text;
-            }
-          }
-        })
-      );
-      setSubsectionDescriptions(results);
-    } catch (error) {
-      console.error('Error fetching subsection descriptions:', error);
-    }
-  };
-
-  const saveSubsectionDescription = async (section: string, subsection: string, text: string) => {
-    const key = `${section}::${subsection}`;
-    try {
-      await fetch('/api/section-notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section, subsection, text }),
-      });
-      setSubsectionDescriptions(prev => {
-        const updated = { ...prev };
-        if (text) {
-          updated[key] = text;
-        } else {
-          delete updated[key];
-        }
-        return updated;
-      });
-    } catch (error) {
-      console.error('Error saving subsection description:', error);
     }
   };
 
@@ -1060,7 +1004,6 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json();
         setCoins(data);
-        fetchSubsectionDescriptions(data);
       }
     } catch (error) {
       console.error('Error fetching coins:', error);
@@ -2151,51 +2094,6 @@ export default function Home() {
                                   </span>
                                 </a>
                               </div>
-                              {(() => {
-                                const descKey = `${section}::${subsection}`;
-                                const desc = subsectionDescriptions[descKey];
-                                const isEditing = editingSubsectionDesc === `explore::${descKey}`;
-                                if (isEditing) {
-                                  return (
-                                    <div className="ml-5 mt-0.5">
-                                      <input
-                                        type="text"
-                                        value={editingSubsectionDescValue}
-                                        onChange={(e) => setEditingSubsectionDescValue(e.target.value)}
-                                        onBlur={() => {
-                                          saveSubsectionDescription(section, subsection, editingSubsectionDescValue);
-                                          setEditingSubsectionDesc(null);
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') {
-                                            saveSubsectionDescription(section, subsection, editingSubsectionDescValue);
-                                            setEditingSubsectionDesc(null);
-                                          } else if (e.key === 'Escape') {
-                                            setEditingSubsectionDesc(null);
-                                          }
-                                        }}
-                                        autoFocus
-                                        className="text-[11px] italic text-gray-400 bg-transparent border-b border-gray-300 focus:border-pink-400 outline-none w-full"
-                                        placeholder="Add description..."
-                                      />
-                                    </div>
-                                  );
-                                }
-                                if (isAuthenticated) {
-                                  return (
-                                    <div
-                                      className="ml-5 mt-0.5 text-[11px] italic text-gray-400 cursor-pointer hover:text-gray-500"
-                                      onClick={() => {
-                                        setEditingSubsectionDesc(`explore::${descKey}`);
-                                        setEditingSubsectionDescValue(desc || '');
-                                      }}
-                                    >
-                                      {desc || 'Add description...'}
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })()}
                               {(isPrincelyStates || isMadrasPresidencyTerritories) && hasMultipleStates && isExpanded && (
                                 <ul className="ml-6 mt-1 space-y-1">
                                   {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
@@ -2325,51 +2223,6 @@ export default function Home() {
                             <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                             {subsection} ({agencyCoins} coins)
                           </h4>
-                          {(() => {
-                            const descKey = `${section}::${subsection}`;
-                            const desc = subsectionDescriptions[descKey];
-                            const isEditing = editingSubsectionDesc === `collection::${descKey}`;
-                            if (isEditing) {
-                              return (
-                                <div className="ml-4 mt-1">
-                                  <input
-                                    type="text"
-                                    value={editingSubsectionDescValue}
-                                    onChange={(e) => setEditingSubsectionDescValue(e.target.value)}
-                                    onBlur={() => {
-                                      saveSubsectionDescription(section, subsection, editingSubsectionDescValue);
-                                      setEditingSubsectionDesc(null);
-                                    }}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        saveSubsectionDescription(section, subsection, editingSubsectionDescValue);
-                                        setEditingSubsectionDesc(null);
-                                      } else if (e.key === 'Escape') {
-                                        setEditingSubsectionDesc(null);
-                                      }
-                                    }}
-                                    autoFocus
-                                    className="text-xs italic text-gray-400 bg-transparent border-b border-gray-300 focus:border-pink-400 outline-none w-full max-w-md"
-                                    placeholder="Add description..."
-                                  />
-                                </div>
-                              );
-                            }
-                            if (isAuthenticated) {
-                              return (
-                                <div
-                                  className="ml-4 mt-1 text-xs italic text-gray-400 cursor-pointer hover:text-gray-500"
-                                  onClick={() => {
-                                    setEditingSubsectionDesc(`collection::${descKey}`);
-                                    setEditingSubsectionDescValue(desc || '');
-                                  }}
-                                >
-                                  {desc || 'Add description...'}
-                                </div>
-                              );
-                            }
-                            return null;
-                          })()}
                         </div>
                         {(() => {
                           const allSubsubsections = Object.keys(groupedCoins[section][subsection]).sort();
@@ -3382,13 +3235,8 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        {isAuthenticated && subsectionDescriptions[`British India Princely States::${subsection}`] && (
-                          <div className={`text-[11px] italic mt-0.5 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
-                            {subsectionDescriptions[`British India Princely States::${subsection}`]}
-                          </div>
-                        )}
+                        </button>
 
-                      </button>
                     );
                   })}
                 </div>
@@ -3626,13 +3474,8 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      {isAuthenticated && subsectionDescriptions[`European Trading Companies::${subsection}`] && (
-                        <div className={`text-[11px] italic mt-0.5 ${selectedEuropeanCategory === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
-                          {subsectionDescriptions[`European Trading Companies::${subsection}`]}
-                        </div>
-                      )}
+                      </button>
 
-                    </button>
                   );
                 })}
               </div>
@@ -3814,13 +3657,8 @@ export default function Home() {
                       }`}
                     >
                       <div className="text-sm font-semibold">{subsection}</div>
-                      {isAuthenticated && subsectionDescriptions[`British India Presidencies::${subsection}`] && (
-                        <div className={`text-[11px] italic mt-0.5 ${selectedPresidency === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
-                          {subsectionDescriptions[`British India Presidencies::${subsection}`]}
-                        </div>
-                      )}
+                      </button>
 
-                    </button>
                   );
                 })}
               </div>
@@ -3968,11 +3806,6 @@ export default function Home() {
                               <div className={`text-xs ${selectedSubsection === sub ? 'text-purple-200' : 'text-gray-500'}`}>
                                 {subCoinCount} coin{subCoinCount !== 1 ? 's' : ''}
                               </div>
-                              {selectedSection && subsectionDescriptions[`${selectedSection}::${sub}`] && (
-                                <div className={`text-[11px] italic mt-0.5 ${selectedSubsection === sub ? 'text-purple-200' : 'text-gray-400'}`}>
-                                  {subsectionDescriptions[`${selectedSection}::${sub}`]}
-                                </div>
-                              )}
                             </button>
                           );
                         })}
@@ -4065,11 +3898,6 @@ export default function Home() {
                         }`}
                       >
                         <div className="text-sm font-semibold">{subsection}</div>
-                        {isAuthenticated && selectedSection && subsectionDescriptions[`${selectedSection}::${subsection}`] && (
-                          <div className={`text-[11px] italic mt-0.5 ${selectedSubsection === subsection ? 'text-purple-200' : 'text-gray-400'}`}>
-                            {subsectionDescriptions[`${selectedSection}::${subsection}`]}
-                          </div>
-                        )}
                       </button>
                     );
                   })}
