@@ -53,7 +53,7 @@ export async function POST() {
         updatedCount++;
         return {
           ...coin,
-          dateVerified: '2026-03-26'
+          dateVerified: 'March, 2026'
         };
       }
       return coin;
