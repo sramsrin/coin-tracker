@@ -2573,6 +2573,7 @@ export default function Home() {
                                           </span>
                                         </span>
                                       </th>
+                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Verified</th>}
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Obverse</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Reverse</th>
@@ -2580,10 +2581,7 @@ export default function Home() {
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Price</th>}
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Source</th>}
                                       {isAuthenticated && (
-                                        <>
-                                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>
-                                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Verified</th>
-                                        </>
+                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>
                                       )}
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Book & Notes</th>
                                     </tr>
@@ -2615,6 +2613,7 @@ export default function Home() {
                                             {coin.matchConfidence}
                                           </span>
                                         </td>
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.dateVerified}</td>}
                                         <td className="px-3 py-2 text-xs">
                                           <div className="flex gap-1">
                                             {coin.image1Url && (
@@ -2634,12 +2633,7 @@ export default function Home() {
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchasePrice}</td>}
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                                        {isAuthenticated && (
-                                          <>
-                                            <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>
-                                            <td className="px-3 py-2 text-xs text-gray-800">{coin.dateVerified}</td>
-                                          </>
-                                        )}
+                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>}
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                                       </tr>
                                     ))}
@@ -2725,6 +2719,11 @@ export default function Home() {
                         </span>
                       </span>
                     </th>
+                    {isAuthenticated && (
+                      <th onClick={() => handleSort('dateVerified')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                        Verified {sortField === 'dateVerified' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
+                    )}
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">
                       Images
                     </th>
@@ -2748,14 +2747,9 @@ export default function Home() {
                       </th>
                     )}
                     {isAuthenticated && (
-                      <>
-                        <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                          Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSort('dateVerified')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                          Verified {sortField === 'dateVerified' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                      </>
+                      <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                        Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      </th>
                     )}
 
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
@@ -2792,6 +2786,7 @@ export default function Home() {
                           {coin.matchConfidence}
                         </span>
                       </td>
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.dateVerified}</td>}
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
                           {coin.image1Url && (
@@ -2811,12 +2806,7 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                      {isAuthenticated && (
-                        <>
-                          <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>
-                          <td className="px-4 py-3 text-xs text-gray-800">{coin.dateVerified}</td>
-                        </>
-                      )}
+                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
 
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                     </tr>
