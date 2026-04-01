@@ -2246,8 +2246,12 @@ export default function Home() {
                                   <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
                                   {subsubsection === 'All' ? subsection : subsubsection} ({stateCoins.length} coins)
                                 </h5>
+                                {(subsubsection === 'Kishangarh/Jaipur' || (subsubsection === 'All' && subsection === 'Kishangarh/Jaipur')) && (
+                                  <div className="ml-4 mt-1 text-xs italic text-gray-400 max-w-2xl leading-relaxed">
+                                    Kishangarh issued coins that imitated Jaipur. So its hard to determine if these are Jaipur or Kishangarh.
+                                  </div>
+                                )}
                               </div>
-
                               <div className="overflow-x-auto">
                                 <table className="w-full border border-gray-200 rounded">
                                   <thead className="bg-pink-50">
