@@ -2218,7 +2218,7 @@ export default function Home() {
                         id={`subsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}`}
                         className="mb-6 ml-4 scroll-mt-4"
                       >
-                        <div className="mb-3">
+                        <div className="mb-3 hidden">
                           <h4 className="text-lg font-semibold text-gray-700 flex items-center">
                             <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                             {subsection} ({agencyCoins} coins)
@@ -2238,17 +2238,16 @@ export default function Home() {
                           return (
                             <div
                               key={subsubsection}
-                              id={showStateHeader ? `subsubsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}-${subsubsection.replace(/\s+/g, '-').toLowerCase()}` : undefined}
-                              className={showStateHeader ? "mb-4 ml-6 scroll-mt-4" : "mb-4"}
+                              id={`subsubsection-${section.replace(/\s+/g, '-').toLowerCase()}-${subsection.replace(/\s+/g, '-').toLowerCase()}-${subsubsection.replace(/\s+/g, '-').toLowerCase()}`}
+                              className="mb-4 ml-4 scroll-mt-4"
                             >
-                              {showStateHeader && (
-                                <div className="mb-2">
-                                  <h5 className="text-md font-medium text-gray-600 flex items-center">
-                                    <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
-                                    {subsubsection} ({stateCoins.length} coins)
-                                  </h5>
-                                </div>
-                              )}
+                              <div className="mb-2">
+                                <h5 className="text-md font-medium text-gray-600 flex items-center">
+                                  <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
+                                  {subsubsection === 'All' ? subsection : subsubsection} ({stateCoins.length} coins)
+                                </h5>
+                              </div>
+
                               <div className="overflow-x-auto">
                                 <table className="w-full border border-gray-200 rounded">
                                   <thead className="bg-pink-50">
@@ -2384,9 +2383,6 @@ export default function Home() {
                     <th onClick={() => handleSort('index')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-20">
                       Index {sortField === 'index' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('subsection')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Subsection {sortField === 'subsection' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th onClick={() => handleSort('subsubsection')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       State {sortField === 'subsubsection' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2461,8 +2457,7 @@ export default function Home() {
                       >
                         <CoinIndexDisplay index={coin.index} />
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.subsection}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.subsubsection}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{coin.subsubsection || coin.subsection}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.date}</td>
