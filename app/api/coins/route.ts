@@ -25,6 +25,7 @@ interface Coin {
   purchasePrice: string;
   purchaseSource: string;
   purchaseDate: string;
+  dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
 }
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
       purchasePrice: body.purchasePrice?.trim() || '',
       purchaseSource: body.purchaseSource?.trim() || '',
       purchaseDate: body.purchaseDate?.trim() || '',
+      dateVerified: body.dateVerified?.trim() || '',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
     };

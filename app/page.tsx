@@ -213,6 +213,7 @@ interface Coin {
   purchasePrice: string;
   purchaseSource: string;
   purchaseDate: string;
+  dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
 }
@@ -450,6 +451,7 @@ export default function Home() {
     purchasePrice: '',
     purchaseSource: '',
     purchaseDate: '',
+    dateVerified: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1233,7 +1235,7 @@ export default function Home() {
     }
 
     // Special handling for purchaseDate (parse as date for chronological sorting)
-    if (sortField === 'purchaseDate') {
+    if (sortField === 'purchaseDate' || sortField === 'dateVerified') {
       const aTime = aValue ? new Date(aValue).getTime() : 0;
       const bTime = bValue ? new Date(bValue).getTime() : 0;
       return sortDirection === 'asc' ? aTime - bTime : bTime - aTime;
@@ -1424,6 +1426,7 @@ export default function Home() {
           purchasePrice: '',
           purchaseSource: '',
           purchaseDate: '',
+          dateVerified: '',
         });
         // Clear image state
         setAddImage1File(null);
@@ -1463,6 +1466,7 @@ export default function Home() {
       purchasePrice: coin.purchasePrice,
       purchaseSource: coin.purchaseSource,
       purchaseDate: coin.purchaseDate,
+      dateVerified: coin.dateVerified,
     });
   };
 
@@ -2044,6 +2048,18 @@ export default function Home() {
                 placeholder="e.g. March 2026"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date Verified
+              </label>
+              <input
+                type="text"
+                value={formData.dateVerified}
+                onChange={(e) => setFormData({ ...formData, dateVerified: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="e.g. 2024-03-31"
+              />
+            </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Obverse
@@ -2563,7 +2579,12 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Price</th>}
                                       {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Source</th>}
-                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>}
+                                      {isAuthenticated && (
+                                        <>
+                                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>
+                                          <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Verified</th>
+                                        </>
+                                      )}
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Book & Notes</th>
                                     </tr>
                                   </thead>
@@ -2613,7 +2634,12 @@ export default function Home() {
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchasePrice}</td>}
                                         {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>}
+                                        {isAuthenticated && (
+                                          <>
+                                            <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>
+                                            <td className="px-3 py-2 text-xs text-gray-800">{coin.dateVerified}</td>
+                                          </>
+                                        )}
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                                       </tr>
                                     ))}
@@ -2722,10 +2748,16 @@ export default function Home() {
                       </th>
                     )}
                     {isAuthenticated && (
-                      <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                        Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </th>
+                      <>
+                        <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                          Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => handleSort('dateVerified')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
+                          Verified {sortField === 'dateVerified' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                      </>
                     )}
+
                     <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Book & Notes {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2779,7 +2811,13 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
                       {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
+                      {isAuthenticated && (
+                        <>
+                          <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>
+                          <td className="px-4 py-3 text-xs text-gray-800">{coin.dateVerified}</td>
+                        </>
+                      )}
+
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                     </tr>
                   ))}
@@ -3008,6 +3046,16 @@ export default function Home() {
                       onChange={(e) => setEditFormData({ ...editFormData, purchaseDate: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       placeholder="e.g. March 2026"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Verified</label>
+                    <input
+                      type="text"
+                      value={editFormData.dateVerified || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, dateVerified: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="e.g. 2024-03-31"
                     />
                   </div>
                   <div className="md:col-span-3">
