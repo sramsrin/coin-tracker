@@ -417,9 +417,6 @@ export default function Home() {
   const [subsectionDescriptions, setSubsectionDescriptions] = useState<Record<string, string>>({});
   const [editingSubsectionDesc, setEditingSubsectionDesc] = useState<string | null>(null);
   const [editingSubsectionDescValue, setEditingSubsectionDescValue] = useState('');
-  const [subsubsectionDescriptions, setSubsubsectionDescriptions] = useState<Record<string, string>>({});
-  const [editingSubsubsectionDesc, setEditingSubsubsectionDesc] = useState<string | null>(null);
-  const [editingSubsubsectionDescValue, setEditingSubsubsectionDescValue] = useState('');
   // Image upload state for add form
   const [addImage1File, setAddImage1File] = useState<File | null>(null);
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
@@ -757,60 +754,6 @@ export default function Home() {
     }
   };
 
-  // Subsubsection descriptions (ghost text) - fetch all on coins load
-  const fetchSubsubsectionDescriptions = async (coinList: Coin[]) => {
-    try {
-      const triples = new Set<string>();
-      coinList.forEach(c => {
-        if (c.section && c.subsection && c.subsubsection) {
-          triples.add(`${c.section}::${c.subsection}::${c.subsubsection}`);
-        }
-      });
-      const results: Record<string, string> = {};
-      await Promise.all(
-        Array.from(triples).map(async (key) => {
-          const [section, subsection, subsubsection] = key.split('::');
-          const params = new URLSearchParams();
-          params.append('section', section);
-          params.append('subsection', subsection);
-          params.append('subsubsection', subsubsection);
-          const response = await fetch(`/api/section-notes?${params.toString()}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.text) {
-              results[key] = data.text;
-            }
-          }
-        })
-      );
-      setSubsubsectionDescriptions(results);
-    } catch (error) {
-      console.error('Error fetching subsubsection descriptions:', error);
-    }
-  };
-
-  const saveSubsubsectionDescription = async (section: string, subsection: string, subsubsection: string, text: string) => {
-    const key = `${section}::${subsection}::${subsubsection}`;
-    try {
-      await fetch('/api/section-notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section, subsection, subsubsection, text }),
-      });
-      setSubsubsectionDescriptions(prev => {
-        const updated = { ...prev };
-        if (text) {
-          updated[key] = text;
-        } else {
-          delete updated[key];
-        }
-        return updated;
-      });
-    } catch (error) {
-      console.error('Error saving subsubsection description:', error);
-    }
-  };
-
   const highlightEuropeanOnMap = (categoryNames: string[] | null) => {
     if (!europeanMapCanvas || !europeanOriginalImageData) return;
 
@@ -1118,7 +1061,6 @@ export default function Home() {
         const data = await response.json();
         setCoins(data);
         fetchSubsectionDescriptions(data);
-        fetchSubsubsectionDescriptions(data);
       }
     } catch (error) {
       console.error('Error fetching coins:', error);
@@ -2271,51 +2213,6 @@ export default function Home() {
                                             ({stateCoins})
                                           </span>
                                         </a>
-                                        {(() => {
-                                          const sssDescKey = `${section}::${subsection}::${subsubsection}`;
-                                          const sssDesc = subsubsectionDescriptions[sssDescKey];
-                                          const isSssEditing = editingSubsubsectionDesc === `explore::${sssDescKey}`;
-                                          if (isSssEditing) {
-                                            return (
-                                              <div className="ml-3 mt-0.5">
-                                                <input
-                                                  type="text"
-                                                  value={editingSubsubsectionDescValue}
-                                                  onChange={(e) => setEditingSubsubsectionDescValue(e.target.value)}
-                                                  onBlur={() => {
-                                                    saveSubsubsectionDescription(section, subsection, subsubsection, editingSubsubsectionDescValue);
-                                                    setEditingSubsubsectionDesc(null);
-                                                  }}
-                                                  onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                      saveSubsubsectionDescription(section, subsection, subsubsection, editingSubsubsectionDescValue);
-                                                      setEditingSubsubsectionDesc(null);
-                                                    } else if (e.key === 'Escape') {
-                                                      setEditingSubsubsectionDesc(null);
-                                                    }
-                                                  }}
-                                                  autoFocus
-                                                  className="text-[10px] italic text-gray-400 bg-transparent border-b border-gray-300 focus:border-pink-400 outline-none w-full"
-                                                  placeholder="Add description..."
-                                                />
-                                              </div>
-                                            );
-                                          }
-                                          if (isAuthenticated) {
-                                            return (
-                                              <div
-                                                className="ml-3 mt-0.5 text-[10px] italic text-gray-400 cursor-pointer hover:text-gray-500"
-                                                onClick={() => {
-                                                  setEditingSubsubsectionDesc(`explore::${sssDescKey}`);
-                                                  setEditingSubsubsectionDescValue(sssDesc || '');
-                                                }}
-                                              >
-                                                {sssDesc || 'Add description...'}
-                                              </div>
-                                            );
-                                          }
-                                          return null;
-                                        })()}
                                       </li>
                                     );
                                   })}
@@ -2497,51 +2394,6 @@ export default function Home() {
                                     <span className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></span>
                                     {subsubsection} ({stateCoins.length} coins)
                                   </h5>
-                                  {(() => {
-                                    const sssDescKey = `${section}::${subsection}::${subsubsection}`;
-                                    const sssDesc = subsubsectionDescriptions[sssDescKey];
-                                    const isSssEditing = editingSubsubsectionDesc === `collection::${sssDescKey}`;
-                                    if (isSssEditing) {
-                                      return (
-                                        <div className="ml-4 mt-0.5">
-                                          <input
-                                            type="text"
-                                            value={editingSubsubsectionDescValue}
-                                            onChange={(e) => setEditingSubsubsectionDescValue(e.target.value)}
-                                            onBlur={() => {
-                                              saveSubsubsectionDescription(section, subsection, subsubsection, editingSubsubsectionDescValue);
-                                              setEditingSubsubsectionDesc(null);
-                                            }}
-                                            onKeyDown={(e) => {
-                                              if (e.key === 'Enter') {
-                                                saveSubsubsectionDescription(section, subsection, subsubsection, editingSubsubsectionDescValue);
-                                                setEditingSubsubsectionDesc(null);
-                                              } else if (e.key === 'Escape') {
-                                                setEditingSubsubsectionDesc(null);
-                                              }
-                                            }}
-                                            autoFocus
-                                            className="text-[11px] italic text-gray-400 bg-transparent border-b border-gray-300 focus:border-pink-400 outline-none w-full max-w-md"
-                                            placeholder="Add description..."
-                                          />
-                                        </div>
-                                      );
-                                    }
-                                    if (isAuthenticated) {
-                                      return (
-                                        <div
-                                          className="ml-4 mt-0.5 text-[11px] italic text-gray-400 cursor-pointer hover:text-gray-500"
-                                          onClick={() => {
-                                            setEditingSubsubsectionDesc(`collection::${sssDescKey}`);
-                                            setEditingSubsubsectionDescValue(sssDesc || '');
-                                          }}
-                                        >
-                                          {sssDesc || 'Add description...'}
-                                        </div>
-                                      );
-                                    }
-                                    return null;
-                                  })()}
                                 </div>
                               )}
                               <div className="overflow-x-auto">
@@ -3573,12 +3425,6 @@ export default function Home() {
                           }`}
                         >
                           <div className="text-sm font-semibold">{state}</div>
-                          {isAuthenticated && selectedSubsection && subsubsectionDescriptions[`British India Princely States::${selectedSubsection}::${state}`] && (
-                            <div className={`text-[11px] italic mt-0.5 ${selectedState === state ? 'text-purple-200' : 'text-gray-400'}`}>
-                              {subsubsectionDescriptions[`British India Princely States::${selectedSubsection}::${state}`]}
-                            </div>
-                          )}
-
                         </button>
                       );
                     })}
