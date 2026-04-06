@@ -216,6 +216,7 @@ interface Coin {
   dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
+  referenceImageUrl?: string;
 }
 
 type SortField = keyof Coin;
@@ -419,11 +420,15 @@ export default function Home() {
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
   const [addImage1Preview, setAddImage1Preview] = useState<string | null>(null);
   const [addImage2Preview, setAddImage2Preview] = useState<string | null>(null);
+  const [addReferenceImageFile, setAddReferenceImageFile] = useState<File | null>(null);
+  const [addReferenceImagePreview, setAddReferenceImagePreview] = useState<string | null>(null);
   // Image upload state for edit form
   const [editImage1File, setEditImage1File] = useState<File | null>(null);
   const [editImage2File, setEditImage2File] = useState<File | null>(null);
   const [editImage1Preview, setEditImage1Preview] = useState<string | null>(null);
   const [editImage2Preview, setEditImage2Preview] = useState<string | null>(null);
+  const [editReferenceImageFile, setEditReferenceImageFile] = useState<File | null>(null);
+  const [editReferenceImagePreview, setEditReferenceImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
@@ -1268,7 +1273,7 @@ export default function Home() {
         const newCoin = await response.json();
 
         // Upload images if selected
-        if (addImage1File || addImage2File) {
+        if (addImage1File || addImage2File || addReferenceImageFile) {
           setIsUploading(true);
           const imageUpdates: Record<string, string> = {};
           if (addImage1File) {
@@ -1278,6 +1283,10 @@ export default function Home() {
           if (addImage2File) {
             const url = await uploadImage(addImage2File);
             if (url) imageUpdates.image2Url = url;
+          }
+          if (addReferenceImageFile) {
+            const url = await uploadImage(addReferenceImageFile);
+            if (url) imageUpdates.referenceImageUrl = url;
           }
           if (Object.keys(imageUpdates).length > 0) {
             await fetch(`/api/coins?id=${newCoin.id}`, {
@@ -1316,8 +1325,10 @@ export default function Home() {
         // Clear image state
         setAddImage1File(null);
         setAddImage2File(null);
+        setAddReferenceImageFile(null);
         setAddImage1Preview(null);
         setAddImage2Preview(null);
+        setAddReferenceImagePreview(null);
         // Refresh coins list
         fetchCoins();
       }
@@ -1330,8 +1341,10 @@ export default function Home() {
     setEditingCoin(coin);
     setEditImage1File(null);
     setEditImage2File(null);
+    setEditReferenceImageFile(null);
     setEditImage1Preview(null);
     setEditImage2Preview(null);
+    setEditReferenceImagePreview(null);
     setEditFormData({
       index: coin.index,
       section: coin.section,
@@ -1370,6 +1383,10 @@ export default function Home() {
         const url = await uploadImage(editImage2File);
         if (url) imageUpdates.image2Url = url;
       }
+      if (editReferenceImageFile) {
+        const url = await uploadImage(editReferenceImageFile);
+        if (url) imageUpdates.referenceImageUrl = url;
+      }
       setIsUploading(false);
 
       const response = await fetch(`/api/coins?id=${editingCoin.id}`, {
@@ -1383,6 +1400,7 @@ export default function Home() {
           // Preserve existing image URLs, override with new uploads
           image1Url: imageUpdates.image1Url || editingCoin.image1Url || '',
           image2Url: imageUpdates.image2Url || editingCoin.image2Url || '',
+          referenceImageUrl: imageUpdates.referenceImageUrl || editingCoin.referenceImageUrl || '',
         }),
       });
 
@@ -1392,8 +1410,10 @@ export default function Home() {
         setEditFormData({});
         setEditImage1File(null);
         setEditImage2File(null);
+        setEditReferenceImageFile(null);
         setEditImage1Preview(null);
         setEditImage2Preview(null);
+        setEditReferenceImagePreview(null);
       }
     } catch (error) {
       console.error('Error updating coin:', error);
@@ -1971,7 +1991,7 @@ export default function Home() {
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
                   <input
@@ -2016,7 +2036,30 @@ export default function Home() {
                     <img src={addImage2Preview} alt="Preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                   )}
                 </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setAddReferenceImageFile(file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setAddReferenceImagePreview(reader.result as string);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setAddReferenceImagePreview(null);
+                      }
+                    }}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                  />
+                  {addReferenceImagePreview && (
+                    <img src={addReferenceImagePreview} alt="Reference Preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                  )}
+                </div>
               </div>
+
             </div>
             <div className="md:col-span-3">
               <button
@@ -2326,6 +2369,11 @@ export default function Home() {
                                                 <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
                                               </a>
                                             )}
+                                            {coin.referenceImageUrl && (
+                                              <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
+                                                <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                                              </a>
+                                            )}
                                           </div>
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
@@ -2491,6 +2539,11 @@ export default function Home() {
                           {coin.image2Url && (
                             <a href={coin.image2Url} target="_blank" rel="noopener noreferrer">
                               <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                            </a>
+                          )}
+                          {coin.referenceImageUrl && (
+                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
                             </a>
                           )}
                         </div>
@@ -2763,7 +2816,7 @@ export default function Home() {
                   {/* Image Upload */}
                   <div className="md:col-span-3">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
                         {editingCoin.image1Url && !editImage1Preview && (
@@ -2818,6 +2871,34 @@ export default function Home() {
                         />
                         {editImage2Preview && (
                           <img src={editImage2Preview} alt="New preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
+                        {editingCoin.referenceImageUrl && !editReferenceImagePreview && (
+                          <div className="mb-2">
+                            <img src={editingCoin.referenceImageUrl} alt="Current reference" className="h-24 rounded border border-gray-200 object-contain" />
+                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setEditReferenceImageFile(file);
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => setEditReferenceImagePreview(reader.result as string);
+                              reader.readAsDataURL(file);
+                            } else {
+                              setEditReferenceImagePreview(null);
+                            }
+                          }}
+                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                        />
+                        {editReferenceImagePreview && (
+                          <img src={editReferenceImagePreview} alt="New reference preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                         )}
                       </div>
                     </div>
@@ -3830,6 +3911,11 @@ export default function Home() {
                           {coin.image2Url && (
                             <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
                               <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
+                            </a>
+                          )}
+                          {coin.referenceImageUrl && (
+                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer" className="block">
+                              <img src={coin.referenceImageUrl} alt="Reference" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
                             </a>
                           )}
                         </div>

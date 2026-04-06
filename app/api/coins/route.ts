@@ -28,6 +28,7 @@ interface Coin {
   dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
+  referenceImageUrl?: string;
 }
 
 // Helper function to read coins from KV
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
       dateVerified: body.dateVerified?.trim() || '',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
+      referenceImageUrl: body.referenceImageUrl?.trim() || '',
     };
 
     coins.push(newCoin);
