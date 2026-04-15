@@ -12,7 +12,7 @@ export async function GET() {
 
     let updatedCount = 0;
     const updatedCoins = coins.map((coin) => {
-      if (coin.section === 'European Overseas') {
+      if (coin.section === 'European Overseas' || coin.section === 'Delhi Sultanate') {
         updatedCount++;
         return { ...coin, section: 'Other' };
       }
