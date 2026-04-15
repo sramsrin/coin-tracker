@@ -3147,7 +3147,6 @@ export default function Home() {
                   'European Trading Companies'
                 ];
                 const otherGroupSections = [
-                  'European Overseas',
                   'Older Indian Kingdoms',
                   'Other',
                   'Indeterminate'
