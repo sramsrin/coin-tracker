@@ -10,9 +10,12 @@ export async function GET() {
       return NextResponse.json({ message: 'No coins found' });
     }
 
+    const sections = Array.from(new Set(coins.map(c => c.section))).filter(Boolean);
+
     let updatedCount = 0;
     const updatedCoins = coins.map((coin) => {
-      if (coin.section === 'European Overseas' || coin.section === 'Delhi Sultanate') {
+      const section = coin.section?.trim();
+      if (section === 'European Overseas' || section === 'Delhi Sultanate') {
         updatedCount++;
         return { ...coin, section: 'Other' };
       }
@@ -26,7 +29,8 @@ export async function GET() {
     return NextResponse.json({
       message: 'Migration completed',
       updatedCount,
-      totalCount: coins.length
+      totalCount: coins.length,
+      availableSections: sections
     });
   } catch (error) {
     console.error('Migration error:', error);
