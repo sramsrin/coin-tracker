@@ -11,11 +11,16 @@ export async function GET() {
     }
 
     const sections = Array.from(new Set(coins.map(c => c.section))).filter(Boolean);
+    const subsections = Array.from(new Set(coins.map(c => c.subsection))).filter(Boolean);
 
     let updatedCount = 0;
     const updatedCoins = coins.map((coin) => {
       const section = coin.section?.trim();
-      if (section === 'European Overseas' || section === 'Delhi Sultanate') {
+      const subsection = coin.subsection?.trim();
+      
+      // Check if we need to move based on section OR subsection
+      if (section === 'European Overseas' || section === 'Delhi Sultanate' || 
+          subsection === 'European Overseas' || subsection === 'Delhi Sultanate') {
         updatedCount++;
         return { ...coin, section: 'Other' };
       }
@@ -30,7 +35,8 @@ export async function GET() {
       message: 'Migration completed',
       updatedCount,
       totalCount: coins.length,
-      availableSections: sections
+      availableSections: sections,
+      availableSubsections: subsections
     });
   } catch (error) {
     console.error('Migration error:', error);
