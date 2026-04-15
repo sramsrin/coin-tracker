@@ -1637,16 +1637,6 @@ export default function Home() {
               >
                 📊 Collection
               </button>
-              <button
-                onClick={() => setActiveTab('targets')}
-                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
-                  activeTab === 'targets'
-                    ? 'bg-pink-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-pink-50'
-                }`}
-              >
-                🎯 Targets
-              </button>
             </div>
           </div>
 
@@ -2988,49 +2978,6 @@ export default function Home() {
           </>
         )}
 
-        {activeTab === 'targets' && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="mb-4">
-              <h2 className="text-2xl font-semibold text-gray-700">Princely States Target Tracker</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Remaining states from your agency target list. This updates automatically when you add a coin in
-                <span className="font-medium text-gray-700"> British India Princely States</span>.
-              </p>
-              <p className="text-sm text-pink-700 font-semibold mt-2">
-                Remaining targets: {totalRemainingTargets}
-              </p>
-            </div>
-
-            {unresolvedTargetsByAgency.length === 0 ? (
-              <div className="p-6 rounded-lg border border-green-200 bg-green-50 text-green-800 font-medium">
-                All target states completed. Great work!
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {unresolvedTargetsByAgency.map((group) => (
-                  <div key={group.agency} className="border border-pink-100 rounded-lg p-4 bg-pink-50/30">
-                    <h3 className="font-semibold text-gray-800 mb-2">
-                      {group.agency} ({group.states.length})
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {group.states
-                        .sort((a, b) => a.localeCompare(b))
-                        .map((state) => (
-                          <span
-                            key={`${group.agency}-${state}`}
-                            className="px-2 py-1 rounded-md bg-white border border-pink-200 text-xs text-gray-700"
-                          >
-                            {state}
-                          </span>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Map Tab */}
         {activeTab === 'map' && (
           <div className="bg-white rounded-lg shadow-lg p-6">
@@ -3444,6 +3391,48 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+            {/* Princely States Tracker - Moved below map */}
+            <div className="mt-8 bg-white rounded-lg border-2 border-pink-100 p-6 shadow-sm mb-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-semibold text-gray-700">Princely States Tracker</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Remaining states from your agency target list. This updates automatically when you add a coin in
+                  <span className="font-medium text-gray-700"> British India Princely States</span>.
+                </p>
+                <p className="text-sm text-pink-700 font-semibold mt-2">
+                  Remaining states to track: {totalRemainingTargets}
+                </p>
+              </div>
+
+              {unresolvedTargetsByAgency.length === 0 ? (
+                <div className="p-6 rounded-lg border border-green-200 bg-green-50 text-green-800 font-medium">
+                  All states tracked. Great work!
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {unresolvedTargetsByAgency.map((group) => (
+                    <div key={group.agency} className="border border-pink-100 rounded-lg p-4 bg-pink-50/30">
+                      <h3 className="font-semibold text-gray-800 mb-2">
+                        {group.agency} ({group.states.length})
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {group.states
+                          .sort((a, b) => a.localeCompare(b))
+                          .map((state) => (
+                            <span
+                              key={`${group.agency}-${state}`}
+                              className="px-2 py-1 rounded-md bg-white border border-pink-200 text-xs text-gray-700"
+                            >
+                              {state}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Mapping Management - Admin Only */}
             {isAuthenticated && (
