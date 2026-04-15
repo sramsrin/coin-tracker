@@ -2100,7 +2100,7 @@ export default function Home() {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Older Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Peninsular India';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -2265,7 +2265,7 @@ export default function Home() {
                         })().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Older Indian Kingdoms';
+                          const isMadrasPresidencyTerritories = section === 'Peninsular India';
                           const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
 
                           return (
@@ -3147,7 +3147,7 @@ export default function Home() {
                   'European Trading Companies'
                 ];
                 const otherGroupSections = [
-                  'Older Indian Kingdoms',
+                  'Peninsular India',
                   'Other',
                   'Indeterminate'
                 ];
@@ -3843,8 +3843,8 @@ export default function Home() {
 
             </>)}
 
-            {/* Indeterminate / Older Indian Kingdoms - image-focused sections */}
-            {(selectedSection === 'Indeterminate' || selectedSection === 'Older Indian Kingdoms') && (
+            {/* Indeterminate / Peninsular India - image-focused sections */}
+            {(selectedSection === 'Indeterminate' || selectedSection === 'Peninsular India') && (
               <div className="mb-6">
                 {/* Subsection selector */}
                 {(() => {
@@ -3941,7 +3941,7 @@ export default function Home() {
             )}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && selectedSection !== 'Older Indian Kingdoms' && (
+            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && selectedSection !== 'Peninsular India' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
