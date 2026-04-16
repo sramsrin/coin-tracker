@@ -3147,7 +3147,7 @@ export default function Home() {
                   'European Trading Companies'
                 ];
                 const otherGroupSections = [
-                  'Deccan Kingdoms',
+                  'Peninsular India',
                   'Other',
                   'Indeterminate'
                 ];
