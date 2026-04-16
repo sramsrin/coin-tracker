@@ -141,6 +141,40 @@ function CoinIndexDisplay({ index }: { index: string }) {
   return <>{index}</>;
 }
 
+function ParsedReferences({ references }: { references: string }) {
+  if (!references || references.trim() === '') return null;
+  
+  const parts = references.split(',').map(p => p.trim());
+  const refs: { text: string; link: string }[] = [];
+  
+  for (let i = 0; i < parts.length; i += 2) {
+    if (parts[i]) {
+      refs.push({
+        text: parts[i],
+        link: parts[i + 1] || '#'
+      });
+    }
+  }
+  
+  return (
+    <div className="flex flex-wrap gap-x-2 gap-y-1">
+      {refs.map((ref, idx) => (
+        <span key={idx} className="inline-flex items-center">
+          <a 
+            href={ref.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-pink-600 hover:text-pink-800 hover:underline transition"
+          >
+            {ref.text}
+          </a>
+          {idx < refs.length - 1 && <span className="ml-2 text-gray-300">|</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function compareIndexForSort(a: string, b: string): number {
   const aTransit = isInTransitIndex(a);
   const bTransit = isInTransitIndex(b);
@@ -203,8 +237,7 @@ interface Coin {
   numistaNumber: string;
   numistaLink: string;
   weight: string;
-  obverse: string;
-  reverse: string;
+  references: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
@@ -428,8 +461,7 @@ export default function Home() {
     numistaNumber: '',
     numistaLink: '',
     weight: '',
-    obverse: '',
-    reverse: '',
+    references: '',
     date: '',
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
   });
@@ -1273,8 +1305,7 @@ export default function Home() {
           numistaNumber: '',
           numistaLink: '',
           weight: '',
-          obverse: '',
-          reverse: '',
+          references: '',
           date: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
         });
@@ -1307,8 +1338,7 @@ export default function Home() {
       numistaNumber: coin.numistaNumber,
       numistaLink: coin.numistaLink,
       weight: coin.weight,
-      obverse: coin.obverse,
-      reverse: coin.reverse,
+      references: coin.references,
       matchConfidence: coin.matchConfidence,
     });
   };
@@ -1811,25 +1841,13 @@ export default function Home() {
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Obverse
+                References
               </label>
               <textarea
-                value={formData.obverse}
-                onChange={(e) => setFormData({ ...formData, obverse: e.target.value })}
+                value={formData.references}
+                onChange={(e) => setFormData({ ...formData, references: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="Description of obverse side..."
-                rows={2}
-              />
-            </div>
-            <div className="md:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reverse
-              </label>
-              <textarea
-                value={formData.reverse}
-                onChange={(e) => setFormData({ ...formData, reverse: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="Description of reverse side..."
+                placeholder="text1, link1, text2, link2..."
                 rows={2}
               />
             </div>
@@ -2137,9 +2155,7 @@ export default function Home() {
                                         </span>
                                       </th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Obverse</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Reverse</th>
-                                    </tr>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">References</th>                                    </tr>
                                   </thead>
                                   <tbody>
                                     {stateCoins.map((coin) => (
@@ -2182,9 +2198,9 @@ export default function Home() {
                                             )}
                                           </div>
                                         </td>
-                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
-                                      </tr>
+                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs">
+                                          <ParsedReferences references={coin.references} />
+                                        </td>                                      </tr>
                                     ))}
                                   </tbody>
                                 </table>
@@ -2268,11 +2284,8 @@ export default function Home() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">
                       Images
                     </th>
-                    <th onClick={() => handleSort('obverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Obverse {sortField === 'obverse' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th onClick={() => handleSort('references')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
+                      References {sortField === 'references' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                   </tr>
                 </thead>
@@ -2318,8 +2331,9 @@ export default function Home() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
+                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
+                        <ParsedReferences references={coin.references} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -2493,20 +2507,12 @@ export default function Home() {
                     </select>
                   </div>
                   <div className="md:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Obverse Description</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">References</label>
                     <textarea
-                      value={editFormData.obverse || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, obverse: e.target.value })}
+                      value={editFormData.references || ''}
+                      onChange={(e) => setEditFormData({ ...editFormData, references: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      rows={2}
-                    />
-                  </div>
-                  <div className="md:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Reverse Description</label>
-                    <textarea
-                      value={editFormData.reverse || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, reverse: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="text1, link1, text2, link2..."
                       rows={2}
                     />
                   </div>
@@ -3555,17 +3561,22 @@ export default function Home() {
                               {coin.matchConfidence}
                             </span>
                           </div>
-                          {coin.obverse && (
-                            <div className="text-sm"><span className="font-semibold text-gray-700">Obverse:</span> <span className="text-gray-600">{coin.obverse}</span></div>
-                          )}
-                          {coin.reverse && (
-                            <div className="text-sm"><span className="font-semibold text-gray-700">Reverse:</span> <span className="text-gray-600">{coin.reverse}</span></div>
+                          {coin.references && (
+                            <div className="text-sm flex gap-2">
+                              <span className="font-semibold text-gray-700">References:</span> 
+                              <ParsedReferences references={coin.references} />
+                            </div>
                           )}
                           {coin.weight && (
                             <div className="text-sm"><span className="font-semibold text-gray-700">Weight:</span> <span className="text-gray-600">{coin.weight}g</span></div>
                           )}
                           {coin.numistaLink && (
-                            <div className="text-sm"><span className="font-semibold text-gray-700">Reference:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
+                            <div className="text-sm">
+                              <span className="font-semibold text-gray-700">Reference:</span> 
+                              <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                                {coin.numistaNumber || 'View'}
+                              </a>
+                            </div>
                           )}
                         </div>
                       </div>

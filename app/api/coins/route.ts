@@ -15,8 +15,7 @@ interface Coin {
   numistaNumber: string;
   numistaLink: string;
   weight: string;
-  obverse: string;
-  reverse: string;
+  references: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
@@ -69,8 +68,7 @@ export async function POST(request: NextRequest) {
       numistaNumber: body.numistaNumber?.trim() || '',
       numistaLink: body.numistaLink?.trim() || '',
       weight: body.weight?.trim() || '',
-      obverse: body.obverse?.trim() || '',
-      reverse: body.reverse?.trim() || '',
+      references: body.references?.trim() || '',
       date: body.date?.trim() || '',
       matchConfidence: body.matchConfidence || 'High',
       image1Url: body.image1Url?.trim() || '',
