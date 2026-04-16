@@ -461,6 +461,8 @@ export default function Home() {
     weight: '',
     references: '',
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
+    image1Url: '',
+    image2Url: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1257,7 +1259,7 @@ export default function Home() {
       if (response.ok) {
         const newCoin = await response.json();
 
-        // Upload images if selected
+        // Upload images if files selected (file upload takes priority over URL)
         if (addImage1File || addImage2File) {
           setIsUploading(true);
           const imageUpdates: Record<string, string> = {};
@@ -1293,8 +1295,9 @@ export default function Home() {
           weight: '',
           references: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
+          image1Url: '',
+          image2Url: '',
         });
-        // Clear image state
         setAddImage1File(null);
         setAddImage2File(null);
         setAddImage1Preview(null);
@@ -1325,6 +1328,8 @@ export default function Home() {
       weight: coin.weight,
       references: coin.references,
       matchConfidence: coin.matchConfidence,
+      image1Url: coin.image1Url || '',
+      image2Url: coin.image2Url || '',
     });
   };
 
@@ -1332,7 +1337,7 @@ export default function Home() {
     if (!editingCoin) return;
 
     try {
-      // Upload new images if selected
+      // Upload new images if files selected (file upload takes priority over URL)
       setIsUploading(true);
       const imageUpdates: Record<string, string> = {};
       if (editImage1File) {
@@ -1353,9 +1358,9 @@ export default function Home() {
         body: JSON.stringify({
           ...editingCoin,
           ...editFormData,
-          // Preserve existing image URLs, override with new uploads
-          image1Url: imageUpdates.image1Url || editingCoin.image1Url || '',
-          image2Url: imageUpdates.image2Url || editingCoin.image2Url || '',
+          // File uploads override URL field values
+          ...(imageUpdates.image1Url ? { image1Url: imageUpdates.image1Url } : {}),
+          ...(imageUpdates.image2Url ? { image2Url: imageUpdates.image2Url } : {}),
         }),
       });
 
@@ -1830,6 +1835,14 @@ export default function Home() {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
                   <input
+                    type="url"
+                    value={formData.image1Url}
+                    onChange={(e) => { setFormData({ ...formData, image1Url: e.target.value }); setAddImage1File(null); setAddImage1Preview(null); }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                    placeholder="Paste image URL..."
+                  />
+                  <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
+                  <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
@@ -1839,18 +1852,27 @@ export default function Home() {
                         const reader = new FileReader();
                         reader.onloadend = () => setAddImage1Preview(reader.result as string);
                         reader.readAsDataURL(file);
+                        setFormData({ ...formData, image1Url: '' });
                       } else {
                         setAddImage1Preview(null);
                       }
                     }}
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
                   />
-                  {addImage1Preview && (
-                    <img src={addImage1Preview} alt="Preview 1" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                  {(addImage1Preview || formData.image1Url) && (
+                    <img src={addImage1Preview || formData.image1Url} alt="Preview 1" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                   )}
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image 2 (Reverse)</label>
+                  <input
+                    type="url"
+                    value={formData.image2Url}
+                    onChange={(e) => { setFormData({ ...formData, image2Url: e.target.value }); setAddImage2File(null); setAddImage2Preview(null); }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                    placeholder="Paste image URL..."
+                  />
+                  <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -1861,18 +1883,18 @@ export default function Home() {
                         const reader = new FileReader();
                         reader.onloadend = () => setAddImage2Preview(reader.result as string);
                         reader.readAsDataURL(file);
+                        setFormData({ ...formData, image2Url: '' });
                       } else {
                         setAddImage2Preview(null);
                       }
                     }}
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
                   />
-                  {addImage2Preview && (
-                    <img src={addImage2Preview} alt="Preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                  {(addImage2Preview || formData.image2Url) && (
+                    <img src={addImage2Preview || formData.image2Url} alt="Preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                   )}
                 </div>
               </div>
-
             </div>
             <div className="md:col-span-3">
               <button
@@ -2473,18 +2495,20 @@ export default function Home() {
                       rows={2}
                     />
                   </div>
-                  {/* Image Upload */}
+                  {/* Image URLs / Upload */}
                   <div className="md:col-span-3">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
-                        {editingCoin.image1Url && !editImage1Preview && (
-                          <div className="mb-2">
-                            <img src={editingCoin.image1Url} alt="Current obverse" className="h-24 rounded border border-gray-200 object-contain" />
-                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
-                          </div>
-                        )}
+                        <input
+                          type="url"
+                          value={editFormData.image1Url || ''}
+                          onChange={(e) => { setEditFormData({ ...editFormData, image1Url: e.target.value }); setEditImage1File(null); setEditImage1Preview(null); }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                          placeholder="Paste image URL..."
+                        />
+                        <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -2495,24 +2519,27 @@ export default function Home() {
                               const reader = new FileReader();
                               reader.onloadend = () => setEditImage1Preview(reader.result as string);
                               reader.readAsDataURL(file);
+                              setEditFormData({ ...editFormData, image1Url: '' });
                             } else {
                               setEditImage1Preview(null);
                             }
                           }}
                           className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
                         />
-                        {editImage1Preview && (
-                          <img src={editImage1Preview} alt="New preview 1" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                        {(editImage1Preview || editFormData.image1Url) && (
+                          <img src={editImage1Preview || editFormData.image1Url || ''} alt="Obverse preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                         )}
                       </div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Image 2 (Reverse)</label>
-                        {editingCoin.image2Url && !editImage2Preview && (
-                          <div className="mb-2">
-                            <img src={editingCoin.image2Url} alt="Current reverse" className="h-24 rounded border border-gray-200 object-contain" />
-                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
-                          </div>
-                        )}
+                        <input
+                          type="url"
+                          value={editFormData.image2Url || ''}
+                          onChange={(e) => { setEditFormData({ ...editFormData, image2Url: e.target.value }); setEditImage2File(null); setEditImage2Preview(null); }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                          placeholder="Paste image URL..."
+                        />
+                        <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -2523,14 +2550,15 @@ export default function Home() {
                               const reader = new FileReader();
                               reader.onloadend = () => setEditImage2Preview(reader.result as string);
                               reader.readAsDataURL(file);
+                              setEditFormData({ ...editFormData, image2Url: '' });
                             } else {
                               setEditImage2Preview(null);
                             }
                           }}
                           className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
                         />
-                        {editImage2Preview && (
-                          <img src={editImage2Preview} alt="New preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                        {(editImage2Preview || editFormData.image2Url) && (
+                          <img src={editImage2Preview || editFormData.image2Url || ''} alt="Reverse preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                         )}
                       </div>
                     </div>
