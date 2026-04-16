@@ -141,38 +141,37 @@ function CoinIndexDisplay({ index }: { index: string }) {
   return <>{index}</>;
 }
 
-function ParsedReferences({ references }: { references: string }) {
+function ParsedMatchNotes({ references }: { references: string }) {
   if (!references || references.trim() === '') return null;
-  
-  const parts = references.split(',').map(p => p.trim());
-  const refs: { text: string; link: string }[] = [];
-  
-  for (let i = 0; i < parts.length; i += 2) {
-    if (parts[i]) {
-      refs.push({
-        text: parts[i],
-        link: parts[i + 1] || '#'
-      });
+
+  const linkPattern = /\[([^|]+?)\s*\|\s*([^\]]+?)\]/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkPattern.exec(references)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(references.slice(lastIndex, match.index));
     }
+    parts.push(
+      <a
+        key={match.index}
+        href={match[2].trim()}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-pink-600 hover:text-pink-800 hover:underline transition"
+      >
+        {match[1].trim()}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
   }
-  
-  return (
-    <div className="flex flex-wrap gap-x-2 gap-y-1">
-      {refs.map((ref, idx) => (
-        <span key={idx} className="inline-flex items-center">
-          <a 
-            href={ref.link} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-pink-600 hover:text-pink-800 hover:underline transition"
-          >
-            {ref.text}
-          </a>
-          {idx < refs.length - 1 && <span className="ml-2 text-gray-300">|</span>}
-        </span>
-      ))}
-    </div>
-  );
+
+  if (lastIndex < references.length) {
+    parts.push(references.slice(lastIndex));
+  }
+
+  return <span>{parts}</span>;
 }
 
 function compareIndexForSort(a: string, b: string): number {
@@ -1544,7 +1543,7 @@ export default function Home() {
 
   const indeterminateCount = coins.filter((c) => c.section === 'Indeterminate').length;
   const inTransitCount = coins.filter((c) => isInTransitIndex(c.index)).length;
-  const onNumistaCount = coins.filter((c) => c.numistaLink && !isInTransitIndex(c.index)).length;
+  const onNumistaCount = coins.filter((c) => c.numistaLink && c.numistaLink.includes('numista.com') && !isInTransitIndex(c.index)).length;
   const ownedPrincelyStateKeys = new Set(
     coins
       .filter((coin) => coin.section === 'British India Princely States')
@@ -1815,13 +1814,13 @@ export default function Home() {
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                References
+                Match Notes
               </label>
               <textarea
                 value={formData.references}
                 onChange={(e) => setFormData({ ...formData, references: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="text1, link1, text2, link2..."
+                placeholder="Free text. Use [display text | URL] for links"
                 rows={2}
               />
             </div>
@@ -2128,7 +2127,7 @@ export default function Home() {
                                         </span>
                                       </th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">References</th>                                    </tr>
+                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Match Notes</th>                                    </tr>
                                   </thead>
                                   <tbody>
                                     {stateCoins.map((coin) => (
@@ -2171,7 +2170,7 @@ export default function Home() {
                                           </div>
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs">
-                                          <ParsedReferences references={coin.references} />
+                                          <ParsedMatchNotes references={coin.references} />
                                         </td>                                      </tr>
                                     ))}
                                   </tbody>
@@ -2254,7 +2253,7 @@ export default function Home() {
                       Images
                     </th>
                     <th onClick={() => handleSort('references')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      References {sortField === 'references' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      Match Notes {sortField === 'references' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                   </tr>
                 </thead>
@@ -2300,7 +2299,7 @@ export default function Home() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
-                        <ParsedReferences references={coin.references} />
+                        <ParsedMatchNotes references={coin.references} />
                       </td>
                     </tr>
                   ))}
@@ -2465,12 +2464,12 @@ export default function Home() {
                     </select>
                   </div>
                   <div className="md:col-span-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">References</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Match Notes</label>
                     <textarea
                       value={editFormData.references || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, references: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="text1, link1, text2, link2..."
+                      placeholder="Free text. Use [display text | URL] for links"
                       rows={2}
                     />
                   </div>
@@ -3520,8 +3519,8 @@ export default function Home() {
                           </div>
                           {coin.references && (
                             <div className="text-sm flex gap-2">
-                              <span className="font-semibold text-gray-700">References:</span> 
-                              <ParsedReferences references={coin.references} />
+                              <span className="font-semibold text-gray-700">Match Notes:</span>
+                              <ParsedMatchNotes references={coin.references} />
                             </div>
                           )}
                           {coin.weight && (
