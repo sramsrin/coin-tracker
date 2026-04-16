@@ -40,3 +40,4 @@ For structural changes (section renames, new fields, etc.):
 - "British India Post 1835" → "British India Uniform Coinage"
 - "British India Pre 1835" → "British India Presidencies"
 - "Annexed kingdoms" moved from subsection to own "Annexed Kingdoms" section
+- Triggering clean build.
