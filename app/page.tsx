@@ -2126,7 +2126,7 @@ export default function Home() {
                                   </span>
                                 </a>
                               </div>
-                              {(isPrincelyStates || isMadrasPresidencyTerritories) && hasMultipleStates && isExpanded && (
+                              {isPrincelyStates && hasMultipleStates && isExpanded && (
                                 <ul className="ml-6 mt-1 space-y-1">
                                   {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
                                     if (subsubsection === 'Other') return null;
