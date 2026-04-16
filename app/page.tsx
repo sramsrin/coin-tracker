@@ -238,7 +238,6 @@ interface Coin {
   numistaLink: string;
   weight: string;
   references: string;
-  date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
@@ -462,7 +461,6 @@ export default function Home() {
     numistaLink: '',
     weight: '',
     references: '',
-    date: '',
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
   });
 
@@ -1130,13 +1128,6 @@ export default function Home() {
       return sortDirection === 'asc' ? ia.localeCompare(ib) : ib.localeCompare(ia);
     }
 
-    // Special handling for date field (numeric year sorting)
-    if (sortField === 'date') {
-      const aYear = parseInt(aValue) || 0;
-      const bYear = parseInt(bValue) || 0;
-      return sortDirection === 'asc' ? aYear - bYear : bYear - aYear;
-    }
-
     // Try to parse as numbers for numeric sorting
     const aNum = parseFloat(aValue);
     const bNum = parseFloat(bValue);
@@ -1173,10 +1164,6 @@ export default function Home() {
   const extractYear = (subsection: string, coins?: Coin[]): number => {
     const match = subsection.match(/\((\d{4})/);
     if (match) return parseInt(match[1]);
-    if (coins && coins.length > 0) {
-      const years = coins.map(c => parseInt(c.date)).filter(y => !isNaN(y));
-      if (years.length > 0) return Math.min(...years);
-    }
     return 9999;
   };
 
@@ -1306,7 +1293,6 @@ export default function Home() {
           numistaLink: '',
           weight: '',
           references: '',
-          date: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
         });
         // Clear image state
@@ -1769,18 +1755,6 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date
-              </label>
-              <input
-                type="text"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., 1850, 1800-1820, 19th century"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Reference Number
               </label>
               <input
@@ -2140,7 +2114,6 @@ export default function Home() {
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Index</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Value</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Currency</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Date</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Reference#</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Weight</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">
@@ -2168,7 +2141,6 @@ export default function Home() {
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.faceValue}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">{coin.currency}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.date}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800">
                                           {coin.numistaLink ? (
                                             <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
@@ -2261,9 +2233,6 @@ export default function Home() {
                     <th onClick={() => handleSort('currency')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Currency {sortField === 'currency' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
-                    <th onClick={() => handleSort('date')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                      Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th onClick={() => handleSort('numistaNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
                       Reference # {sortField === 'numistaNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
@@ -2301,7 +2270,6 @@ export default function Home() {
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.subsubsection || coin.subsection}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.faceValue}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">{coin.currency}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.date}</td>
                       <td className="px-4 py-3 text-xs text-gray-800">
                         {coin.numistaLink ? (
                           <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-800 underline">
@@ -2453,16 +2421,6 @@ export default function Home() {
                       type="text"
                       value={editFormData.currency || ''}
                       onChange={(e) => setEditFormData({ ...editFormData, currency: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                    <input
-                      type="text"
-                      value={editFormData.date || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
-                      placeholder="e.g., 1850, 1800-1820, 19th century"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
                   </div>
@@ -3556,7 +3514,6 @@ export default function Home() {
                             <span className="text-lg font-bold text-gray-800">#<CoinIndexDisplay index={coin.index} /></span>
                             {coin.subsection && <span className="text-sm text-purple-600 font-medium">{coin.subsection}</span>}
                             <span className="text-sm text-gray-500">{coin.faceValue} {coin.currency}</span>
-                            {coin.date && <span className="text-sm text-gray-500">({coin.date})</span>}
                             <span className={`px-2 py-1 rounded text-xs font-medium ${coin.matchConfidence === 'High' ? 'bg-green-100 text-green-800' : coin.matchConfidence === 'Medium' ? 'bg-blue-100 text-blue-800' : coin.matchConfidence === 'None' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>
                               {coin.matchConfidence}
                             </span>
