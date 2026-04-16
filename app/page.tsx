@@ -200,23 +200,15 @@ interface Coin {
   subsubsection: string;
   faceValue: string;
   currency: string;
-  kmNumber: string;
   numistaNumber: string;
   numistaLink: string;
   weight: string;
-  book: string;
-  numberAndNotes: string;
   obverse: string;
   reverse: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
-  purchasePrice: string;
-  purchaseSource: string;
-  purchaseDate: string;
-  dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
-  referenceImageUrl?: string;
 }
 
 type SortField = keyof Coin;
@@ -420,15 +412,11 @@ export default function Home() {
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
   const [addImage1Preview, setAddImage1Preview] = useState<string | null>(null);
   const [addImage2Preview, setAddImage2Preview] = useState<string | null>(null);
-  const [addReferenceImageFile, setAddReferenceImageFile] = useState<File | null>(null);
-  const [addReferenceImagePreview, setAddReferenceImagePreview] = useState<string | null>(null);
   // Image upload state for edit form
   const [editImage1File, setEditImage1File] = useState<File | null>(null);
   const [editImage2File, setEditImage2File] = useState<File | null>(null);
   const [editImage1Preview, setEditImage1Preview] = useState<string | null>(null);
   const [editImage2Preview, setEditImage2Preview] = useState<string | null>(null);
-  const [editReferenceImageFile, setEditReferenceImageFile] = useState<File | null>(null);
-  const [editReferenceImagePreview, setEditReferenceImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
@@ -437,20 +425,13 @@ export default function Home() {
     subsubsection: '',
     faceValue: '',
     currency: '',
-    kmNumber: '',
     numistaNumber: '',
     numistaLink: '',
     weight: '',
-    book: '',
-    numberAndNotes: '',
     obverse: '',
     reverse: '',
     date: '',
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
-    purchasePrice: '',
-    purchaseSource: '',
-    purchaseDate: '',
-    dateVerified: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1124,20 +1105,6 @@ export default function Home() {
       return sortDirection === 'asc' ? aYear - bYear : bYear - aYear;
     }
 
-    // Special handling for purchaseDate (parse as date for chronological sorting)
-    if (sortField === 'purchaseDate' || sortField === 'dateVerified') {
-      const aTime = aValue ? new Date(aValue).getTime() : 0;
-      const bTime = bValue ? new Date(bValue).getTime() : 0;
-      return sortDirection === 'asc' ? aTime - bTime : bTime - aTime;
-    }
-
-    // Special handling for purchasePrice (strip $ sign for numeric sorting)
-    if (sortField === 'purchasePrice') {
-      const aNum = parseFloat(aValue.replace(/[$,]/g, '')) || 0;
-      const bNum = parseFloat(bValue.replace(/[$,]/g, '')) || 0;
-      return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
-    }
-
     // Try to parse as numbers for numeric sorting
     const aNum = parseFloat(aValue);
     const bNum = parseFloat(bValue);
@@ -1273,7 +1240,7 @@ export default function Home() {
         const newCoin = await response.json();
 
         // Upload images if selected
-        if (addImage1File || addImage2File || addReferenceImageFile) {
+        if (addImage1File || addImage2File) {
           setIsUploading(true);
           const imageUpdates: Record<string, string> = {};
           if (addImage1File) {
@@ -1283,10 +1250,6 @@ export default function Home() {
           if (addImage2File) {
             const url = await uploadImage(addImage2File);
             if (url) imageUpdates.image2Url = url;
-          }
-          if (addReferenceImageFile) {
-            const url = await uploadImage(addReferenceImageFile);
-            if (url) imageUpdates.referenceImageUrl = url;
           }
           if (Object.keys(imageUpdates).length > 0) {
             await fetch(`/api/coins?id=${newCoin.id}`, {
@@ -1307,28 +1270,19 @@ export default function Home() {
           subsubsection: '',
           faceValue: '',
           currency: '',
-          kmNumber: '',
           numistaNumber: '',
           numistaLink: '',
           weight: '',
-          book: '',
-          numberAndNotes: '',
           obverse: '',
           reverse: '',
           date: '',
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
-          purchasePrice: '',
-          purchaseSource: '',
-          purchaseDate: '',
-          dateVerified: '',
         });
         // Clear image state
         setAddImage1File(null);
         setAddImage2File(null);
-        setAddReferenceImageFile(null);
         setAddImage1Preview(null);
         setAddImage2Preview(null);
-        setAddReferenceImagePreview(null);
         // Refresh coins list
         fetchCoins();
       }
@@ -1341,10 +1295,8 @@ export default function Home() {
     setEditingCoin(coin);
     setEditImage1File(null);
     setEditImage2File(null);
-    setEditReferenceImageFile(null);
     setEditImage1Preview(null);
     setEditImage2Preview(null);
-    setEditReferenceImagePreview(null);
     setEditFormData({
       index: coin.index,
       section: coin.section,
@@ -1352,19 +1304,12 @@ export default function Home() {
       subsubsection: coin.subsubsection,
       faceValue: coin.faceValue,
       currency: coin.currency,
-      kmNumber: coin.kmNumber,
       numistaNumber: coin.numistaNumber,
       numistaLink: coin.numistaLink,
       weight: coin.weight,
-      book: coin.book,
-      numberAndNotes: coin.numberAndNotes,
       obverse: coin.obverse,
       reverse: coin.reverse,
       matchConfidence: coin.matchConfidence,
-      purchasePrice: coin.purchasePrice,
-      purchaseSource: coin.purchaseSource,
-      purchaseDate: coin.purchaseDate,
-      dateVerified: coin.dateVerified,
     });
   };
 
@@ -1383,10 +1328,6 @@ export default function Home() {
         const url = await uploadImage(editImage2File);
         if (url) imageUpdates.image2Url = url;
       }
-      if (editReferenceImageFile) {
-        const url = await uploadImage(editReferenceImageFile);
-        if (url) imageUpdates.referenceImageUrl = url;
-      }
       setIsUploading(false);
 
       const response = await fetch(`/api/coins?id=${editingCoin.id}`, {
@@ -1400,7 +1341,6 @@ export default function Home() {
           // Preserve existing image URLs, override with new uploads
           image1Url: imageUpdates.image1Url || editingCoin.image1Url || '',
           image2Url: imageUpdates.image2Url || editingCoin.image2Url || '',
-          referenceImageUrl: imageUpdates.referenceImageUrl || editingCoin.referenceImageUrl || '',
         }),
       });
 
@@ -1410,10 +1350,8 @@ export default function Home() {
         setEditFormData({});
         setEditImage1File(null);
         setEditImage2File(null);
-        setEditReferenceImageFile(null);
         setEditImage1Preview(null);
         setEditImage2Preview(null);
-        setEditReferenceImagePreview(null);
       }
     } catch (error) {
       console.error('Error updating coin:', error);
@@ -1813,18 +1751,6 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                KM Number
-              </label>
-              <input
-                type="text"
-                value={formData.kmNumber}
-                onChange={(e) => setFormData({ ...formData, kmNumber: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., KM# 132"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Reference Number
               </label>
               <input
@@ -1870,18 +1796,6 @@ export default function Home() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Book
-              </label>
-              <input
-                type="text"
-                value={formData.book}
-                onChange={(e) => setFormData({ ...formData, book: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g., Red Book"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Match Confidence
               </label>
               <select
@@ -1894,66 +1808,6 @@ export default function Home() {
                 <option value="Low">Low</option>
                 <option value="None">None</option>
               </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Number & Notes
-              </label>
-              <input
-                type="text"
-                value={formData.numberAndNotes}
-                onChange={(e) => setFormData({ ...formData, numberAndNotes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="Notes..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Price
-              </label>
-              <input
-                type="text"
-                value={formData.purchasePrice}
-                onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g. $10"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Source
-              </label>
-              <input
-                type="text"
-                value={formData.purchaseSource}
-                onChange={(e) => setFormData({ ...formData, purchaseSource: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g. eBay, dealer name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Date
-              </label>
-              <input
-                type="text"
-                value={formData.purchaseDate}
-                onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g. March 2026"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date Verified
-              </label>
-              <input
-                type="text"
-                value={formData.dateVerified}
-                onChange={(e) => setFormData({ ...formData, dateVerified: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                placeholder="e.g. 2024-03-31"
-              />
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1981,7 +1835,7 @@ export default function Home() {
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
                   <input
@@ -2024,28 +1878,6 @@ export default function Home() {
                   />
                   {addImage2Preview && (
                     <img src={addImage2Preview} alt="Preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
-                  )}
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      setAddReferenceImageFile(file);
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => setAddReferenceImagePreview(reader.result as string);
-                        reader.readAsDataURL(file);
-                      } else {
-                        setAddReferenceImagePreview(null);
-                      }
-                    }}
-                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
-                  />
-                  {addReferenceImagePreview && (
-                    <img src={addReferenceImagePreview} alt="Reference Preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                   )}
                 </div>
               </div>
@@ -2304,17 +2136,9 @@ export default function Home() {
                                           </span>
                                         </span>
                                       </th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Verified</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Images</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Obverse</th>
                                       <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Reverse</th>
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">KM#</th>
-                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Price</th>}
-                                      {isAuthenticated && <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-20">Source</th>}
-                                      {isAuthenticated && (
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 w-24">Purchased</th>
-                                      )}
-                                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Book & Notes</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -2344,7 +2168,6 @@ export default function Home() {
                                             {coin.matchConfidence}
                                           </span>
                                         </td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.dateVerified}</td>
                                         <td className="px-3 py-2 text-xs">
                                           <div className="flex gap-1">
                                             {coin.image1Url && (
@@ -2357,20 +2180,10 @@ export default function Home() {
                                                 <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
                                               </a>
                                             )}
-                                            {coin.referenceImageUrl && (
-                                              <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
-                                                <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
-                                              </a>
-                                            )}
                                           </div>
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
-                                        <td className="px-3 py-2 text-xs text-gray-800">{coin.kmNumber}</td>
-                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchasePrice}</td>}
-                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                                        {isAuthenticated && <td className="px-3 py-2 text-xs text-gray-800">{coin.purchaseDate}</td>}
-                                        <td className="px-3 py-2 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -2452,9 +2265,6 @@ export default function Home() {
                         </span>
                       </span>
                     </th>
-                    <th onClick={() => handleSort('dateVerified')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                      Verified {sortField === 'dateVerified' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">
                       Images
                     </th>
@@ -2463,28 +2273,6 @@ export default function Home() {
                     </th>
                     <th onClick={() => handleSort('reverse')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
                       Reverse {sortField === 'reverse' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
-                    <th onClick={() => handleSort('kmNumber')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                      KM Number {sortField === 'kmNumber' && (sortDirection === 'asc' ? '↑' : '↓')}
-                    </th>
-                    {isAuthenticated && (
-                      <th onClick={() => handleSort('purchasePrice')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                        Price {sortField === 'purchasePrice' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </th>
-                    )}
-                    {isAuthenticated && (
-                      <th onClick={() => handleSort('purchaseSource')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                        Source {sortField === 'purchaseSource' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </th>
-                    )}
-                    {isAuthenticated && (
-                      <th onClick={() => handleSort('purchaseDate')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200 w-24">
-                        Purchased {sortField === 'purchaseDate' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </th>
-                    )}
-
-                    <th onClick={() => handleSort('book')} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-pink-200">
-                      Book & Notes {sortField === 'book' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                   </tr>
                 </thead>
@@ -2516,7 +2304,6 @@ export default function Home() {
                           {coin.matchConfidence}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.dateVerified}</td>
                       <td className="px-4 py-3 text-xs">
                         <div className="flex gap-1">
                           {coin.image1Url && (
@@ -2529,21 +2316,10 @@ export default function Home() {
                               <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
                             </a>
                           )}
-                          {coin.referenceImageUrl && (
-                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
-                              <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
-                            </a>
-                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.obverse}</td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{coin.reverse}</td>
-                      <td className="px-4 py-3 text-xs text-gray-800">{coin.kmNumber}</td>
-                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchasePrice}</td>}
-                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseSource}</td>}
-                      {isAuthenticated && <td className="px-4 py-3 text-xs text-gray-800">{coin.purchaseDate}</td>}
-
-                      <td className="px-4 py-3 text-xs text-gray-800 max-w-xs truncate">{[coin.book, coin.numberAndNotes].filter(Boolean).join(' - ')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -2677,15 +2453,6 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">KM Number</label>
-                    <input
-                      type="text"
-                      value={editFormData.kmNumber || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, kmNumber: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Reference Number</label>
                     <input
                       type="text"
@@ -2713,15 +2480,6 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Book</label>
-                    <input
-                      type="text"
-                      value={editFormData.book || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, book: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Match Confidence</label>
                     <select
                       value={editFormData.matchConfidence || 'High'}
@@ -2733,55 +2491,6 @@ export default function Home() {
                       <option value="Low">Low</option>
                       <option value="None">None</option>
                     </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number & Notes</label>
-                    <input
-                      type="text"
-                      value={editFormData.numberAndNotes || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, numberAndNotes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
-                    <input
-                      type="text"
-                      value={editFormData.purchasePrice || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, purchasePrice: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="e.g. $10"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Source</label>
-                    <input
-                      type="text"
-                      value={editFormData.purchaseSource || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, purchaseSource: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="e.g. eBay, dealer name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Date</label>
-                    <input
-                      type="text"
-                      value={editFormData.purchaseDate || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, purchaseDate: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="e.g. March 2026"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Verified</label>
-                    <input
-                      type="text"
-                      value={editFormData.dateVerified || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, dateVerified: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="e.g. 2024-03-31"
-                    />
                   </div>
                   <div className="md:col-span-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Obverse Description</label>
@@ -2804,7 +2513,7 @@ export default function Home() {
                   {/* Image Upload */}
                   <div className="md:col-span-3">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Coin Images</label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Image 1 (Obverse)</label>
                         {editingCoin.image1Url && !editImage1Preview && (
@@ -2859,34 +2568,6 @@ export default function Home() {
                         />
                         {editImage2Preview && (
                           <img src={editImage2Preview} alt="New preview 2" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
-                        {editingCoin.referenceImageUrl && !editReferenceImagePreview && (
-                          <div className="mb-2">
-                            <img src={editingCoin.referenceImageUrl} alt="Current reference" className="h-24 rounded border border-gray-200 object-contain" />
-                            <span className="text-xs text-gray-400 block mt-1">Current image</span>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null;
-                            setEditReferenceImageFile(file);
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => setEditReferenceImagePreview(reader.result as string);
-                              reader.readAsDataURL(file);
-                            } else {
-                              setEditReferenceImagePreview(null);
-                            }
-                          }}
-                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
-                        />
-                        {editReferenceImagePreview && (
-                          <img src={editReferenceImagePreview} alt="New reference preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                         )}
                       </div>
                     </div>
@@ -3862,11 +3543,6 @@ export default function Home() {
                               <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
                             </a>
                           )}
-                          {coin.referenceImageUrl && (
-                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer" className="block">
-                              <img src={coin.referenceImageUrl} alt="Reference" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
-                            </a>
-                          )}
                         </div>
                         {/* Details */}
                         <div className="p-6 space-y-2">
@@ -3890,9 +3566,6 @@ export default function Home() {
                           )}
                           {coin.numistaLink && (
                             <div className="text-sm"><span className="font-semibold text-gray-700">Reference:</span> <a href={coin.numistaLink} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">{coin.numistaNumber || 'View'}</a></div>
-                          )}
-                          {coin.numberAndNotes && (
-                            <div className="text-sm mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200"><span className="font-semibold text-amber-800">Notes:</span> <span className="text-amber-700">{coin.numberAndNotes}</span></div>
                           )}
                         </div>
                       </div>

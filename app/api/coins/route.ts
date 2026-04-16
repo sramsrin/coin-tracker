@@ -12,23 +12,15 @@ interface Coin {
   subsubsection: string;
   faceValue: string;
   currency: string;
-  kmNumber: string;
   numistaNumber: string;
   numistaLink: string;
   weight: string;
-  book: string;
-  numberAndNotes: string;
   obverse: string;
   reverse: string;
   date: string;
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
-  purchasePrice: string;
-  purchaseSource: string;
-  purchaseDate: string;
-  dateVerified?: string;
   image1Url?: string;
   image2Url?: string;
-  referenceImageUrl?: string;
 }
 
 // Helper function to read coins from KV
@@ -74,23 +66,15 @@ export async function POST(request: NextRequest) {
       subsubsection: body.subsubsection?.trim() || '',
       faceValue: body.faceValue?.trim() || '',
       currency: body.currency?.trim() || '',
-      kmNumber: body.kmNumber?.trim() || '',
       numistaNumber: body.numistaNumber?.trim() || '',
       numistaLink: body.numistaLink?.trim() || '',
       weight: body.weight?.trim() || '',
-      book: body.book?.trim() || '',
-      numberAndNotes: body.numberAndNotes?.trim() || '',
       obverse: body.obverse?.trim() || '',
       reverse: body.reverse?.trim() || '',
       date: body.date?.trim() || '',
       matchConfidence: body.matchConfidence || 'High',
-      purchasePrice: body.purchasePrice?.trim() || '',
-      purchaseSource: body.purchaseSource?.trim() || '',
-      purchaseDate: body.purchaseDate?.trim() || '',
-      dateVerified: body.dateVerified?.trim() || '',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
-      referenceImageUrl: body.referenceImageUrl?.trim() || '',
     };
 
     coins.push(newCoin);
