@@ -2100,7 +2100,6 @@ export default function Home() {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Peninsular India';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
                           const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
@@ -2108,7 +2107,7 @@ export default function Home() {
                           return (
                             <li key={subsection}>
                               <div className="flex items-center">
-                                {(isPrincelyStates || isMadrasPresidencyTerritories) && hasMultipleStates && (
+                                {isPrincelyStates && hasMultipleStates && (
                                   <button
                                     onClick={() => toggleAgency(agencyKey)}
                                     className="mr-1 text-pink-600 hover:text-pink-800 focus:outline-none"
@@ -2265,8 +2264,7 @@ export default function Home() {
                         })().map((subsubsection) => {
                           const stateCoins = groupedCoins[section][subsection][subsubsection];
                           const isPrincelyStates = section === 'British India Princely States';
-                          const isMadrasPresidencyTerritories = section === 'Peninsular India';
-                          const showStateHeader = (isPrincelyStates || isMadrasPresidencyTerritories) && subsubsection !== 'Other';
+                          const showStateHeader = isPrincelyStates && subsubsection !== 'Other';
 
                           return (
                             <div
@@ -3140,83 +3138,46 @@ export default function Home() {
 
               {(() => {
                 const allSections = Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort();
-                const colonialSections = [
-                  'British India Presidencies',
-                  'British India Princely States',
-                  'British India Uniform Coinage',
-                  'European Trading Companies'
-                ];
-                const otherGroupSections = [
-                  'Peninsular India',
-                  'Other',
-                  'Indeterminate'
-                ];
-                const remainingSections = allSections.filter(s =>
-                  !colonialSections.includes(s) && !otherGroupSections.includes(s)
-                );
-
-                const renderSectionButton = (section: string) => (
-                  <button
-                    key={section}
-                    onClick={() => {
-                      if (selectedSection === section) {
-                        setSelectedSection(null);
-                        setSelectedSubsection(null);
-                        setSelectedState(null);
-                        setSelectedEuropeanCategory(null);
-                        setSelectedEuropeanPower(null);
-                        setSelectedPresidency(null);
-                      } else {
-                        setSelectedSection(section);
-                        setSelectedSubsection(null);
-                        setSelectedState(null);
-                        setSelectedEuropeanCategory(null);
-                        setSelectedEuropeanPower(null);
-                        setSelectedPresidency(null);
-                        // Set map mode based on section
-                        if (section === 'British India Princely States') {
-                          setMapMode('princely');
-                        } else if (section === 'European Trading Companies') {
-                          setMapMode('european');
-                        } else if (section === 'British India Presidencies') {
-                          setMapMode('presidencies');
-                        }
-                      }
-                    }}
-                    className={`px-4 py-3 rounded-lg transition text-left ${
-                      selectedSection === section
-                        ? 'bg-purple-600 text-white shadow-lg'
-                        : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
-                    }`}
-                  >
-                    <div className="text-sm font-semibold">{section}</div>
-                  </button>
-                );
 
                 return (
-                  <div className="space-y-4">
-                    {/* India: 1600-1947 Colonial Era Box */}
-                    <div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {colonialSections.filter(s => allSections.includes(s)).map(renderSectionButton)}
-                      </div>
-                    </div>
-
-                    {/* Other Box */}
-                    {otherGroupSections.some(s => allSections.includes(s)) && (
-                      <div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                          {otherGroupSections.filter(s => allSections.includes(s)).map(renderSectionButton)}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Remaining Sections (if any) */}
-                    {remainingSections.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {remainingSections.map(renderSectionButton)}
-                      </div>
-                    )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {allSections.map(section => (
+                      <button
+                        key={section}
+                        onClick={() => {
+                          if (selectedSection === section) {
+                            setSelectedSection(null);
+                            setSelectedSubsection(null);
+                            setSelectedState(null);
+                            setSelectedEuropeanCategory(null);
+                            setSelectedEuropeanPower(null);
+                            setSelectedPresidency(null);
+                          } else {
+                            setSelectedSection(section);
+                            setSelectedSubsection(null);
+                            setSelectedState(null);
+                            setSelectedEuropeanCategory(null);
+                            setSelectedEuropeanPower(null);
+                            setSelectedPresidency(null);
+                            // Set map mode based on section
+                            if (section === 'British India Princely States') {
+                              setMapMode('princely');
+                            } else if (section === 'European Trading Companies') {
+                              setMapMode('european');
+                            } else if (section === 'British India Presidencies') {
+                              setMapMode('presidencies');
+                            }
+                          }
+                        }}
+                        className={`px-4 py-3 rounded-lg transition text-left ${
+                          selectedSection === section
+                            ? 'bg-purple-600 text-white shadow-lg'
+                            : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                        }`}
+                      >
+                        <div className="text-sm font-semibold">{section}</div>
+                      </button>
+                    ))}
                   </div>
                 );
               })()}
@@ -3843,8 +3804,8 @@ export default function Home() {
 
             </>)}
 
-            {/* Indeterminate / Peninsular India - image-focused sections */}
-            {(selectedSection === 'Indeterminate' || selectedSection === 'Peninsular India') && (
+            {/* Indeterminate - image-focused section */}
+            {selectedSection === 'Indeterminate' && (
               <div className="mb-6">
                 {/* Subsection selector */}
                 {(() => {
@@ -3941,7 +3902,7 @@ export default function Home() {
             )}
 
             {/* Other Sections Mode (no map, just subsections) */}
-            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && selectedSection !== 'Peninsular India' && (
+            {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && (
               <div className="mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
