@@ -71,7 +71,10 @@
       "Bash(tee:*)",
       "Bash(git -C /Users/sahanavasanth/Desktop/LavenderCoinApp log --oneline -20)",
       "Bash(vercel env pull:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(xargs ls:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

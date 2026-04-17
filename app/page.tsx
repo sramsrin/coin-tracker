@@ -240,6 +240,8 @@ interface Coin {
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
+  secondarySection?: string;
+  secondarySubsection?: string;
 }
 
 type SortField = keyof Coin;
@@ -1027,29 +1029,28 @@ export default function Home() {
     }
   };
 
-  // Get unique sections and subsections
-  const uniqueSections = Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort();
+  // Get unique sections and subsections (including secondary sections)
+  const uniqueSections = Array.from(new Set([
+    ...coins.map(c => c.section),
+    ...coins.map(c => c.secondarySection).filter(Boolean) as string[],
+  ].filter(Boolean))).sort();
 
-  // Get subsections for a specific section
+  // Get subsections for a specific section (including secondary mappings)
   const getSubsectionsForSection = (section: string) => {
     if (!section) return [];
-    return Array.from(new Set(
-      coins
-        .filter(c => c.section === section)
-        .map(c => c.subsection)
-        .filter(Boolean)
-    )).sort();
+    return Array.from(new Set([
+      ...coins.filter(c => c.section === section).map(c => c.subsection),
+      ...coins.filter(c => c.secondarySection === section).map(c => c.secondarySubsection || ''),
+    ].filter(Boolean))).sort();
   };
 
-  // Get subsubsections for a specific section and subsection
+  // Get subsubsections for a specific section and subsection (including secondary mappings)
   const getSubsubsectionsForSubsection = (section: string, subsection: string) => {
     if (!section || !subsection) return [];
-    return Array.from(new Set(
-      coins
-        .filter(c => c.section === section && c.subsection === subsection)
-        .map(c => c.subsubsection)
-        .filter(Boolean)
-    )).sort();
+    return Array.from(new Set([
+      ...coins.filter(c => c.section === section && c.subsection === subsection).map(c => c.subsubsection),
+      ...coins.filter(c => c.secondarySection === section && (c.secondarySubsection || '') === subsection).map(c => c.subsubsection),
+    ].filter(Boolean))).sort();
   };
 
   // Get subsections for the selected section in add form
@@ -1145,19 +1146,19 @@ export default function Home() {
 
   // Group coins by section, subsection, and subsubsection
   const groupedCoins: { [section: string]: { [subsection: string]: { [subsubsection: string]: Coin[] } } } = {};
+  const addToGroup = (section: string, subsection: string, subsubsection: string, coin: Coin) => {
+    if (!groupedCoins[section]) groupedCoins[section] = {};
+    if (!groupedCoins[section][subsection]) groupedCoins[section][subsection] = {};
+    const sub = subsubsection || 'All';
+    if (!groupedCoins[section][subsection][sub]) groupedCoins[section][subsection][sub] = [];
+    groupedCoins[section][subsection][sub].push(coin);
+  };
   sortedCoins.forEach(coin => {
-    if (!groupedCoins[coin.section]) {
-      groupedCoins[coin.section] = {};
+    addToGroup(coin.section, coin.subsection, coin.subsubsection, coin);
+    // Also add to secondary section if set
+    if (coin.secondarySection) {
+      addToGroup(coin.secondarySection, coin.secondarySubsection || '', coin.subsubsection, coin);
     }
-    if (!groupedCoins[coin.section][coin.subsection]) {
-      groupedCoins[coin.section][coin.subsection] = {};
-    }
-    // If subsubsection is empty, use 'All' as the default grouping
-    const subsubsection = coin.subsubsection || 'All';
-    if (!groupedCoins[coin.section][coin.subsection][subsubsection]) {
-      groupedCoins[coin.section][coin.subsection][subsubsection] = [];
-    }
-    groupedCoins[coin.section][coin.subsection][subsubsection].push(coin);
   });
 
   // Helper function to extract start year from subsection name (e.g., "William IV (1830-1837)" -> 1830)
@@ -2671,12 +2672,15 @@ export default function Home() {
                   {(() => {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
 
-                    // Calculate coin count for current context
+                    // Calculate coin count for current context (including secondary section coins)
                     const filteredCoins = coins.filter(coin => {
-                      if (section && coin.section !== section) return false;
-                      if (subsection && coin.subsection !== subsection) return false;
-                      if (subsubsection && coin.subsubsection !== subsubsection) return false;
-                      return true;
+                      const matchesPrimary = (!section || coin.section === section) &&
+                        (!subsection || coin.subsection === subsection) &&
+                        (!subsubsection || coin.subsubsection === subsubsection);
+                      const matchesSecondary = section && coin.secondarySection === section &&
+                        (!subsection || (coin.secondarySubsection || '') === subsection) &&
+                        (!subsubsection || coin.subsubsection === subsubsection);
+                      return matchesPrimary || matchesSecondary;
                     });
 
                     return (
@@ -2809,7 +2813,10 @@ export default function Home() {
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">Select Section</h3>
 
               {(() => {
-                const allSections = Array.from(new Set(coins.map(c => c.section).filter(Boolean))).sort();
+                const allSections = Array.from(new Set([
+                  ...coins.map(c => c.section),
+                  ...coins.map(c => c.secondarySection).filter(Boolean) as string[],
+                ].filter(Boolean))).sort();
 
                 return (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -3575,17 +3582,15 @@ export default function Home() {
                 <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">{selectedSection} - Subsections</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {(() => {
-                    const subsections = Array.from(new Set(
-                      coins
-                        .filter(c => c.section === selectedSection)
-                        .map(c => c.subsection)
-                        .filter(Boolean)
-                    ));
+                    const subsections = Array.from(new Set([
+                      ...coins.filter(c => c.section === selectedSection).map(c => c.subsection),
+                      ...coins.filter(c => c.secondarySection === selectedSection).map(c => c.secondarySubsection || ''),
+                    ].filter(Boolean)));
                     return sortSubsections(selectedSection, subsections, groupedCoins[selectedSection]);
                   })().map(subsection => {
-                    const subsectionCoins = coins.filter(c =>
-                      c.section === selectedSection && c.subsection === subsection
-                    ).length;
+                    const subsectionCoins = groupedCoins[selectedSection]?.[subsection]
+                      ? Object.values(groupedCoins[selectedSection][subsection]).reduce((s, arr) => s + arr.length, 0)
+                      : 0;
 
                     return (
                       <button

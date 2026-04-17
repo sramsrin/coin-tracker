@@ -19,6 +19,8 @@ interface Coin {
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
+  secondarySection?: string;
+  secondarySubsection?: string;
 }
 
 // Helper function to read coins from KV
@@ -71,6 +73,8 @@ export async function POST(request: NextRequest) {
       matchConfidence: body.matchConfidence || 'High',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
+      ...(body.secondarySection?.trim() && { secondarySection: body.secondarySection.trim() }),
+      ...(body.secondarySubsection?.trim() && { secondarySubsection: body.secondarySubsection.trim() }),
     };
 
     coins.push(newCoin);
