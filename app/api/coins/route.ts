@@ -19,6 +19,7 @@ interface Coin {
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
+  referenceImageUrl?: string;
   secondarySection?: string;
   secondarySubsection?: string;
 }
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
       matchConfidence: body.matchConfidence || 'High',
       image1Url: body.image1Url?.trim() || '',
       image2Url: body.image2Url?.trim() || '',
+      referenceImageUrl: body.referenceImageUrl?.trim() || '',
       ...(body.secondarySection?.trim() && { secondarySection: body.secondarySection.trim() }),
       ...(body.secondarySubsection?.trim() && { secondarySubsection: body.secondarySubsection.trim() }),
     };
@@ -158,7 +160,7 @@ export async function DELETE(request: NextRequest) {
 
     // Clean up blob images if they exist
     if (coinToDelete) {
-      const urlsToDelete = [coinToDelete.image1Url, coinToDelete.image2Url].filter(Boolean) as string[];
+      const urlsToDelete = [coinToDelete.image1Url, coinToDelete.image2Url, coinToDelete.referenceImageUrl].filter(Boolean) as string[];
       if (urlsToDelete.length > 0) {
         try {
           await del(urlsToDelete);

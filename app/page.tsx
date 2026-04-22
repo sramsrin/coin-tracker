@@ -240,6 +240,7 @@ interface Coin {
   matchConfidence: 'High' | 'Medium' | 'Low' | 'None';
   image1Url?: string;
   image2Url?: string;
+  referenceImageUrl?: string;
   secondarySection?: string;
   secondarySubsection?: string;
 }
@@ -443,13 +444,17 @@ export default function Home() {
   // Image upload state for add form
   const [addImage1File, setAddImage1File] = useState<File | null>(null);
   const [addImage2File, setAddImage2File] = useState<File | null>(null);
+  const [addRefImageFile, setAddRefImageFile] = useState<File | null>(null);
   const [addImage1Preview, setAddImage1Preview] = useState<string | null>(null);
   const [addImage2Preview, setAddImage2Preview] = useState<string | null>(null);
+  const [addRefImagePreview, setAddRefImagePreview] = useState<string | null>(null);
   // Image upload state for edit form
   const [editImage1File, setEditImage1File] = useState<File | null>(null);
   const [editImage2File, setEditImage2File] = useState<File | null>(null);
+  const [editRefImageFile, setEditRefImageFile] = useState<File | null>(null);
   const [editImage1Preview, setEditImage1Preview] = useState<string | null>(null);
   const [editImage2Preview, setEditImage2Preview] = useState<string | null>(null);
+  const [editRefImagePreview, setEditRefImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     index: '',
@@ -465,6 +470,7 @@ export default function Home() {
     matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
     image1Url: '',
     image2Url: '',
+    referenceImageUrl: '',
   });
 
   // Load coins on mount and restore authentication
@@ -1261,7 +1267,7 @@ export default function Home() {
         const newCoin = await response.json();
 
         // Upload images if files selected (file upload takes priority over URL)
-        if (addImage1File || addImage2File) {
+        if (addImage1File || addImage2File || addRefImageFile) {
           setIsUploading(true);
           const imageUpdates: Record<string, string> = {};
           if (addImage1File) {
@@ -1271,6 +1277,10 @@ export default function Home() {
           if (addImage2File) {
             const url = await uploadImage(addImage2File);
             if (url) imageUpdates.image2Url = url;
+          }
+          if (addRefImageFile) {
+            const url = await uploadImage(addRefImageFile);
+            if (url) imageUpdates.referenceImageUrl = url;
           }
           if (Object.keys(imageUpdates).length > 0) {
             await fetch(`/api/coins?id=${newCoin.id}`, {
@@ -1298,11 +1308,14 @@ export default function Home() {
           matchConfidence: 'High' as 'High' | 'Medium' | 'Low' | 'None',
           image1Url: '',
           image2Url: '',
+          referenceImageUrl: '',
         });
         setAddImage1File(null);
         setAddImage2File(null);
+        setAddRefImageFile(null);
         setAddImage1Preview(null);
         setAddImage2Preview(null);
+        setAddRefImagePreview(null);
         // Refresh coins list
         fetchCoins();
       }
@@ -1315,8 +1328,10 @@ export default function Home() {
     setEditingCoin(coin);
     setEditImage1File(null);
     setEditImage2File(null);
+    setEditRefImageFile(null);
     setEditImage1Preview(null);
     setEditImage2Preview(null);
+    setEditRefImagePreview(null);
     setEditFormData({
       index: coin.index,
       section: coin.section,
@@ -1331,6 +1346,7 @@ export default function Home() {
       matchConfidence: coin.matchConfidence,
       image1Url: coin.image1Url || '',
       image2Url: coin.image2Url || '',
+      referenceImageUrl: coin.referenceImageUrl || '',
     });
   };
 
@@ -1349,6 +1365,10 @@ export default function Home() {
         const url = await uploadImage(editImage2File);
         if (url) imageUpdates.image2Url = url;
       }
+      if (editRefImageFile) {
+        const url = await uploadImage(editRefImageFile);
+        if (url) imageUpdates.referenceImageUrl = url;
+      }
       setIsUploading(false);
 
       const response = await fetch(`/api/coins?id=${editingCoin.id}`, {
@@ -1362,6 +1382,7 @@ export default function Home() {
           // File uploads override URL field values
           ...(imageUpdates.image1Url ? { image1Url: imageUpdates.image1Url } : {}),
           ...(imageUpdates.image2Url ? { image2Url: imageUpdates.image2Url } : {}),
+          ...(imageUpdates.referenceImageUrl ? { referenceImageUrl: imageUpdates.referenceImageUrl } : {}),
         }),
       });
 
@@ -1371,8 +1392,10 @@ export default function Home() {
         setEditFormData({});
         setEditImage1File(null);
         setEditImage2File(null);
+        setEditRefImageFile(null);
         setEditImage1Preview(null);
         setEditImage2Preview(null);
+        setEditRefImagePreview(null);
       }
     } catch (error) {
       console.error('Error updating coin:', error);
@@ -1896,6 +1919,37 @@ export default function Home() {
                   )}
                 </div>
               </div>
+              <div className="mt-3">
+                <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
+                <input
+                  type="url"
+                  value={formData.referenceImageUrl}
+                  onChange={(e) => { setFormData({ ...formData, referenceImageUrl: e.target.value }); setAddRefImageFile(null); setAddRefImagePreview(null); }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                  placeholder="Paste reference image URL..."
+                />
+                <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setAddRefImageFile(file);
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setAddRefImagePreview(reader.result as string);
+                      reader.readAsDataURL(file);
+                      setFormData({ ...formData, referenceImageUrl: '' });
+                    } else {
+                      setAddRefImagePreview(null);
+                    }
+                  }}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                />
+                {(addRefImagePreview || formData.referenceImageUrl) && (
+                  <img src={addRefImagePreview || formData.referenceImageUrl} alt="Reference preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                )}
+              </div>
             </div>
             <div className="md:col-span-3">
               <button
@@ -2190,6 +2244,11 @@ export default function Home() {
                                                 <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
                                               </a>
                                             )}
+                                            {coin.referenceImageUrl && (
+                                              <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
+                                                <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-purple-200 hover:border-purple-400 transition" />
+                                              </a>
+                                            )}
                                           </div>
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs">
@@ -2317,6 +2376,11 @@ export default function Home() {
                           {coin.image2Url && (
                             <a href={coin.image2Url} target="_blank" rel="noopener noreferrer">
                               <img src={coin.image2Url} alt="Reverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
+                            </a>
+                          )}
+                          {coin.referenceImageUrl && (
+                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-purple-200 hover:border-purple-400 transition" />
                             </a>
                           )}
                         </div>
@@ -2562,6 +2626,37 @@ export default function Home() {
                           <img src={editImage2Preview || editFormData.image2Url || ''} alt="Reverse preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
                         )}
                       </div>
+                    </div>
+                    <div className="mt-3">
+                      <label className="block text-xs text-gray-500 mb-1">Reference Image</label>
+                      <input
+                        type="url"
+                        value={editFormData.referenceImageUrl || ''}
+                        onChange={(e) => { setEditFormData({ ...editFormData, referenceImageUrl: e.target.value }); setEditRefImageFile(null); setEditRefImagePreview(null); }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 mb-1"
+                        placeholder="Paste reference image URL..."
+                      />
+                      <span className="block text-xs text-gray-400 mb-1">or upload a file:</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setEditRefImageFile(file);
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => setEditRefImagePreview(reader.result as string);
+                            reader.readAsDataURL(file);
+                            setEditFormData({ ...editFormData, referenceImageUrl: '' });
+                          } else {
+                            setEditRefImagePreview(null);
+                          }
+                        }}
+                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                      />
+                      {(editRefImagePreview || editFormData.referenceImageUrl) && (
+                        <img src={editRefImagePreview || editFormData.referenceImageUrl || ''} alt="Reference preview" className="mt-2 h-24 rounded border border-gray-200 object-contain" />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -3539,6 +3634,11 @@ export default function Home() {
                           {coin.image2Url && (
                             <a href={coin.image2Url} target="_blank" rel="noopener noreferrer" className="block">
                               <img src={coin.image2Url} alt="Reverse" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition" />
+                            </a>
+                          )}
+                          {coin.referenceImageUrl && (
+                            <a href={coin.referenceImageUrl} target="_blank" rel="noopener noreferrer" className="block">
+                              <img src={coin.referenceImageUrl} alt="Reference" className="rounded-lg shadow-md max-h-72 object-contain hover:opacity-90 transition border-2 border-purple-200" />
                             </a>
                           )}
                         </div>
