@@ -1249,9 +1249,21 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Auto-populate secondary section from existing coins with the same classification
+    const matchingCoin = coins.find(c =>
+      c.section === formData.section &&
+      c.subsection === formData.subsection &&
+      c.subsubsection === formData.subsubsection &&
+      c.secondarySection
+    );
+
     const coinData = {
       ...formData,
       index: addCoinInTransit ? IN_TRANSIT_INDEX : (formData.index?.trim() || getNextIndex()),
+      ...(matchingCoin?.secondarySection ? {
+        secondarySection: matchingCoin.secondarySection,
+        secondarySubsection: matchingCoin.secondarySubsection || '',
+      } : {}),
     };
 
     try {
