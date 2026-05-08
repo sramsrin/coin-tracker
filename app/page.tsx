@@ -2925,15 +2925,15 @@ export default function Home() {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
                     if (!section) return null;
 
-                    // Determine which dynasties match the current selection (most specific wins)
+                    // Determine which dynasties match the current selection (most specific level only, no fallthrough)
                     const { sectionToDynasties, subsectionToDynasties, subsubsectionToDynasties } = dynastyMapping;
                     let matchDynasties: string[] = [];
-                    if (subsubsection && subsubsectionToDynasties[subsubsection as keyof typeof subsubsectionToDynasties]) {
-                      matchDynasties = subsubsectionToDynasties[subsubsection as keyof typeof subsubsectionToDynasties];
-                    } else if (subsection && subsectionToDynasties[subsection as keyof typeof subsectionToDynasties]) {
-                      matchDynasties = subsectionToDynasties[subsection as keyof typeof subsectionToDynasties];
-                    } else if (sectionToDynasties[section as keyof typeof sectionToDynasties]) {
-                      matchDynasties = sectionToDynasties[section as keyof typeof sectionToDynasties];
+                    if (subsubsection) {
+                      matchDynasties = subsubsectionToDynasties[subsubsection as keyof typeof subsubsectionToDynasties] || [];
+                    } else if (subsection) {
+                      matchDynasties = subsectionToDynasties[subsection as keyof typeof subsectionToDynasties] || [];
+                    } else {
+                      matchDynasties = sectionToDynasties[section as keyof typeof sectionToDynasties] || [];
                     }
 
                     if (matchDynasties.length === 0) return null;
