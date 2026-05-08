@@ -11,6 +11,7 @@ interface TimelineEntry {
   place: string;
   description: string;
   source: string;
+  sourceUrl?: string;
   verified: boolean;
   dynasty: string;
   people?: string[];
@@ -28,6 +29,7 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   place: '',
   description: '',
   source: '',
+  sourceUrl: '',
   verified: false,
   dynasty: '',
   people: [],
@@ -163,6 +165,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
       place: entry.place,
       description: entry.description,
       source: entry.source,
+      sourceUrl: entry.sourceUrl || '',
       verified: entry.verified,
       dynasty: entry.dynasty,
       people: entry.people || [],
@@ -420,7 +423,21 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                     )}
 
                     {/* Source */}
-                    <div className="mt-2 text-[10px] text-gray-400">Source: {entry.source}</div>
+                    <div className="mt-2 text-[10px] text-gray-400">
+                      Source:{' '}
+                      {entry.sourceUrl ? (
+                        <a
+                          href={entry.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-pink-500 hover:text-pink-700 underline"
+                        >
+                          {entry.source}
+                        </a>
+                      ) : (
+                        entry.source
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -550,14 +567,26 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                 </div>
 
                 {/* Source */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Source (blog post)</label>
-                  <input
-                    type="text"
-                    value={formData.source}
-                    onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Source (blog post)</label>
+                    <input
+                      type="text"
+                      value={formData.source}
+                      onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Source URL</label>
+                    <input
+                      type="url"
+                      value={formData.sourceUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                      placeholder="https://..."
+                    />
+                  </div>
                 </div>
 
                 {/* Verified */}

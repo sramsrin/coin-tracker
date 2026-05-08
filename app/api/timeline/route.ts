@@ -12,6 +12,7 @@ interface TimelineEntry {
   place: string;
   description: string;
   source: string;
+  sourceUrl?: string;
   verified: boolean;
   dynasty: string;
   people?: string[];
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
       place: body.place?.trim() || '',
       description: body.description?.trim() || '',
       source: body.source?.trim() || '',
+      ...(body.sourceUrl?.trim() && { sourceUrl: body.sourceUrl.trim() }),
       verified: body.verified || false,
       dynasty: body.dynasty?.trim() || '',
       ...(body.people?.length && { people: body.people }),
