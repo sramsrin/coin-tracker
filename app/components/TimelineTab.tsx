@@ -64,6 +64,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [saving, setSaving] = useState(false);
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -360,27 +361,25 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <div
                     className={`border-l-4 ${
                       entry.verified ? 'border-l-green-500' : battle ? 'border-l-red-400' : 'border-l-purple-400'
-                    } bg-white rounded-lg shadow-sm p-3 hover:shadow-md transition`}
+                    } bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
+                    onClick={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
                   >
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {battle && (
-                            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
-                              Battle
-                            </span>
-                          )}
-                          <h3 className="font-semibold text-gray-800 text-sm">{entry.name}</h3>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 flex-wrap">
-                          <span>{entry.time}</span>
-                          <span>·</span>
-                          <span>{entry.place}</span>
-                        </div>
+                    {/* Collapsed header - always visible */}
+                    <div className="flex items-center justify-between gap-2 p-3">
+                      <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
+                        {battle && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700 flex-shrink-0">
+                            Battle
+                          </span>
+                        )}
+                        <h3 className="font-semibold text-gray-800 text-sm">{entry.name}</h3>
+                        <span className="text-xs text-gray-400">{entry.time}</span>
+                        <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${expandedId === entry.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
                       </div>
 
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                         {isAuthenticated && (
                           <button
                             onClick={() => handleVerifiedToggle(entry)}
@@ -417,65 +416,74 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       </div>
                     </div>
 
-                    {/* Dynasty badges */}
-                    {entry.dynasty.length > 0 && (
-                      <div className="mt-2 flex gap-1 flex-wrap">
-                        {entry.dynasty.map((d, i) => (
-                          <span key={i} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
-                            {d}
-                          </span>
-                        ))}
+                    {/* Expanded content */}
+                    {expandedId === entry.id && (
+                      <div className="px-3 pb-3 border-t border-gray-100 pt-2">
+                        {/* Place */}
+                        <div className="text-xs text-gray-500 mb-2">{entry.place}</div>
+
+                        {/* Dynasty badges */}
+                        {entry.dynasty.length > 0 && (
+                          <div className="flex gap-1 flex-wrap mb-2">
+                            {entry.dynasty.map((d, i) => (
+                              <span key={i} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
+                                {d}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Description */}
+                        <p className="text-xs text-gray-600 leading-relaxed">{entry.description}</p>
+
+                        {/* Battle details */}
+                        {battle && (
+                          <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
+                            {entry.sideA && (
+                              <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{entry.sideA}</span></div>
+                            )}
+                            {entry.sideB && (
+                              <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{entry.sideB}</span></div>
+                            )}
+                            {entry.victor && (
+                              <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{entry.victor}</span></div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Part of */}
+                        {entry.partOf && (
+                          <div className="mt-1.5 text-[10px] text-purple-600">Part of: {entry.partOf}</div>
+                        )}
+
+                        {/* People */}
+                        {entry.people && entry.people.length > 0 && (
+                          <div className="flex gap-1 mt-2 flex-wrap">
+                            {entry.people.map((p, i) => (
+                              <span key={i} className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{p}</span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Source */}
+                        <div className="mt-2 text-[10px] text-gray-400">
+                          Source:{' '}
+                          {entry.sourceUrl ? (
+                            <a
+                              href={entry.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-pink-500 hover:text-pink-700 underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {entry.source}
+                            </a>
+                          ) : (
+                            entry.source
+                          )}
+                        </div>
                       </div>
                     )}
-
-                    {/* Description */}
-                    <p className="text-xs text-gray-600 mt-2 leading-relaxed">{entry.description}</p>
-
-                    {/* Battle details */}
-                    {battle && (
-                      <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
-                        {entry.sideA && (
-                          <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{entry.sideA}</span></div>
-                        )}
-                        {entry.sideB && (
-                          <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{entry.sideB}</span></div>
-                        )}
-                        {entry.victor && (
-                          <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{entry.victor}</span></div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Part of */}
-                    {entry.partOf && (
-                      <div className="mt-1.5 text-[10px] text-purple-600">Part of: {entry.partOf}</div>
-                    )}
-
-                    {/* People */}
-                    {entry.people && entry.people.length > 0 && (
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {entry.people.map((p, i) => (
-                          <span key={i} className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{p}</span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Source */}
-                    <div className="mt-2 text-[10px] text-gray-400">
-                      Source:{' '}
-                      {entry.sourceUrl ? (
-                        <a
-                          href={entry.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-pink-500 hover:text-pink-700 underline"
-                        >
-                          {entry.source}
-                        </a>
-                      ) : (
-                        entry.source
-                      )}
-                    </div>
                   </div>
                 </div>
               );
