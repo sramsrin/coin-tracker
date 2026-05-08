@@ -19,6 +19,7 @@ interface TimelineEntry {
   sideB?: string;
   victor?: string;
   partOf?: string;
+  southIndia?: boolean;
 }
 
 const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
@@ -65,6 +66,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [southIndiaOnly, setSouthIndiaOnly] = useState(true);
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -104,6 +106,11 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const filtered = useMemo(() => {
     let result = entries;
 
+    // South India filter (entries without the field default to true)
+    if (southIndiaOnly) {
+      result = result.filter((e) => e.southIndia !== false);
+    }
+
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
       result = result.filter((e) =>
         e.dynasty.some(d => multiDynastyFilter.includes(d)) ||
@@ -136,7 +143,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     }
 
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
-  }, [entries, search, dynastyFilter, multiDynastyFilter]);
+  }, [entries, search, dynastyFilter, multiDynastyFilter, southIndiaOnly]);
 
   const groupedByEra = useMemo(() => {
     const groups: { era: string; entries: TimelineEntry[] }[] = [];
@@ -315,6 +322,19 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
               </button>
             )}
           </div>
+
+          {/* South India toggle */}
+          <button
+            onClick={() => setSouthIndiaOnly(!southIndiaOnly)}
+            className={`px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap border ${
+              southIndiaOnly
+                ? 'bg-purple-100 text-purple-700 border-purple-300'
+                : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+            }`}
+            title={southIndiaOnly ? 'Showing South India events only. Click to show all.' : 'Showing all events. Click to filter to South India.'}
+          >
+            {southIndiaOnly ? 'South India' : 'All Regions'}
+          </button>
 
           {isAuthenticated && (
             <button
