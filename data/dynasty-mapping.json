@@ -1,6 +1,6 @@
 {
   "sectionToDynasties": {
-    "Tamil Kingdoms": ["Chola Empire", "Pandyas", "Madurai Sultanate", "Madurai Nayaks", "Gingee Nayaks", "Sivagangai"],
+    "Tamil Kingdoms": ["Chola Empire", "Pandyas", "Madurai Sultanate", "Madurai Nayaks", "Gingee Nayaks", "Sivagangai", "Nawab of Arcot / Carnatic", "Nawab of Arcot", "Gingee Maratha", "Thanjavur Marathas", "Thanjavur Nayak"],
     "British India Presidencies": ["British East India Company"],
     "British India Uniform Coinage": ["British East India Company"],
     "British India Princely States": ["Mysore Kingdom", "Nawab of Arcot / Carnatic", "Nawab of Arcot", "Venad / Travancore", "Pudukottai"],
@@ -14,6 +14,8 @@
     "Madurai Nayak": ["Madurai Nayaks"],
     "Gingee Nayak": ["Gingee Nayaks"],
     "Sivagangai": ["Sivagangai"],
+    "Gingee Marathas": ["Gingee Maratha"],
+    "Thanjavur Nayak": ["Thanjavur Nayak"],
     "French India": ["French East India Company"],
     "Dutch East India Company": ["Dutch East India Company"],
     "Danish East India Company": ["Danish"],
