@@ -1,672 +1,6 @@
 [
   {
     "id": "1",
-    "type": "person",
-    "name": "Aditya Chola",
-    "time": "~900 AD",
-    "timeStart": 900,
-    "timeEnd": null,
-    "place": "Kaveri Delta",
-    "description": "Small-time warlord who became \"Big Dog\" of Kaveri Delta; ambushed and killed Pallava king for \"street cred\"; claimed descent from Sangam Cholas",
-    "source": "Cholas Part 1",
-    "verified": false
-  },
-  {
-    "id": "2",
-    "type": "person",
-    "name": "Parantaka Chola",
-    "time": "~900-950 AD",
-    "timeStart": 900,
-    "timeEnd": 950,
-    "place": "Kaveri Delta/Tamil Nadu",
-    "description": "Son of Aditya; united Delta warlords; defeated Pandyas and Pallavas; tried to raid Sri Lanka; humbled by Rashtrakutas who killed his son Rajaditya",
-    "source": "Cholas Part 1",
-    "verified": false
-  },
-  {
-    "id": "3",
-    "type": "person",
-    "name": "Rajaditya",
-    "time": "~950 AD",
-    "timeStart": 950,
-    "timeEnd": null,
-    "place": "Tamil Nadu",
-    "description": "Crown prince, son of Parantaka; killed by Rashtrakutas in battle",
-    "source": "Cholas Part 1",
-    "verified": false
-  },
-  {
-    "id": "4",
-    "type": "person",
-    "name": "Aditya Karikalan",
-    "time": "~960s AD",
-    "timeStart": 960,
-    "timeEnd": null,
-    "place": "Kaveri Delta",
-    "description": "Chola prince, murdered by Brahmins from Chola court; Ponniyin Selvan novel set in this period",
-    "source": "Cholas Part 1",
-    "verified": false
-  },
-  {
-    "id": "5",
-    "type": "person",
-    "name": "Rajaraja Cholan",
-    "time": "~985-1014 AD",
-    "timeStart": 985,
-    "timeEnd": 1014,
-    "place": "Thanjavur/Tamil Nadu",
-    "description": "Emerged from chaos; expanded Chola empire in all directions; built Thanjavur Periya Kovil (Big Temple); set up efficient revenue system",
-    "source": "Cholas Part 1, Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "6",
-    "type": "person",
-    "name": "Rajendra Chola",
-    "time": "~1014-1044 AD",
-    "timeStart": 1014,
-    "timeEnd": 1044,
-    "place": "Gangaikondacholapuram/Tamil Nadu",
-    "description": "Son of Rajaraja; expanded even further including Bengal coast and overseas; built rival temple at Gangaikondacholapuram",
-    "source": "Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "7",
-    "type": "person",
-    "name": "Uttama Chola",
-    "time": "~970-985 AD",
-    "timeStart": 970,
-    "timeEnd": 985,
-    "place": "Kaveri Delta",
-    "description": "Began the efficient revenue extraction system that Rajaraja perfected",
-    "source": "Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "8",
-    "type": "person",
-    "name": "Sembiyan Mahadevi",
-    "time": "~10th century AD",
-    "timeStart": 900,
-    "timeEnd": 999,
-    "place": "Tamil Nadu",
-    "description": "Renovated nearly 20 temples",
-    "source": "Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "9",
-    "type": "person",
-    "name": "Krishnadevaraya",
-    "time": "~1529",
-    "timeStart": 1529,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Vijayanagara emperor; sent Nayaka governor to Madurai when Pandyas could no longer maintain order",
-    "source": "Madurai Through the Ages",
-    "verified": false
-  },
-  {
-    "id": "10",
-    "type": "person",
-    "name": "Thirumalai Nayak",
-    "time": "1600s",
-    "timeStart": 1600,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Most famous Madurai Nayak ruler; built grand palace still standing; rebuilt large portions of Meenakshi Temple",
-    "source": "Madurai Through the Ages",
-    "verified": false
-  },
-  {
-    "id": "11",
-    "type": "person",
-    "name": "Vasco da Gama",
-    "time": "1498",
-    "timeStart": 1498,
-    "timeEnd": null,
-    "place": "Calicut",
-    "description": "Portuguese explorer, first European to reach India by sea",
-    "source": "Corporate Warfare",
-    "verified": false
-  },
-  {
-    "id": "12",
-    "type": "person",
-    "name": "Nader Shah",
-    "time": "1739",
-    "timeStart": 1739,
-    "timeEnd": null,
-    "place": "Delhi",
-    "description": "Persian invader who looted Mughal treasury; invasion hollowed out Mughal central authority",
-    "source": "How Did a Joint-Stock Company..., Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "13",
-    "type": "person",
-    "name": "Aurangzeb",
-    "time": "1675-1700",
-    "timeStart": 1675,
-    "timeEnd": 1700,
-    "place": "Deccan/Tamil Nadu",
-    "description": "Mughal emperor, defeated Deccan sultanates, appointed Nizam of Hyderabad",
-    "source": "Blog 1 (17th Century)",
-    "verified": false
-  },
-  {
-    "id": "14",
-    "type": "person",
-    "name": "Tej Singh / Desingaraja",
-    "time": "~1700",
-    "timeStart": 1700,
-    "timeEnd": null,
-    "place": "Gingee",
-    "description": "Local chieftain at Gingee Fort, fell into tax arrears, Nawab attacked the fort",
-    "source": "Blog 1 (17th Century), Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "15",
-    "type": "person",
-    "name": "Ramnad Sethupathi",
-    "time": "1707",
-    "timeStart": 1707,
-    "timeEnd": null,
-    "place": "Ramnad",
-    "description": "Declared independence from Madurai Nayaks, emerged as regional power",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "16",
-    "type": "person",
-    "name": "Ramnad Sethupathi",
-    "time": "1801",
-    "timeStart": 1801,
-    "timeEnd": null,
-    "place": "Ramnad",
-    "description": "Allied with British during Polygar Wars",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "17",
-    "type": "person",
-    "name": "Meenakshi (Queen Regent)",
-    "time": "1736",
-    "timeStart": 1736,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Queen Regent of Madurai Nayaks, requested aid from Chanda Sahib to quell rebellion, was betrayed",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "18",
-    "type": "person",
-    "name": "Chanda Sahib",
-    "time": "1736",
-    "timeStart": 1736,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Nephew of Nawab of Arcot, seized Madurai using fake Quran trick",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "19",
-    "type": "person",
-    "name": "Chanda Sahib",
-    "time": "1740",
-    "timeStart": 1740,
-    "timeEnd": null,
-    "place": "Tamil Nadu",
-    "description": "Captured by invading Marathas",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "20",
-    "type": "person",
-    "name": "Chanda Sahib",
-    "time": "1749-1752",
-    "timeStart": 1749,
-    "timeEnd": 1752,
-    "place": "Arcot/Trichy",
-    "description": "French-backed candidate for Nawab, besieged Trichy, beheaded by Manakji",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "21",
-    "type": "person",
-    "name": "Anwar-ud-din Khan",
-    "time": "1740s",
-    "timeStart": 1740,
-    "timeEnd": null,
-    "place": "Arcot",
-    "description": "Nawab of Carnatic, sent army to discipline French",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "22",
-    "type": "person",
-    "name": "Anwar-ud-din Khan",
-    "time": "1746",
-    "timeStart": 1746,
-    "timeEnd": null,
-    "place": "Adyar/Madras",
-    "description": "His army shattered at Battle of Adyar by French",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "23",
-    "type": "person",
-    "name": "Anwar-ud-din Khan",
-    "time": "1749",
-    "timeStart": 1749,
-    "timeEnd": null,
-    "place": "Ambur",
-    "description": "Killed at Battle of Ambur",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "24",
-    "type": "person",
-    "name": "La Bourdonnais",
-    "time": "1746",
-    "timeStart": 1746,
-    "timeEnd": null,
-    "place": "Fort St. George/Madras",
-    "description": "French commander, captured Fort St. George",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "25",
-    "type": "person",
-    "name": "Dupleix (Joseph Francois)",
-    "time": "1746-1754",
-    "timeStart": 1746,
-    "timeEnd": 1754,
-    "place": "Pondicherry",
-    "description": "French Governor, began interfering in local politics after witnessing military superiority",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "26",
-    "type": "person",
-    "name": "Robert Clive",
-    "time": "1746-1748",
-    "timeStart": 1746,
-    "timeEnd": 1748,
-    "place": "Fort St. David",
-    "description": "First saw action during failed French attack",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "27",
-    "type": "person",
-    "name": "Robert Clive",
-    "time": "1751",
-    "timeStart": 1751,
-    "timeEnd": null,
-    "place": "Arcot",
-    "description": "Led famous Siege of Arcot, brilliant diversion that relieved Trichy",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "28",
-    "type": "person",
-    "name": "Muhammad Ali Khan Wallajah",
-    "time": "1749",
-    "timeStart": 1749,
-    "timeEnd": null,
-    "place": "Trichy",
-    "description": "Fled to Trichy Rockfort after father killed at Ambur",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "29",
-    "type": "person",
-    "name": "Muhammad Ali Khan Wallajah",
-    "time": "1752-1761",
-    "timeStart": 1752,
-    "timeEnd": 1761,
-    "place": "Arcot",
-    "description": "Installed as Nawab of Arcot after Chanda Sahib's death",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "30",
-    "type": "person",
-    "name": "Muhammad Ali Khan Wallajah",
-    "time": "1761+",
-    "timeStart": 1761,
-    "timeEnd": null,
-    "place": "Arcot",
-    "description": "Nominal ruler, drowning in debt to British (Arcot debts), relied on British bayonets",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "31",
-    "type": "person",
-    "name": "Muzaffar Jung",
-    "time": "1749",
-    "timeStart": 1749,
-    "timeEnd": null,
-    "place": "Hyderabad",
-    "description": "French-backed candidate for Nizam",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "32",
-    "type": "person",
-    "name": "Nasir Jung",
-    "time": "1749",
-    "timeStart": 1749,
-    "timeEnd": null,
-    "place": "Hyderabad",
-    "description": "British-backed candidate for Nizam",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "33",
-    "type": "person",
-    "name": "Manakji",
-    "time": "1752",
-    "timeStart": 1752,
-    "timeEnd": null,
-    "place": "Thanjavur",
-    "description": "General of Thanjavur Marathas, captured and beheaded Chanda Sahib",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "34",
-    "type": "person",
-    "name": "Haider Ali",
-    "time": "~1752-1755",
-    "timeStart": 1752,
-    "timeEnd": 1755,
-    "place": "Trichy",
-    "description": "Young army general on Mysore side during siege of Trichy",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "35",
-    "type": "person",
-    "name": "Haider Ali",
-    "time": "1763-1782",
-    "timeStart": 1763,
-    "timeEnd": 1782,
-    "place": "Tamil Nadu/Dindigul",
-    "description": "Sultan of Mysore, raided Tamil Nadu during Anglo-Mysore Wars",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "36",
-    "type": "person",
-    "name": "Yusuf Khan (Marudhunayagam)",
-    "time": "~1751",
-    "timeStart": 1751,
-    "timeEnd": null,
-    "place": "Trichy",
-    "description": "Served under Chanda Sahib and French, laid siege to Trichy",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false,
-    "affiliations": ["French", "British", "Independent"]
-  },
-  {
-    "id": "37",
-    "type": "person",
-    "name": "Yusuf Khan (Marudhunayagam)",
-    "time": "~1752-1755",
-    "timeStart": 1752,
-    "timeEnd": 1755,
-    "place": "Trichy",
-    "description": "Switched to British service, broke through enemy lines to supply besieged Trichy, refused Mysore bribe, exposed turncoat Ponniappan",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false,
-    "affiliations": ["French", "British", "Independent"]
-  },
-  {
-    "id": "38",
-    "type": "person",
-    "name": "Yusuf Khan (Marudhunayagam)",
-    "time": "late 1750s",
-    "timeStart": 1757,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Became de facto governor of Madurai and far south",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false,
-    "affiliations": ["French", "British", "Independent"]
-  },
-  {
-    "id": "39",
-    "type": "person",
-    "name": "Yusuf Khan (Marudhunayagam)",
-    "time": "~1760",
-    "timeStart": 1760,
-    "timeEnd": null,
-    "place": "Tirunelveli",
-    "description": "Fought Puli Thevar at Nel-kattum-seval fort",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false,
-    "affiliations": ["French", "British", "Independent"]
-  },
-  {
-    "id": "40",
-    "type": "person",
-    "name": "Yusuf Khan (Marudhunayagam)",
-    "time": "1763",
-    "timeStart": 1763,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Rebelled against Nawab and Company, besieged, betrayed by internal mutiny (Marchand, Srinivasa Rao, Baba Sahib), executed",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false,
-    "affiliations": ["French", "British", "Independent"]
-  },
-  {
-    "id": "41",
-    "type": "person",
-    "name": "Ponniappan",
-    "time": "~1752-1755",
-    "timeStart": 1752,
-    "timeEnd": 1755,
-    "place": "Trichy",
-    "description": "In Yusuf Khan's service, offered bribe by Mysore to turn against British, exposed by Yusuf Khan",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "42",
-    "type": "person",
-    "name": "Mahfuz Khan",
-    "time": "1755",
-    "timeStart": 1755,
-    "timeEnd": null,
-    "place": "Trichy",
-    "description": "Elder brother of Nawab Wallajah, appointed governor of Trichy/Madurai/South",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "43",
-    "type": "person",
-    "name": "Mahfuz Khan",
-    "time": "1761+",
-    "timeStart": 1761,
-    "timeEnd": null,
-    "place": "Tirunelveli/Madurai",
-    "description": "Poor job stabilizing region, couldn't collect revenue from Polygars, influence declined",
-    "source": "Blog 2 (1700-1761), Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "44",
-    "type": "person",
-    "name": "Count de Lally",
-    "time": "1758",
-    "timeStart": 1758,
-    "timeEnd": null,
-    "place": "Arcot",
-    "description": "Aggressive French commander, captured Arcot",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "45",
-    "type": "person",
-    "name": "Count de Lally",
-    "time": "1760",
-    "timeStart": 1760,
-    "timeEnd": null,
-    "place": "Wandiwash",
-    "description": "Defeated by British at Battle of Wandiwash",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "46",
-    "type": "person",
-    "name": "Count de Lally",
-    "time": "1760-1761",
-    "timeStart": 1760,
-    "timeEnd": 1761,
-    "place": "Pondicherry",
-    "description": "Captured when British besieged Pondicherry",
-    "source": "Blog 2 (1700-1761)",
-    "verified": false
-  },
-  {
-    "id": "47",
-    "type": "person",
-    "name": "Puli Thevar",
-    "time": "~1760",
-    "timeStart": 1760,
-    "timeEnd": null,
-    "place": "Tirunelveli/Nel-kattum-seval",
-    "description": "Organized Tirunelveli polygars in resistance against revenue collection, fought Yusuf Khan",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "48",
-    "type": "person",
-    "name": "Marchand",
-    "time": "1763",
-    "timeStart": 1763,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Frenchman who led internal mutiny against Yusuf Khan",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "49",
-    "type": "person",
-    "name": "Srinivasa Rao",
-    "time": "1763",
-    "timeStart": 1763,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Participant in mutiny against Yusuf Khan",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "50",
-    "type": "person",
-    "name": "Baba Sahib",
-    "time": "1763",
-    "timeStart": 1763,
-    "timeEnd": null,
-    "place": "Madurai",
-    "description": "Participant in mutiny against Yusuf Khan",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "51",
-    "type": "person",
-    "name": "Tipu Sultan",
-    "time": "1782-1799",
-    "timeStart": 1782,
-    "timeEnd": 1799,
-    "place": "Tamil Nadu",
-    "description": "Son of Haider Ali, continued raids on Tamil Nadu",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "52",
-    "type": "person",
-    "name": "Tipu Sultan",
-    "time": "1799",
-    "timeStart": 1799,
-    "timeEnd": null,
-    "place": "Srirangapatnam",
-    "description": "Killed at fall of Srirangapatnam",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "53",
-    "type": "person",
-    "name": "Veerapandiya Kattabomman",
-    "time": "1799",
-    "timeStart": 1799,
-    "timeEnd": null,
-    "place": "Panchalankurichi",
-    "description": "Polygar who refused to pay taxes, betrayed by Ettayapuram Polygar and Pudukottai Tondaiman Raja",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "54",
-    "type": "person",
-    "name": "Marudhu Brothers",
-    "time": "1801",
-    "timeStart": 1801,
-    "timeEnd": null,
-    "place": "Sivagangai",
-    "description": "Led Second Polygar War with escaped Kattabomman associates, caught and hanged",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "55",
-    "type": "person",
-    "name": "Tipu's Sons",
-    "time": "1806",
-    "timeStart": 1806,
-    "timeEnd": null,
-    "place": "Vellore",
-    "description": "Stationed at Vellore Fort, connected to Vellore Mutiny",
-    "source": "Blog 4 (1761-1808)",
-    "verified": false
-  },
-  {
-    "id": "56",
-    "type": "event",
     "name": "Cholas Unite the Kaveri Delta",
     "time": "~900 AD",
     "timeStart": 900,
@@ -675,11 +9,14 @@
     "description": "Aditya and Parantaka Chola unite small warlords through incentives (shared loot from raids), killing the Pallava king, and claiming Sangam-era Chola lineage",
     "source": "Cholas Part 1",
     "verified": false,
-    "relatedEntities": ["Aditya Chola", "Parantaka Chola"]
+    "dynasty": "Chola Empire",
+    "people": [
+      "Aditya Chola",
+      "Parantaka Chola"
+    ]
   },
   {
-    "id": "57",
-    "type": "event",
+    "id": "2",
     "name": "Cholas Defeat Pandyas and Pallavas",
     "time": "~920-940 AD",
     "timeStart": 920,
@@ -688,11 +25,16 @@
     "description": "United Kaveri Delta cartel defeats exhausted Pandyas and Pallavas; Parantaka even tries to raid Sri Lanka",
     "source": "Cholas Part 1",
     "verified": false,
-    "relatedEntities": ["Parantaka Chola"]
+    "dynasty": "Chola Empire",
+    "sideA": "Chola Empire",
+    "sideB": "Pandyas / Pallavas",
+    "victor": "Chola Empire",
+    "people": [
+      "Parantaka Chola"
+    ]
   },
   {
-    "id": "58",
-    "type": "event",
+    "id": "3",
     "name": "Rashtrakuta Invasion of Tamil Nadu",
     "time": "~950 AD",
     "timeStart": 950,
@@ -701,11 +43,17 @@
     "description": "Rashtrakutas decimate Chola army, kill crown prince Rajaditya, drive Parantaka from Thanjavur, reach Rameswaram; leave inscription; keep Tondai Nadu as buffer zone",
     "source": "Cholas Part 1",
     "verified": false,
-    "relatedEntities": ["Rajaditya", "Parantaka Chola"]
+    "dynasty": "Rashtrakutas",
+    "sideA": "Rashtrakutas",
+    "sideB": "Chola Empire",
+    "victor": "Rashtrakutas",
+    "people": [
+      "Rajaditya",
+      "Parantaka Chola"
+    ]
   },
   {
-    "id": "59",
-    "type": "event",
+    "id": "4",
     "name": "Fall of the Rashtrakutas",
     "time": "~972 AD",
     "timeStart": 972,
@@ -713,11 +61,12 @@
     "place": "Deccan",
     "description": "Warlord from northern frontier defeats Rashtrakuta king, ransacks capital; creates power vacuum south of Vindhyas; Cholas had nothing to do with it but benefited",
     "source": "Cholas Part 2",
-    "verified": false
+    "verified": false,
+    "dynasty": "Rashtrakutas",
+    "people": []
   },
   {
-    "id": "60",
-    "type": "event",
+    "id": "5",
     "name": "Chola Peak: Plunder in All Directions",
     "time": "~985-1044 AD",
     "timeStart": 985,
@@ -726,11 +75,14 @@
     "description": "Without Rashtrakutas to stop them, Cholas plunder north (Rashtrakuta territory), northeast (Bengal coast), south (Pandya + Sri Lanka), west (Chera territory + Arabian Sea), and overseas (Indonesia/Malaysia on merchant ships)",
     "source": "Cholas Part 2",
     "verified": false,
-    "relatedEntities": ["Rajaraja Cholan", "Rajendra Chola"]
+    "dynasty": "Chola Empire",
+    "people": [
+      "Rajaraja Cholan",
+      "Rajendra Chola"
+    ]
   },
   {
-    "id": "61",
-    "type": "event",
+    "id": "6",
     "name": "Chola Revenue System Overhaul",
     "time": "~970-1014 AD",
     "timeStart": 970,
@@ -739,11 +91,14 @@
     "description": "Cholas dismantle centuries-old Nadu institutions and local warlord loyalties; establish centralized revenue secretariat cutting out middlemen; farmer's 20 sacks now go directly to Chola coffers instead of split with local warlord and Nadu assembly",
     "source": "Cholas Part 2",
     "verified": false,
-    "relatedEntities": ["Uttama Chola", "Rajaraja Cholan"]
+    "dynasty": "Chola Empire",
+    "people": [
+      "Uttama Chola",
+      "Rajaraja Cholan"
+    ]
   },
   {
-    "id": "62",
-    "type": "event",
+    "id": "7",
     "name": "Chola Overseas Raid (Indonesia/Malaysia)",
     "time": "~1025 AD",
     "timeStart": 1025,
@@ -752,11 +107,13 @@
     "description": "Chola army carried on merchant ships raids Southeast Asia; merchants of the 500 guild then harvest camphor and dominate sea routes to China; only known Indian dynasty to conduct trans-oceanic military raids",
     "source": "Cholas Part 2",
     "verified": false,
-    "relatedEntities": ["Rajendra Chola"]
+    "dynasty": "Chola Empire",
+    "people": [
+      "Rajendra Chola"
+    ]
   },
   {
-    "id": "63",
-    "type": "event",
+    "id": "8",
     "name": "Construction of Thanjavur Periya Kovil",
     "time": "~1010 AD",
     "timeStart": 1010,
@@ -765,11 +122,13 @@
     "description": "Rajaraja builds massive temple; Meikirti inscriptions on walls serve as power projection to distant villages",
     "source": "Cholas Part 2",
     "verified": false,
-    "relatedEntities": ["Rajaraja Cholan"]
+    "dynasty": "Chola Empire",
+    "people": [
+      "Rajaraja Cholan"
+    ]
   },
   {
-    "id": "64",
-    "type": "event",
+    "id": "9",
     "name": "Later Pandya Revival",
     "time": "~1250 AD",
     "timeStart": 1250,
@@ -777,11 +136,12 @@
     "place": "Madurai",
     "description": "After period of Chola dominance, Pandyas return to power in Madurai; \"Later Pandya\" period; last Chola King reportedly disappeared into the forest (basis for Aayirathil Oruvan movie)",
     "source": "Madurai Through the Ages",
-    "verified": false
+    "verified": false,
+    "dynasty": "Pandyas",
+    "people": []
   },
   {
-    "id": "65",
-    "type": "event",
+    "id": "10",
     "name": "Madurai Sultanate",
     "time": "1335-1375",
     "timeStart": 1335,
@@ -789,11 +149,12 @@
     "place": "Madurai",
     "description": "Delhi Sultanate forces sent south; governor declares independence; priests wall up real Siva Lingam in Meenakshi Temple and install duplicate; raiders desecrate fake (still visible as exhibit)",
     "source": "Madurai Through the Ages",
-    "verified": false
+    "verified": false,
+    "dynasty": "Madurai Sultanate",
+    "people": []
   },
   {
-    "id": "66",
-    "type": "event",
+    "id": "11",
     "name": "Vijayanagara Drives Out Madurai Sultanate",
     "time": "~1375-1400",
     "timeStart": 1375,
@@ -801,11 +162,12 @@
     "place": "Madurai",
     "description": "Vijayanagara army drives out Sultanate, restores Pandyas as vassals for next century",
     "source": "Madurai Through the Ages",
-    "verified": false
+    "verified": false,
+    "dynasty": "Vijayanagara Empire",
+    "people": []
   },
   {
-    "id": "67",
-    "type": "event",
+    "id": "12",
     "name": "Nayaka Appointed as Governor of Madurai",
     "time": "~1529",
     "timeStart": 1529,
@@ -814,11 +176,13 @@
     "description": "Krishnadevaraya sends loyal general as Nayaka (Governor) when Pandya kings can no longer maintain order",
     "source": "Madurai Through the Ages",
     "verified": false,
-    "relatedEntities": ["Krishnadevaraya"]
+    "dynasty": "Vijayanagara Empire",
+    "people": [
+      "Krishnadevaraya"
+    ]
   },
   {
-    "id": "68",
-    "type": "event",
+    "id": "13",
     "name": "Haider Ali's 222 Coin",
     "time": "~1761-1782",
     "timeStart": 1761,
@@ -827,11 +191,13 @@
     "description": "Haider Ali's coins feature numeral 222 in Arabic - a cryptographic encoding of his name using Abjad system (Ha=8, Ya=10, Dal=4, Ra=200 = 222)",
     "source": "Haider Ali Blog",
     "verified": false,
-    "relatedEntities": ["Haider Ali"]
+    "dynasty": "Mysore Kingdom",
+    "people": [
+      "Haider Ali"
+    ]
   },
   {
-    "id": "69",
-    "type": "event",
+    "id": "14",
     "name": "Dutch Occupy Pondicherry (and mint coins)",
     "time": "1690s",
     "timeStart": 1690,
@@ -839,11 +205,12 @@
     "place": "Pondicherry",
     "description": "Dutch held Puducherry for 6 years and issued coins with \"Pudu\" in Tamil on reverse and Dutch Kali iconography on obverse",
     "source": "Corporate Warfare",
-    "verified": false
+    "verified": false,
+    "dynasty": "Dutch East India Company",
+    "people": []
   },
   {
-    "id": "70",
-    "type": "event",
+    "id": "15",
     "name": "Vijayanagara Pagoda System Adopted by EIC",
     "time": "1640",
     "timeStart": 1640,
@@ -851,11 +218,12 @@
     "place": "Madras",
     "description": "EIC obtained minting rights and adopted gold Pagoda (3.4g gold) = 36 silver Fanams; 1 Fanam = 80 copper Kasu",
     "source": "Currency in Madras Presidency",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "71",
-    "type": "event",
+    "id": "16",
     "name": "Introduction of Arcot Rupee",
     "time": "1742",
     "timeStart": 1742,
@@ -863,11 +231,12 @@
     "place": "Madras",
     "description": "Madras Presidency begins minting Arcot Rupees alongside Pagodas to facilitate trade with other presidencies using Mughal Rupee system",
     "source": "Currency in Madras Presidency",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "72",
-    "type": "event",
+    "id": "17",
     "name": "Pagoda Demonetized",
     "time": "1818",
     "timeStart": 1818,
@@ -875,11 +244,12 @@
     "place": "Madras Presidency",
     "description": "Presidency stops accepting Pagodas and Fanams, standardizes on Silver Rupees and copper Cash",
     "source": "Currency in Madras Presidency",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "73",
-    "type": "event",
+    "id": "18",
     "name": "Uniform Coinage Act",
     "time": "1835",
     "timeStart": 1835,
@@ -887,11 +257,12 @@
     "place": "All India",
     "description": "All presidencies adopt identical standardized coins: 1 Rupee = 16 Annas = 64 Paisa = 192 Pie",
     "source": "Currency in Madras Presidency",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "74",
-    "type": "event",
+    "id": "19",
     "name": "End of Free Coinage (Fiat Transition)",
     "time": "1893",
     "timeStart": 1893,
@@ -899,11 +270,12 @@
     "place": "India",
     "description": "Coins no longer derive value from intrinsic metal content; transition to fiat currency",
     "source": "Currency in Madras Presidency",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "75",
-    "type": "event",
+    "id": "20",
     "name": "Thirai Cash Double Obverse Error",
     "time": "~1600s",
     "timeStart": 1600,
@@ -911,11 +283,12 @@
     "place": "Venad (Travancore)",
     "description": "Hammered coin error - craftsperson used two identical deer dies instead of deer + battle axe; rare double obverse",
     "source": "A Historical Mistake",
-    "verified": false
+    "verified": false,
+    "dynasty": "Venad / Travancore",
+    "people": []
   },
   {
-    "id": "76",
-    "type": "event",
+    "id": "21",
     "name": "Battle of Tallikota",
     "time": "1565",
     "timeStart": 1565,
@@ -923,11 +296,15 @@
     "place": "Tallikota (Deccan)",
     "description": "Deccan sultanates defeat Vijayanagara Empire, leads to fragmentation into Nayak dynasties",
     "source": "Blog 1 (17th Century)",
-    "verified": false
+    "verified": false,
+    "dynasty": "Vijayanagara Empire",
+    "sideA": "Deccan Sultanates",
+    "sideB": "Vijayanagara Empire",
+    "victor": "Deccan Sultanates",
+    "people": []
   },
   {
-    "id": "77",
-    "type": "event",
+    "id": "22",
     "name": "Nayak Dynasties Emerge",
     "time": "post-1565",
     "timeStart": 1565,
@@ -935,11 +312,12 @@
     "place": "Chandragiri, Gingee, Madurai, Thanjavur",
     "description": "Four independent Nayak kingdoms established across Tamil Nadu after Vijayanagara collapse",
     "source": "Blog 1 (17th Century)",
-    "verified": false
+    "verified": false,
+    "dynasty": "Vijayanagara Empire",
+    "people": []
   },
   {
-    "id": "78",
-    "type": "event",
+    "id": "23",
     "name": "Deccan Sultanates Expand South",
     "time": "1650-1680",
     "timeStart": 1650,
@@ -947,11 +325,15 @@
     "place": "Chandragiri (Golconda), Gingee/Vellore (Bijapur)",
     "description": "Golconda takes Tondai Nadu, Bijapur takes Nadu Nadu; Madurai and Thanjavur Nayaks pay tribute",
     "source": "Blog 1 (17th Century)",
-    "verified": false
+    "verified": false,
+    "dynasty": "Golconda Sultanate",
+    "sideA": "Golconda Sultanate / Bijapur Sultanate",
+    "sideB": "Chandragiri Nayaks / Gingee Nayaks",
+    "victor": "Golconda Sultanate / Bijapur Sultanate",
+    "people": []
   },
   {
-    "id": "79",
-    "type": "event",
+    "id": "24",
     "name": "Maratha Conquest of Gingee",
     "time": "~1675",
     "timeStart": 1675,
@@ -959,11 +341,12 @@
     "place": "Gingee",
     "description": "Marathas conquer Gingee from Bijapur",
     "source": "Blog 1 (17th Century)",
-    "verified": false
+    "verified": false,
+    "dynasty": "Thanjavur Marathas",
+    "people": []
   },
   {
-    "id": "80",
-    "type": "event",
+    "id": "25",
     "name": "Thanjavur Maratha Dynasty Established",
     "time": "~1674",
     "timeStart": 1674,
@@ -971,11 +354,12 @@
     "place": "Thanjavur",
     "description": "Marathas establish dynasty in Thanjavur (Ekoji)",
     "source": "Blog 1 (17th Century)",
-    "verified": false
+    "verified": false,
+    "dynasty": "Thanjavur Marathas",
+    "people": []
   },
   {
-    "id": "81",
-    "type": "event",
+    "id": "26",
     "name": "Mughal Siege of Gingee",
     "time": "~1690s",
     "timeStart": 1690,
@@ -984,11 +368,16 @@
     "description": "Aurangzeb's forces besiege Gingee; pyrrhic victory that exhausted Mughal forces and prevented further southern expansion",
     "source": "Blog 1 (17th Century)",
     "verified": false,
-    "relatedEntities": ["Aurangzeb"]
+    "dynasty": "Mughal Empire",
+    "sideA": "Mughal Empire",
+    "sideB": "Marathas",
+    "victor": "Mughal Empire",
+    "people": [
+      "Aurangzeb"
+    ]
   },
   {
-    "id": "82",
-    "type": "event",
+    "id": "27",
     "name": "Nawab of Carnatic Appointed",
     "time": "~1690s",
     "timeStart": 1690,
@@ -997,11 +386,13 @@
     "description": "Mughals appoint Nawab for the Carnatic region, create Qiladar position at Gingee",
     "source": "Blog 1 (17th Century)",
     "verified": false,
-    "relatedEntities": ["Aurangzeb"]
+    "dynasty": "Mughal Empire",
+    "people": [
+      "Aurangzeb"
+    ]
   },
   {
-    "id": "83",
-    "type": "event",
+    "id": "28",
     "name": "Nayaka Grant - Fort St. George Founded",
     "time": "1639",
     "timeStart": 1639,
@@ -1009,11 +400,12 @@
     "place": "Madraspatnam/Chennapatnam (Madras)",
     "description": "British receive 2-mile land grant, establish Fort St. George and Black Town (George Town)",
     "source": "Blog 3 (Fort St. George)",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "84",
-    "type": "event",
+    "id": "29",
     "name": "Wave II British Expansion - Madras",
     "time": "1658-1708",
     "timeStart": 1658,
@@ -1021,11 +413,12 @@
     "place": "Triplicane, Egmore, Purasawalkam, Tondiarpet",
     "description": "Through leases and Mughal gifts, British expand around Madras",
     "source": "Blog 3 (Fort St. George)",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "85",
-    "type": "event",
+    "id": "30",
     "name": "Ramnad Declares Independence",
     "time": "1707",
     "timeStart": 1707,
@@ -1034,11 +427,13 @@
     "description": "Sethupathi declares independence from Madurai Nayaks",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "relatedEntities": ["Ramnad Sethupathi"]
+    "dynasty": "Ramnad (Sethupathi)",
+    "people": [
+      "Ramnad Sethupathi"
+    ]
   },
   {
-    "id": "86",
-    "type": "event",
+    "id": "31",
     "name": "Fall of Madurai to Nawab",
     "time": "1736",
     "timeStart": 1736,
@@ -1047,11 +442,17 @@
     "description": "Chanda Sahib seizes Madurai through betrayal of Queen Regent Meenakshi (fake Quran trick)",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "relatedEntities": ["Chanda Sahib", "Meenakshi (Queen Regent)"]
+    "dynasty": "Nawab of Arcot / Carnatic",
+    "sideA": "Nawab of Arcot (Chanda Sahib)",
+    "sideB": "Madurai Nayaks",
+    "victor": "Nawab of Arcot",
+    "people": [
+      "Chanda Sahib",
+      "Meenakshi (Queen Regent)"
+    ]
   },
   {
-    "id": "87",
-    "type": "event",
+    "id": "32",
     "name": "Maratha Invasion of Tamil Nadu",
     "time": "1740",
     "timeStart": 1740,
@@ -1060,11 +461,16 @@
     "description": "Thanjavur Marathas call reinforcements from Deccan; Marathas kill Nawab of Arcot, capture Chanda Sahib; Nizam drives them out",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "relatedEntities": ["Chanda Sahib"]
+    "dynasty": "Thanjavur Marathas",
+    "sideA": "Thanjavur Marathas / Deccan Marathas",
+    "sideB": "Nawab of Arcot",
+    "victor": "Marathas (short-term)",
+    "people": [
+      "Chanda Sahib"
+    ]
   },
   {
-    "id": "88",
-    "type": "event",
+    "id": "33",
     "name": "First Carnatic War / Battle of Adyar",
     "time": "1746-1748",
     "timeStart": 1746,
@@ -1073,14 +479,18 @@
     "description": "French capture Fort St. George; Battle of Adyar - small French force shatters Nawab's army with field artillery. \"Europeans ceased being traders with muskets.\" Treaty of Aix-la-Chapelle returns Fort St. George to British.",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "French",
-    "sideB": "British / Nawab Anwar-ud-din",
+    "sideA": "French East India Company",
+    "sideB": "British East India Company / Nawab of Arcot",
     "victor": "French (militarily), British (diplomatically via treaty)",
-    "relatedEntities": ["La Bourdonnais", "Anwar-ud-din Khan", "Dupleix (Joseph Francois)"]
+    "dynasty": "French East India Company",
+    "people": [
+      "La Bourdonnais",
+      "Anwar-ud-din Khan",
+      "Dupleix (Joseph Francois)"
+    ]
   },
   {
-    "id": "89",
-    "type": "event",
+    "id": "34",
     "name": "Second Carnatic War",
     "time": "1749-1754",
     "timeStart": 1749,
@@ -1089,14 +499,20 @@
     "description": "Succession war. Team France (Chanda Sahib + Muzaffar Jung) vs Team Britain (Wallajah + Nasir Jung). Battle of Ambur, Siege of Trichy, Clive's Siege of Arcot, beheading of Chanda Sahib, Mysore siege of Trichy. Treaty of Pondicherry. \"European powers moved from players to masters.\"",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "French / Chanda Sahib / Muzaffar Jung",
-    "sideB": "British / Muhammad Ali Khan Wallajah / Nasir Jung",
+    "sideA": "French East India Company / Nawab of Arcot (Chanda Sahib) / Mughal Empire (Muzaffar Jung)",
+    "sideB": "British East India Company / Nawab of Arcot (Wallajah) / Mughal Empire (Nasir Jung)",
     "victor": "British",
-    "relatedEntities": ["Chanda Sahib", "Muzaffar Jung", "Muhammad Ali Khan Wallajah", "Nasir Jung", "Robert Clive"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Chanda Sahib",
+      "Muzaffar Jung",
+      "Muhammad Ali Khan Wallajah",
+      "Nasir Jung",
+      "Robert Clive"
+    ]
   },
   {
-    "id": "90",
-    "type": "event",
+    "id": "35",
     "name": "Battle of Ambur",
     "time": "1749",
     "timeStart": 1749,
@@ -1105,15 +521,19 @@
     "description": "French-backed forces defeat British-backed Nawab Anwar-ud-din (killed); Muhammad Ali flees to Trichy",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "French / Chanda Sahib",
-    "sideB": "Nawab Anwar-ud-din",
+    "sideA": "French East India Company / Nawab of Arcot (Chanda Sahib)",
+    "sideB": "Nawab of Arcot (Anwar-ud-din)",
     "victor": "French / Chanda Sahib",
     "partOf": "Second Carnatic War",
-    "relatedEntities": ["Anwar-ud-din Khan", "Muhammad Ali Khan Wallajah", "Chanda Sahib"]
+    "dynasty": "French East India Company",
+    "people": [
+      "Anwar-ud-din Khan",
+      "Muhammad Ali Khan Wallajah",
+      "Chanda Sahib"
+    ]
   },
   {
-    "id": "91",
-    "type": "event",
+    "id": "36",
     "name": "Siege of Arcot (Clive)",
     "time": "1751",
     "timeStart": 1751,
@@ -1122,15 +542,18 @@
     "description": "Robert Clive captures Arcot as diversion, forces Chanda Sahib to pull troops from Trichy siege",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "British (Robert Clive)",
-    "sideB": "Chanda Sahib's forces",
+    "sideA": "British East India Company",
+    "sideB": "Nawab of Arcot (Chanda Sahib)",
     "victor": "British",
     "partOf": "Second Carnatic War",
-    "relatedEntities": ["Robert Clive", "Chanda Sahib"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Robert Clive",
+      "Chanda Sahib"
+    ]
   },
   {
-    "id": "92",
-    "type": "event",
+    "id": "37",
     "name": "Beheading of Chanda Sahib",
     "time": "1752",
     "timeStart": 1752,
@@ -1140,11 +563,15 @@
     "source": "Blog 2 (1700-1761)",
     "verified": false,
     "partOf": "Second Carnatic War",
-    "relatedEntities": ["Manakji", "Chanda Sahib", "Muhammad Ali Khan Wallajah"]
+    "dynasty": "Thanjavur Marathas",
+    "people": [
+      "Manakji",
+      "Chanda Sahib",
+      "Muhammad Ali Khan Wallajah"
+    ]
   },
   {
-    "id": "93",
-    "type": "event",
+    "id": "38",
     "name": "Mysore Siege of Trichy",
     "time": "~1752-1755",
     "timeStart": 1752,
@@ -1153,14 +580,18 @@
     "description": "Wallajah reneges on promise to Mysore (refused to hand over Trichy); 3-year siege featuring young Haider Ali on Mysore side and Yusuf Khan on British side",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "Mysore",
-    "sideB": "British / Nawab Wallajah",
+    "sideA": "Mysore Kingdom",
+    "sideB": "British East India Company / Nawab of Arcot",
     "victor": "British / Nawab Wallajah",
-    "relatedEntities": ["Haider Ali", "Yusuf Khan (Marudhunayagam)", "Muhammad Ali Khan Wallajah"]
+    "dynasty": "Mysore Kingdom",
+    "people": [
+      "Haider Ali",
+      "Yusuf Khan (Marudhunayagam)",
+      "Muhammad Ali Khan Wallajah"
+    ]
   },
   {
-    "id": "94",
-    "type": "event",
+    "id": "39",
     "name": "Treaty of Pondicherry",
     "time": "1754",
     "timeStart": 1754,
@@ -1170,11 +601,14 @@
     "source": "Blog 2 (1700-1761)",
     "verified": false,
     "partOf": "Second Carnatic War",
-    "relatedEntities": ["Muhammad Ali Khan Wallajah", "Dupleix (Joseph Francois)"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Muhammad Ali Khan Wallajah",
+      "Dupleix (Joseph Francois)"
+    ]
   },
   {
-    "id": "95",
-    "type": "event",
+    "id": "40",
     "name": "Third Carnatic War / Battle of Wandiwash",
     "time": "1758-1760",
     "timeStart": 1758,
@@ -1183,14 +617,16 @@
     "description": "Count de Lally captures Arcot; British win decisively at Wandiwash; British besiege and raze Pondicherry. French returned in 1763 limited to commercial trade only. Permanently removes French as rival.",
     "source": "Blog 2 (1700-1761)",
     "verified": false,
-    "sideA": "French (Count de Lally)",
-    "sideB": "British",
+    "sideA": "French East India Company",
+    "sideB": "British East India Company",
     "victor": "British",
-    "relatedEntities": ["Count de Lally"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Count de Lally"
+    ]
   },
   {
-    "id": "96",
-    "type": "event",
+    "id": "41",
     "name": "Wave III British Expansion - Madras",
     "time": "1749-1801",
     "timeStart": 1749,
@@ -1198,11 +634,12 @@
     "place": "Mylapore, San Thome, Adyar, Saidapet",
     "description": "Military force and treaties bring southern villages under British control",
     "source": "Blog 3 (Fort St. George)",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "97",
-    "type": "event",
+    "id": "42",
     "name": "Yusuf Khan's Rebellion and Execution",
     "time": "1763",
     "timeStart": 1763,
@@ -1211,11 +648,19 @@
     "description": "Yusuf Khan rebels; Nawab and Company besiege Madurai; internal mutiny by Marchand, Srinivasa Rao, Baba Sahib; Yusuf Khan captured and executed",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Yusuf Khan (Marudhunayagam)", "Marchand", "Srinivasa Rao", "Baba Sahib"]
+    "dynasty": "Nawab of Arcot / Carnatic",
+    "sideA": "Yusuf Khan (Independent)",
+    "sideB": "British East India Company / Nawab of Arcot",
+    "victor": "British East India Company",
+    "people": [
+      "Yusuf Khan (Marudhunayagam)",
+      "Marchand",
+      "Srinivasa Rao",
+      "Baba Sahib"
+    ]
   },
   {
-    "id": "98",
-    "type": "event",
+    "id": "43",
     "name": "Anglo-Mysore Wars Raids on Tamil Nadu",
     "time": "1763-1799",
     "timeStart": 1763,
@@ -1224,11 +669,17 @@
     "description": "Haider Ali and Tipu repeatedly raid Tamil Nadu; tax collection falls ~33%; Dindigul under Mysore since 1755",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Haider Ali", "Tipu Sultan"]
+    "dynasty": "Mysore Kingdom",
+    "sideA": "Mysore Kingdom",
+    "sideB": "British East India Company",
+    "victor": "British East India Company",
+    "people": [
+      "Haider Ali",
+      "Tipu Sultan"
+    ]
   },
   {
-    "id": "99",
-    "type": "event",
+    "id": "44",
     "name": "British Take Over Nawab's Administration",
     "time": "1790",
     "timeStart": 1790,
@@ -1236,11 +687,12 @@
     "place": "Fort St. George / Tamil Nadu",
     "description": "Fort St. George announces takeover of Nawab's country management, having become masters of Bengal",
     "source": "Blog 4 (1761-1808)",
-    "verified": false
+    "verified": false,
+    "dynasty": "British East India Company",
+    "people": []
   },
   {
-    "id": "100",
-    "type": "event",
+    "id": "45",
     "name": "First Polygar War",
     "time": "1799",
     "timeStart": 1799,
@@ -1249,11 +701,16 @@
     "description": "Veerapandiya Kattabomman refuses taxes; betrayed by Ettayapuram Polygar and Pudukottai Tondaiman Raja",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Veerapandiya Kattabomman"]
+    "dynasty": "Polygars",
+    "sideA": "Polygars",
+    "sideB": "British East India Company",
+    "victor": "British East India Company",
+    "people": [
+      "Veerapandiya Kattabomman"
+    ]
   },
   {
-    "id": "101",
-    "type": "event",
+    "id": "46",
     "name": "Fall of Srirangapatnam",
     "time": "1799",
     "timeStart": 1799,
@@ -1262,11 +719,16 @@
     "description": "Tipu Sultan killed; British claim to find correspondence between Tipu and Arcot Nawab",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Tipu Sultan"]
+    "dynasty": "British East India Company",
+    "sideA": "British East India Company",
+    "sideB": "Mysore Kingdom",
+    "victor": "British East India Company",
+    "people": [
+      "Tipu Sultan"
+    ]
   },
   {
-    "id": "102",
-    "type": "event",
+    "id": "47",
     "name": "Second Polygar War",
     "time": "1801",
     "timeStart": 1801,
@@ -1275,14 +737,17 @@
     "description": "Marudhu brothers + escaped Kattabomman associates resist British; Ramnad, Pudukottai, Ettayapuram allied with British; Polygar leaders caught and hanged; Polygar system replaced by Ryotwari",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "sideA": "Marudhu Brothers / Polygars",
-    "sideB": "British / Ramnad / Pudukottai / Ettayapuram",
+    "sideA": "Polygars / Sivagangai",
+    "sideB": "British East India Company / Ramnad (Sethupathi) / Pudukottai / Ettayapuram",
     "victor": "British",
-    "relatedEntities": ["Marudhu Brothers", "Ramnad Sethupathi"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Marudhu Brothers",
+      "Ramnad Sethupathi"
+    ]
   },
   {
-    "id": "103",
-    "type": "event",
+    "id": "48",
     "name": "Carnatic Treaty",
     "time": "1801",
     "timeStart": 1801,
@@ -1291,11 +756,13 @@
     "description": "British use Tipu-Nawab correspondence as pretext; bypass rightful Nawab, install puppet who signs treaty giving full administrative control to British",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Muhammad Ali Khan Wallajah"]
+    "dynasty": "British East India Company",
+    "people": [
+      "Muhammad Ali Khan Wallajah"
+    ]
   },
   {
-    "id": "104",
-    "type": "event",
+    "id": "49",
     "name": "Vellore Mutiny",
     "time": "1806",
     "timeStart": 1806,
@@ -1304,342 +771,9 @@
     "description": "Tipu's sons stationed at Vellore; Sepoys banned from beards/religious marks; massacre of ~200 British soldiers; put down by different British garrison with Indian Sepoys. Similar causes to later Sepoy Mutiny.",
     "source": "Blog 4 (1761-1808)",
     "verified": false,
-    "relatedEntities": ["Tipu's Sons"]
-  },
-  {
-    "id": "105",
-    "type": "kingdom",
-    "name": "Chola Empire (\"Modern\" Cholas)",
-    "time": "~900-1250 AD",
-    "timeStart": 900,
-    "timeEnd": 1250,
-    "place": "Kaveri Delta to all Tamil Nadu to overseas",
-    "description": "No connection to Sangam Cholas; co-opted brand name. United Kaveri Delta warlords, defeated Pandyas/Pallavas, bullied Deccan, raided Indonesia/Malaysia. Built Thanjavur Big Temple. Efficient centralized revenue system. Only Tamil dynasty to project power northward and overseas.",
-    "source": "Cholas Part 1, Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "106",
-    "type": "kingdom",
-    "name": "Pandyas",
-    "time": "ancient-1335 AD",
-    "timeStart": -300,
-    "timeEnd": 1335,
-    "place": "Madurai",
-    "description": "Ancient dynasty; fought Pallavas for 300 years; defeated by Cholas; Later Pandya revival ~1250; fell to Delhi Sultanate 1335",
-    "source": "Cholas Part 1, Madurai Through the Ages",
-    "verified": false
-  },
-  {
-    "id": "107",
-    "type": "kingdom",
-    "name": "Pallavas",
-    "time": "ancient-~900 AD",
-    "timeStart": -300,
-    "timeEnd": 900,
-    "place": "Tondai Nadu/Kancheepuram",
-    "description": "Fought Pandyas for centuries; king killed by Aditya Chola; splinter groups persisted",
-    "source": "Cholas Part 1",
-    "verified": false
-  },
-  {
-    "id": "108",
-    "type": "kingdom",
-    "name": "Rashtrakutas",
-    "time": "~750-972 AD",
-    "timeStart": 750,
-    "timeEnd": 972,
-    "place": "Deccan",
-    "description": "\"Most dangerous gang in India for 200 years\"; periodically raided Tamil Nadu; crushed Cholas ~950 AD; fell to northern frontier warlord ~972 AD",
-    "source": "Cholas Part 1, Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "109",
-    "type": "kingdom",
-    "name": "Madurai Sultanate",
-    "time": "1335-1375",
-    "timeStart": 1335,
-    "timeEnd": 1375,
-    "place": "Madurai",
-    "description": "Delhi Sultanate breakaway; desecrated temples; driven out by Vijayanagara",
-    "source": "Madurai Through the Ages",
-    "verified": false
-  },
-  {
-    "id": "110",
-    "type": "kingdom",
-    "name": "500 Merchant Guild",
-    "time": "~1000 AD",
-    "timeStart": 1000,
-    "timeEnd": null,
-    "place": "Tamil Nadu/Southeast Asia",
-    "description": "Multinational merchant guild with own flag, private armies, code of conduct; paid customs to Cholas; possibly Cholas were their military arm; harvested camphor from Indonesia, exploited Sri Lankan pearl fisheries",
-    "source": "Cholas Part 2",
-    "verified": false
-  },
-  {
-    "id": "111",
-    "type": "kingdom",
-    "name": "Venad / Travancore",
-    "time": "~1600s+",
-    "timeStart": 1600,
-    "timeEnd": null,
-    "place": "Kerala",
-    "description": "Dynasty that became Travancore; issued Thirai Cash coins with deer and battle axe",
-    "source": "A Historical Mistake",
-    "verified": false
-  },
-  {
-    "id": "112",
-    "type": "kingdom",
-    "name": "Vijayanagara Empire",
-    "time": "~1375-1565",
-    "timeStart": 1375,
-    "timeEnd": 1565,
-    "place": "Tamil Nadu",
-    "description": "Drove out Madurai Sultanate; restored Pandyas then appointed Nayaka governors; collapsed after Battle of Tallikota",
-    "source": "Blog 1, Madurai Through the Ages",
-    "verified": false
-  },
-  {
-    "id": "113",
-    "type": "kingdom",
-    "name": "Chandragiri Nayaks",
-    "time": "1565-~1650",
-    "timeStart": 1565,
-    "timeEnd": 1650,
-    "place": "Chandragiri/Tondai Nadu",
-    "description": "Fell to Golconda influence",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "114",
-    "type": "kingdom",
-    "name": "Gingee Nayaks",
-    "time": "1565-~1650",
-    "timeStart": 1565,
-    "timeEnd": 1650,
-    "place": "Gingee/Nadu Nadu",
-    "description": "Fell to Bijapur control",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "115",
-    "type": "kingdom",
-    "name": "Madurai Nayaks",
-    "time": "1565-1736",
-    "timeStart": 1565,
-    "timeEnd": 1736,
-    "place": "Madurai/Pandiya Nadu/Kongu Nadu",
-    "description": "Gradually declined; lost Ramnad 1707; fell to Nawab 1736",
-    "source": "Blog 1, Blog 2",
-    "verified": false
-  },
-  {
-    "id": "116",
-    "type": "kingdom",
-    "name": "Thanjavur Nayaks",
-    "time": "1565-1674",
-    "timeStart": 1565,
-    "timeEnd": 1674,
-    "place": "Thanjavur/Kaveri Delta",
-    "description": "Replaced by Maratha dynasty",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "117",
-    "type": "kingdom",
-    "name": "Golconda Sultanate",
-    "time": "1650-~1687",
-    "timeStart": 1650,
-    "timeEnd": 1687,
-    "place": "Tondai Nadu",
-    "description": "Expanded into Tamil Nadu, defeated by Mughals",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "118",
-    "type": "kingdom",
-    "name": "Bijapur Sultanate",
-    "time": "1650-~1686",
-    "timeStart": 1650,
-    "timeEnd": 1686,
-    "place": "Nadu Nadu/Gingee/Vellore",
-    "description": "Expanded into Tamil Nadu, defeated by Mughals",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "119",
-    "type": "kingdom",
-    "name": "Mughal Empire",
-    "time": "~1690s-1740s",
-    "timeStart": 1690,
-    "timeEnd": 1740,
-    "place": "Tamil Nadu via Nawab",
-    "description": "Appointed Nawab of Carnatic and Nizam of Hyderabad; central power hollowed out after Nadir Shah's invasion 1739",
-    "source": "Blog 1, Blog 2",
-    "verified": false
-  },
-  {
-    "id": "120",
-    "type": "kingdom",
-    "name": "Thanjavur Marathas",
-    "time": "1674-1800s",
-    "timeStart": 1674,
-    "timeEnd": 1800,
-    "place": "Thanjavur",
-    "description": "Established by Ekoji; allied with British in Carnatic Wars; Manakji beheaded Chanda Sahib; vassals of Nawab nominally",
-    "source": "Blog 1, Blog 2, Blog 4",
-    "verified": false
-  },
-  {
-    "id": "121",
-    "type": "kingdom",
-    "name": "Nawab of Arcot / Carnatic",
-    "time": "~1690s-1801",
-    "timeStart": 1690,
-    "timeEnd": 1801,
-    "place": "Arcot",
-    "description": "Mughal appointee to rising power to puppet of British to dissolved by Carnatic Treaty",
-    "source": "Blog 1, Blog 2, Blog 4",
-    "verified": false
-  },
-  {
-    "id": "122",
-    "type": "kingdom",
-    "name": "Ramnad (Sethupathi)",
-    "time": "1707-1801+",
-    "timeStart": 1707,
-    "timeEnd": 1801,
-    "place": "Ramnad",
-    "description": "Independent from 1707; allied with British by 1801",
-    "source": "Blog 2, Blog 4",
-    "verified": false
-  },
-  {
-    "id": "123",
-    "type": "kingdom",
-    "name": "Mysore Kingdom",
-    "time": "1750s-1799",
-    "timeStart": 1750,
-    "timeEnd": 1799,
-    "place": "Mysore/Dindigul/Tamil Nadu",
-    "description": "Haider Ali to Tipu Sultan; major threat to both Nawab and British; fell at Srirangapatnam",
-    "source": "Blog 2, Blog 4",
-    "verified": false
-  },
-  {
-    "id": "124",
-    "type": "kingdom",
-    "name": "British East India Company",
-    "time": "1639-1808",
-    "timeStart": 1639,
-    "timeEnd": 1808,
-    "place": "Madras/Fort St. George to all Tamil Nadu",
-    "description": "Traders to military power to kingmakers to administrators to sovereign rulers",
-    "source": "All 4 blogs",
-    "verified": false
-  },
-  {
-    "id": "125",
-    "type": "kingdom",
-    "name": "French East India Company",
-    "time": "1674-1763",
-    "timeStart": 1674,
-    "timeEnd": 1763,
-    "place": "Pondicherry",
-    "description": "Dominant European power briefly; Dupleix's political interference; eliminated at Wandiwash/Pondicherry; reduced to commercial only",
-    "source": "Blog 1, Blog 2",
-    "verified": false
-  },
-  {
-    "id": "126",
-    "type": "kingdom",
-    "name": "Dutch East India Company",
-    "time": "1600s-1700s",
-    "timeStart": 1600,
-    "timeEnd": 1700,
-    "place": "Pulicat/Nagapattanam",
-    "description": "Dominated 17th century European trade; acquired Nagapattanam from Portuguese; occupied Pondicherry in 1690s",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "127",
-    "type": "kingdom",
-    "name": "Portuguese",
-    "time": "~1600-1749",
-    "timeStart": 1600,
-    "timeEnd": 1749,
-    "place": "San Thome",
-    "description": "First European presence; San Thome Factory; later displaced by British",
-    "source": "Blog 1, Blog 3",
-    "verified": false
-  },
-  {
-    "id": "128",
-    "type": "kingdom",
-    "name": "Danish",
-    "time": "1600s",
-    "timeStart": 1600,
-    "timeEnd": null,
-    "place": "Tranquebar",
-    "description": "Small trading presence",
-    "source": "Blog 1",
-    "verified": false
-  },
-  {
-    "id": "129",
-    "type": "kingdom",
-    "name": "Polygars",
-    "time": "1700s-1801",
-    "timeStart": 1700,
-    "timeEnd": 1801,
-    "place": "Southern Tamil Nadu - Panchalankurichi, Sivagangai, etc.",
-    "description": "Regional chieftains; resisted tax collection; destroyed by Polygar Wars and Ryotwari system",
-    "source": "Blog 2, Blog 4",
-    "verified": false
-  },
-  {
-    "id": "130",
-    "type": "kingdom",
-    "name": "Pudukottai (Tondaiman Raja)",
-    "time": "1799-1801",
-    "timeStart": 1799,
-    "timeEnd": 1801,
-    "place": "Pudukottai",
-    "description": "Allied with British, betrayed Kattabomman",
-    "source": "Blog 4",
-    "verified": false
-  },
-  {
-    "id": "131",
-    "type": "kingdom",
-    "name": "Ettayapuram",
-    "time": "1799-1801",
-    "timeStart": 1799,
-    "timeEnd": 1801,
-    "place": "Ettayapuram",
-    "description": "Allied with British, betrayed Kattabomman",
-    "source": "Blog 4",
-    "verified": false
-  },
-  {
-    "id": "132",
-    "type": "kingdom",
-    "name": "Sivagangai",
-    "time": "1801",
-    "timeStart": 1801,
-    "timeEnd": null,
-    "place": "Sivagangai",
-    "description": "Marudhu brothers; resisted British in Second Polygar War",
-    "source": "Blog 4",
-    "verified": false
+    "dynasty": "British East India Company",
+    "people": [
+      "Tipu's Sons"
+    ]
   }
 ]

@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 
 interface TimelineEntry {
   id: string;
-  type: 'person' | 'event' | 'kingdom';
   name: string;
   time: string;
   timeStart: number;
@@ -13,16 +12,15 @@ interface TimelineEntry {
   description: string;
   source: string;
   verified: boolean;
+  dynasty: string;
+  people?: string[];
   sideA?: string;
   sideB?: string;
   victor?: string;
   partOf?: string;
-  affiliations?: string[];
-  relatedEntities?: string[];
 }
 
 const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
-  type: 'event',
   name: '',
   time: '',
   timeStart: 0,
@@ -31,18 +29,8 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   description: '',
   source: '',
   verified: false,
-};
-
-const TYPE_COLORS: Record<TimelineEntry['type'], { border: string; bg: string; text: string }> = {
-  person: { border: 'border-l-purple-500', bg: 'bg-purple-100', text: 'text-purple-700' },
-  event: { border: 'border-l-pink-500', bg: 'bg-pink-100', text: 'text-pink-700' },
-  kingdom: { border: 'border-l-amber-500', bg: 'bg-amber-100', text: 'text-amber-700' },
-};
-
-const TYPE_LABELS: Record<TimelineEntry['type'], string> = {
-  person: 'Person',
-  event: 'Event',
-  kingdom: 'Kingdom',
+  dynasty: '',
+  people: [],
 };
 
 function getEraLabel(year: number): string {
@@ -72,7 +60,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState<Omit<TimelineEntry, 'id'>>(EMPTY_ENTRY);
   const [saving, setSaving] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<TimelineEntry['type'] | 'all'>('all');
+  const [dynastyFilter, setDynastyFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchEntries();
@@ -92,11 +80,24 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
     }
   }
 
+  // Get unique dynasties for filter dropdown
+  const dynasties = useMemo(() => {
+    const set = new Set<string>();
+    entries.forEach((e) => {
+      if (e.dynasty) set.add(e.dynasty);
+    });
+    return Array.from(set).sort();
+  }, [entries]);
+
   const filtered = useMemo(() => {
     let result = entries;
 
-    if (typeFilter !== 'all') {
-      result = result.filter((e) => e.type === typeFilter);
+    if (dynastyFilter !== 'all') {
+      result = result.filter((e) =>
+        e.dynasty === dynastyFilter ||
+        e.sideA?.includes(dynastyFilter) ||
+        e.sideB?.includes(dynastyFilter)
+      );
     }
 
     if (search.trim()) {
@@ -107,19 +108,18 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
         e.description.toLowerCase().includes(q) ||
         e.source.toLowerCase().includes(q) ||
         e.time.toLowerCase().includes(q) ||
+        e.dynasty.toLowerCase().includes(q) ||
         (e.sideA && e.sideA.toLowerCase().includes(q)) ||
         (e.sideB && e.sideB.toLowerCase().includes(q)) ||
         (e.victor && e.victor.toLowerCase().includes(q)) ||
         (e.partOf && e.partOf.toLowerCase().includes(q)) ||
-        (e.affiliations && e.affiliations.some((a) => a.toLowerCase().includes(q))) ||
-        (e.relatedEntities && e.relatedEntities.some((r) => r.toLowerCase().includes(q)))
+        (e.people && e.people.some((p) => p.toLowerCase().includes(q)))
       );
     }
 
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
-  }, [entries, search, typeFilter]);
+  }, [entries, search, dynastyFilter]);
 
-  // Group entries by era for year markers
   const groupedByEra = useMemo(() => {
     const groups: { era: string; entries: TimelineEntry[] }[] = [];
     let currentEra = '';
@@ -137,7 +137,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
 
   async function handleVerifiedToggle(entry: TimelineEntry) {
     const newVerified = !entry.verified;
-    // Optimistic update
     setEntries((prev) =>
       prev.map((e) => (e.id === entry.id ? { ...e, verified: newVerified } : e))
     );
@@ -148,7 +147,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
         body: JSON.stringify({ verified: newVerified }),
       });
     } catch {
-      // Revert on error
       setEntries((prev) =>
         prev.map((e) => (e.id === entry.id ? { ...e, verified: !newVerified } : e))
       );
@@ -158,7 +156,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
   function openEdit(entry: TimelineEntry) {
     setEditingEntry(entry);
     setFormData({
-      type: entry.type,
       name: entry.name,
       time: entry.time,
       timeStart: entry.timeStart,
@@ -167,18 +164,18 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
       description: entry.description,
       source: entry.source,
       verified: entry.verified,
+      dynasty: entry.dynasty,
+      people: entry.people || [],
       sideA: entry.sideA || '',
       sideB: entry.sideB || '',
       victor: entry.victor || '',
       partOf: entry.partOf || '',
-      affiliations: entry.affiliations || [],
-      relatedEntities: entry.relatedEntities || [],
     });
   }
 
   function openAdd() {
     setEditingEntry(null);
-    setFormData({ ...EMPTY_ENTRY });
+    setFormData({ ...EMPTY_ENTRY, people: [] });
     setShowAddForm(true);
   }
 
@@ -194,8 +191,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
         ...formData,
         timeStart: Number(formData.timeStart) || 0,
         timeEnd: formData.timeEnd ? Number(formData.timeEnd) : null,
-        affiliations: formData.affiliations?.length ? formData.affiliations : undefined,
-        relatedEntities: formData.relatedEntities?.length ? formData.relatedEntities : undefined,
+        people: formData.people?.length ? formData.people : undefined,
       };
 
       if (editingEntry) {
@@ -232,7 +228,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
   async function handleDelete() {
     if (!editingEntry) return;
     if (!confirm('Delete this timeline entry?')) return;
-
     try {
       await fetch(`/api/timeline?id=${editingEntry.id}`, { method: 'DELETE' });
       setEntries((prev) => prev.filter((e) => e.id !== editingEntry.id));
@@ -250,6 +245,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
     );
   }
 
+  const isBattle = (e: TimelineEntry) => !!(e.sideA || e.sideB);
   const showModal = editingEntry !== null || showAddForm;
 
   return (
@@ -262,7 +258,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search timeline..."
+              placeholder="Search events, people, dynasties..."
               className="w-full pl-9 pr-3 py-2 border border-purple-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
             />
             <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -270,35 +266,30 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
             </svg>
           </div>
 
-          {/* Type filter chips */}
-          <div className="flex gap-1.5 flex-wrap">
-            {(['all', 'person', 'event', 'kingdom'] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTypeFilter(t)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition ${
-                  typeFilter === t
-                    ? 'bg-pink-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-pink-50 border border-gray-200'
-                }`}
-              >
-                {t === 'all' ? 'All' : TYPE_LABELS[t]}
-              </button>
+          {/* Dynasty filter */}
+          <select
+            value={dynastyFilter}
+            onChange={(e) => setDynastyFilter(e.target.value)}
+            className="px-3 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+          >
+            <option value="all">All Dynasties</option>
+            {dynasties.map((d) => (
+              <option key={d} value={d}>{d}</option>
             ))}
-          </div>
+          </select>
 
           {isAuthenticated && (
             <button
               onClick={openAdd}
               className="px-3 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg text-xs font-medium transition whitespace-nowrap"
             >
-              + Add Entry
+              + Add Event
             </button>
           )}
         </div>
 
         <div className="text-xs text-gray-500 mt-2">
-          Showing {filtered.length} of {entries.length} entries
+          Showing {filtered.length} of {entries.length} events
         </div>
       </div>
 
@@ -319,25 +310,30 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
               </div>
             </div>
 
-            {/* Entries in this era */}
             {eraEntries.map((entry) => {
-              const colors = TYPE_COLORS[entry.type];
+              const battle = isBattle(entry);
               return (
                 <div key={entry.id} className="relative ml-12 mb-3">
                   {/* Connector dot */}
-                  <div className="absolute -left-[2.15rem] top-3 w-2.5 h-2.5 rounded-full bg-purple-300 border-2 border-white z-10" />
+                  <div className={`absolute -left-[2.15rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-white z-10 ${
+                    battle ? 'bg-red-400' : 'bg-purple-300'
+                  }`} />
 
                   {/* Card */}
                   <div
-                    className={`border-l-4 ${entry.verified ? 'border-l-green-500' : colors.border} bg-white rounded-lg shadow-sm p-3 hover:shadow-md transition`}
+                    className={`border-l-4 ${
+                      entry.verified ? 'border-l-green-500' : battle ? 'border-l-red-400' : 'border-l-purple-400'
+                    } bg-white rounded-lg shadow-sm p-3 hover:shadow-md transition`}
                   >
-                    {/* Header row */}
+                    {/* Header */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${colors.bg} ${colors.text}`}>
-                            {TYPE_LABELS[entry.type]}
-                          </span>
+                          {battle && (
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+                              Battle
+                            </span>
+                          )}
                           <h3 className="font-semibold text-gray-800 text-sm">{entry.name}</h3>
                         </div>
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 flex-wrap">
@@ -348,7 +344,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                       </div>
 
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        {/* Verified checkbox */}
                         {isAuthenticated && (
                           <button
                             onClick={() => handleVerifiedToggle(entry)}
@@ -371,8 +366,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                             </svg>
                           </span>
                         )}
-
-                        {/* Edit button */}
                         {isAuthenticated && (
                           <button
                             onClick={() => openEdit(entry)}
@@ -387,15 +380,28 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                       </div>
                     </div>
 
+                    {/* Dynasty badge */}
+                    <div className="mt-2">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
+                        {entry.dynasty}
+                      </span>
+                    </div>
+
                     {/* Description */}
                     <p className="text-xs text-gray-600 mt-2 leading-relaxed">{entry.description}</p>
 
                     {/* Battle details */}
-                    {entry.type === 'event' && (entry.sideA || entry.sideB) && (
-                      <div className="flex gap-3 mt-2 text-[10px] text-gray-500 flex-wrap">
-                        {entry.sideA && <span>Side A: {entry.sideA}</span>}
-                        {entry.sideB && <span>Side B: {entry.sideB}</span>}
-                        {entry.victor && <span className="font-semibold">Victor: {entry.victor}</span>}
+                    {battle && (
+                      <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
+                        {entry.sideA && (
+                          <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{entry.sideA}</span></div>
+                        )}
+                        {entry.sideB && (
+                          <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{entry.sideB}</span></div>
+                        )}
+                        {entry.victor && (
+                          <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{entry.victor}</span></div>
+                        )}
                       </div>
                     )}
 
@@ -404,20 +410,11 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                       <div className="mt-1.5 text-[10px] text-purple-600">Part of: {entry.partOf}</div>
                     )}
 
-                    {/* Affiliations */}
-                    {entry.affiliations && entry.affiliations.length > 0 && (
+                    {/* People */}
+                    {entry.people && entry.people.length > 0 && (
                       <div className="flex gap-1 mt-2 flex-wrap">
-                        {entry.affiliations.map((a, i) => (
-                          <span key={i} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px]">{a}</span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Related entities */}
-                    {entry.relatedEntities && entry.relatedEntities.length > 0 && (
-                      <div className="flex gap-1 mt-1.5 flex-wrap">
-                        {entry.relatedEntities.map((r, i) => (
-                          <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px]">{r}</span>
+                        {entry.people.map((p, i) => (
+                          <span key={i} className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{p}</span>
                         ))}
                       </div>
                     )}
@@ -433,7 +430,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
 
         {filtered.length === 0 && !loading && (
           <div className="text-center text-gray-500 py-12">
-            {search ? `No entries matching "${search}"` : 'No timeline entries yet'}
+            {search ? `No events matching "${search}"` : 'No timeline events yet'}
           </div>
         )}
       </div>
@@ -444,37 +441,40 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-5">
               <h2 className="text-lg font-bold text-gray-800 mb-4">
-                {editingEntry ? 'Edit Entry' : 'Add New Entry'}
+                {editingEntry ? 'Edit Event' : 'Add New Event'}
               </h2>
 
               <div className="space-y-3">
-                {/* Type */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as TimelineEntry['type'] })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                  >
-                    <option value="person">Person</option>
-                    <option value="event">Event</option>
-                    <option value="kingdom">Kingdom</option>
-                  </select>
-                </div>
-
                 {/* Name */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Event Name</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    placeholder="Entry name"
                   />
                 </div>
 
-                {/* Time display */}
+                {/* Dynasty */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Dynasty / Kingdom</label>
+                  <input
+                    type="text"
+                    value={formData.dynasty}
+                    onChange={(e) => setFormData({ ...formData, dynasty: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    placeholder="e.g. Chola Empire"
+                    list="dynasty-suggestions"
+                  />
+                  <datalist id="dynasty-suggestions">
+                    {dynasties.map((d) => (
+                      <option key={d} value={d} />
+                    ))}
+                  </datalist>
+                </div>
+
+                {/* Time */}
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Time (display)</label>
@@ -515,7 +515,6 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                     value={formData.place}
                     onChange={(e) => setFormData({ ...formData, place: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    placeholder="Thanjavur"
                   />
                 </div>
 
@@ -527,6 +526,26 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  />
+                </div>
+
+                {/* People */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">People Involved (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={(formData.people || []).join(', ')}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        people: e.target.value
+                          .split(',')
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    placeholder="Rajaraja Cholan, Rajendra Chola"
                   />
                 </div>
 
@@ -552,96 +571,49 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
                   <span className="text-sm text-gray-700">Verified</span>
                 </label>
 
-                {/* Event-specific fields */}
-                {formData.type === 'event' && (
-                  <div className="border-t pt-3 mt-2">
-                    <div className="text-xs font-medium text-gray-500 mb-2">Event / Battle Details</div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Side A</label>
-                        <input
-                          type="text"
-                          value={formData.sideA || ''}
-                          onChange={(e) => setFormData({ ...formData, sideA: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Side B</label>
-                        <input
-                          type="text"
-                          value={formData.sideB || ''}
-                          onChange={(e) => setFormData({ ...formData, sideB: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Victor</label>
-                        <input
-                          type="text"
-                          value={formData.victor || ''}
-                          onChange={(e) => setFormData({ ...formData, victor: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Part Of</label>
-                        <input
-                          type="text"
-                          value={formData.partOf || ''}
-                          onChange={(e) => setFormData({ ...formData, partOf: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Person-specific fields */}
-                {formData.type === 'person' && (
-                  <div className="border-t pt-3 mt-2">
-                    <div className="text-xs font-medium text-gray-500 mb-2">Person Details</div>
+                {/* Battle fields */}
+                <div className="border-t pt-3 mt-2">
+                  <div className="text-xs font-medium text-gray-500 mb-2">Battle Details (optional)</div>
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Affiliations (comma-separated)</label>
+                      <label className="block text-xs text-gray-600 mb-1">Side A (dynasty)</label>
                       <input
                         type="text"
-                        value={(formData.affiliations || []).join(', ')}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            affiliations: e.target.value
-                              .split(',')
-                              .map((s) => s.trim())
-                              .filter(Boolean),
-                          })
-                        }
+                        value={formData.sideA || ''}
+                        onChange={(e) => setFormData({ ...formData, sideA: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        placeholder="French, British, Independent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Side B (dynasty)</label>
+                      <input
+                        type="text"
+                        value={formData.sideB || ''}
+                        onChange={(e) => setFormData({ ...formData, sideB: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
                       />
                     </div>
                   </div>
-                )}
-
-                {/* Related entities */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Related Entities (comma-separated)</label>
-                  <input
-                    type="text"
-                    value={(formData.relatedEntities || []).join(', ')}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        relatedEntities: e.target.value
-                          .split(',')
-                          .map((s) => s.trim())
-                          .filter(Boolean),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    placeholder="Chanda Sahib, Robert Clive"
-                  />
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Victor</label>
+                      <input
+                        type="text"
+                        value={formData.victor || ''}
+                        onChange={(e) => setFormData({ ...formData, victor: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Part Of</label>
+                      <input
+                        type="text"
+                        value={formData.partOf || ''}
+                        onChange={(e) => setFormData({ ...formData, partOf: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 

@@ -5,7 +5,6 @@ const TIMELINE_KEY = 'timeline_entries';
 
 interface TimelineEntry {
   id: string;
-  type: 'person' | 'event' | 'kingdom';
   name: string;
   time: string;
   timeStart: number;
@@ -14,12 +13,12 @@ interface TimelineEntry {
   description: string;
   source: string;
   verified: boolean;
+  dynasty: string;
+  people?: string[];
   sideA?: string;
   sideB?: string;
   victor?: string;
   partOf?: string;
-  affiliations?: string[];
-  relatedEntities?: string[];
 }
 
 async function readEntries(): Promise<TimelineEntry[]> {
@@ -57,7 +56,6 @@ export async function POST(request: NextRequest) {
 
     const newEntry: TimelineEntry = {
       id: Date.now().toString(),
-      type: body.type || 'event',
       name: body.name?.trim() || '',
       time: body.time?.trim() || '',
       timeStart: Number(body.timeStart) || 0,
@@ -66,12 +64,12 @@ export async function POST(request: NextRequest) {
       description: body.description?.trim() || '',
       source: body.source?.trim() || '',
       verified: body.verified || false,
+      dynasty: body.dynasty?.trim() || '',
+      ...(body.people?.length && { people: body.people }),
       ...(body.sideA?.trim() && { sideA: body.sideA.trim() }),
       ...(body.sideB?.trim() && { sideB: body.sideB.trim() }),
       ...(body.victor?.trim() && { victor: body.victor.trim() }),
       ...(body.partOf?.trim() && { partOf: body.partOf.trim() }),
-      ...(body.affiliations?.length && { affiliations: body.affiliations }),
-      ...(body.relatedEntities?.length && { relatedEntities: body.relatedEntities }),
     };
 
     entries.push(newEntry);
@@ -110,7 +108,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Trim all string fields
     const trimmedBody: Partial<TimelineEntry> = {};
     for (const key in body) {
       const val = body[key];
