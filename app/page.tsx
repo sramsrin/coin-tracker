@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import TimelineTab from './components/TimelineTab';
+import dynastyMapping from '../data/dynasty-mapping.json';
 
 // Single Blog Card Component
 function BlogCard({ url }: { url: string }) {
@@ -2924,46 +2925,15 @@ export default function Home() {
                     const { section, subsection, subsubsection } = getCurrentSelectionContext();
                     if (!section) return null;
 
-                    // Map coin sections to timeline dynasty names
-                    const SECTION_TO_DYNASTIES: Record<string, string[]> = {
-                      'Tamil Kingdoms': ['Chola Empire', 'Pandyas', 'Madurai Sultanate', 'Madurai Nayaks', 'Gingee Nayaks', 'Sivagangai'],
-                      'British India Presidencies': ['British East India Company'],
-                      'British India Uniform Coinage': ['British East India Company'],
-                      'British India Princely States': ['Mysore Kingdom', 'Nawab of Arcot / Carnatic', 'Nawab of Arcot', 'Venad / Travancore', 'Pudukottai'],
-                      'European Trading Companies': ['French East India Company', 'Dutch East India Company', 'Danish', 'Portuguese'],
-                      'Other': ['Vijayanagara Empire'],
-                    };
-                    const SUBSECTION_TO_DYNASTIES: Record<string, string[]> = {
-                      'Cholas': ['Chola Empire'],
-                      'Madurai Pandya': ['Pandyas'],
-                      'Madurai Sultanate': ['Madurai Sultanate'],
-                      'Madurai Nayak': ['Madurai Nayaks'],
-                      'Gingee Nayak': ['Gingee Nayaks'],
-                      'Sivagangai': ['Sivagangai'],
-                      'French India': ['French East India Company'],
-                      'Dutch East India Company': ['Dutch East India Company'],
-                      'Danish East India Company': ['Danish'],
-                      'Portuguese India': ['Portuguese'],
-                      'Mysore Residency': ['Mysore Kingdom'],
-                      'Madras States Agency': ['Nawab of Arcot / Carnatic', 'Nawab of Arcot', 'Venad / Travancore', 'Pudukottai'],
-                    };
-                    const SUBSUBSECTION_TO_DYNASTIES: Record<string, string[]> = {
-                      'Mysore': ['Mysore Kingdom'],
-                      'Arcot': ['Nawab of Arcot / Carnatic', 'Nawab of Arcot'],
-                      'Travancore': ['Venad / Travancore'],
-                      'Pudukottai': ['Pudukottai'],
-                      'Cochin': [],
-                      'Vijaynagara': ['Vijayanagara Empire'],
-                    };
-
                     // Determine which dynasties match the current selection (most specific wins)
+                    const { sectionToDynasties, subsectionToDynasties, subsubsectionToDynasties } = dynastyMapping;
                     let matchDynasties: string[] = [];
-                    if (subsubsection && SUBSUBSECTION_TO_DYNASTIES[subsubsection]) {
-                      matchDynasties = SUBSUBSECTION_TO_DYNASTIES[subsubsection];
-                    } else if (subsection && SUBSECTION_TO_DYNASTIES[subsection]) {
-                      matchDynasties = SUBSECTION_TO_DYNASTIES[subsection];
-                    } else if (SECTION_TO_DYNASTIES[section]) {
-                      matchDynasties = SECTION_TO_DYNASTIES[section];
+                    if (subsubsection && subsubsectionToDynasties[subsubsection as keyof typeof subsubsectionToDynasties]) {
+                      matchDynasties = subsubsectionToDynasties[subsubsection as keyof typeof subsubsectionToDynasties];
+                    } else if (subsection && subsectionToDynasties[subsection as keyof typeof subsectionToDynasties]) {
+                      matchDynasties = subsectionToDynasties[subsection as keyof typeof subsectionToDynasties];
+                    } else if (sectionToDynasties[section as keyof typeof sectionToDynasties]) {
+                      matchDynasties = sectionToDynasties[section as keyof typeof sectionToDynasties];
                     }
 
                     if (matchDynasties.length === 0) return null;

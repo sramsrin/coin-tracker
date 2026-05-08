@@ -1,0 +1,32 @@
+{
+  "sectionToDynasties": {
+    "Tamil Kingdoms": ["Chola Empire", "Pandyas", "Madurai Sultanate", "Madurai Nayaks", "Gingee Nayaks", "Sivagangai"],
+    "British India Presidencies": ["British East India Company"],
+    "British India Uniform Coinage": ["British East India Company"],
+    "British India Princely States": ["Mysore Kingdom", "Nawab of Arcot / Carnatic", "Nawab of Arcot", "Venad / Travancore", "Pudukottai"],
+    "European Trading Companies": ["French East India Company", "Dutch East India Company", "Danish", "Portuguese"],
+    "Other": ["Vijayanagara Empire"]
+  },
+  "subsectionToDynasties": {
+    "Cholas": ["Chola Empire"],
+    "Madurai Pandya": ["Pandyas"],
+    "Madurai Sultanate": ["Madurai Sultanate"],
+    "Madurai Nayak": ["Madurai Nayaks"],
+    "Gingee Nayak": ["Gingee Nayaks"],
+    "Sivagangai": ["Sivagangai"],
+    "French India": ["French East India Company"],
+    "Dutch East India Company": ["Dutch East India Company"],
+    "Danish East India Company": ["Danish"],
+    "Portuguese India": ["Portuguese"],
+    "Mysore Residency": ["Mysore Kingdom"],
+    "Madras States Agency": ["Nawab of Arcot / Carnatic", "Nawab of Arcot", "Venad / Travancore", "Pudukottai"]
+  },
+  "subsubsectionToDynasties": {
+    "Mysore": ["Mysore Kingdom"],
+    "Arcot": ["Nawab of Arcot / Carnatic", "Nawab of Arcot"],
+    "Travancore": ["Venad / Travancore"],
+    "Pudukottai": ["Pudukottai"],
+    "Cochin": [],
+    "Vijaynagara": ["Vijayanagara Empire"]
+  }
+}
