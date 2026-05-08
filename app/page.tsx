@@ -441,6 +441,8 @@ export default function Home() {
   const [linkCopiedToast, setLinkCopiedToast] = useState(false);
   const pendingCoinIdRef = useRef<string | null>(null);
   const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
+  const [timelineEntries, setTimelineEntries] = useState<{ id: string; dynasty: string; sideA?: string; sideB?: string }[]>([]);
+  const [timelineDynastyFilters, setTimelineDynastyFilters] = useState<string[]>([]);
   const [lotDescription, setLotDescription] = useState('');
   const [lotDescriptionInitial, setLotDescriptionInitial] = useState('');
   const [lotDescriptionSaving, setLotDescriptionSaving] = useState(false);
@@ -535,6 +537,9 @@ export default function Home() {
       }
     };
     fetchRecentBlogs();
+
+    // Fetch timeline entries for dynasty-to-section linking
+    fetch('/api/timeline').then(r => r.ok ? r.json() : []).then(setTimelineEntries).catch(() => {});
   }, []);
 
   // Deep link to a specific coin once coins have loaded
@@ -2915,6 +2920,77 @@ export default function Home() {
                       </a>
                     );
                   })()}
+                  {(() => {
+                    const { section, subsection, subsubsection } = getCurrentSelectionContext();
+                    if (!section) return null;
+
+                    // Map coin sections to timeline dynasty names
+                    const SECTION_TO_DYNASTIES: Record<string, string[]> = {
+                      'Tamil Kingdoms': ['Chola Empire', 'Pandyas', 'Madurai Sultanate', 'Madurai Nayaks', 'Gingee Nayaks', 'Sivagangai'],
+                      'British India Presidencies': ['British East India Company'],
+                      'British India Uniform Coinage': ['British East India Company'],
+                      'British India Princely States': ['Mysore Kingdom', 'Nawab of Arcot / Carnatic', 'Nawab of Arcot', 'Venad / Travancore', 'Pudukottai'],
+                      'European Trading Companies': ['French East India Company', 'Dutch East India Company', 'Danish', 'Portuguese'],
+                      'Other': ['Vijayanagara Empire'],
+                    };
+                    const SUBSECTION_TO_DYNASTIES: Record<string, string[]> = {
+                      'Cholas': ['Chola Empire'],
+                      'Madurai Pandya': ['Pandyas'],
+                      'Madurai Sultanate': ['Madurai Sultanate'],
+                      'Madurai Nayak': ['Madurai Nayaks'],
+                      'Gingee Nayak': ['Gingee Nayaks'],
+                      'Sivagangai': ['Sivagangai'],
+                      'French India': ['French East India Company'],
+                      'Dutch East India Company': ['Dutch East India Company'],
+                      'Danish East India Company': ['Danish'],
+                      'Portuguese India': ['Portuguese'],
+                      'Mysore Residency': ['Mysore Kingdom'],
+                      'Madras States Agency': ['Nawab of Arcot / Carnatic', 'Nawab of Arcot', 'Venad / Travancore', 'Pudukottai'],
+                    };
+                    const SUBSUBSECTION_TO_DYNASTIES: Record<string, string[]> = {
+                      'Mysore': ['Mysore Kingdom'],
+                      'Arcot': ['Nawab of Arcot / Carnatic', 'Nawab of Arcot'],
+                      'Travancore': ['Venad / Travancore'],
+                      'Pudukottai': ['Pudukottai'],
+                      'Cochin': [],
+                      'Vijaynagara': ['Vijayanagara Empire'],
+                    };
+
+                    // Determine which dynasties match the current selection (most specific wins)
+                    let matchDynasties: string[] = [];
+                    if (subsubsection && SUBSUBSECTION_TO_DYNASTIES[subsubsection]) {
+                      matchDynasties = SUBSUBSECTION_TO_DYNASTIES[subsubsection];
+                    } else if (subsection && SUBSECTION_TO_DYNASTIES[subsection]) {
+                      matchDynasties = SUBSECTION_TO_DYNASTIES[subsection];
+                    } else if (SECTION_TO_DYNASTIES[section]) {
+                      matchDynasties = SECTION_TO_DYNASTIES[section];
+                    }
+
+                    if (matchDynasties.length === 0) return null;
+
+                    // Count timeline events matching these dynasties (primary dynasty or battle sides)
+                    const eventCount = timelineEntries.filter(e =>
+                      matchDynasties.includes(e.dynasty) ||
+                      (e.sideA && matchDynasties.some(d => e.sideA!.includes(d))) ||
+                      (e.sideB && matchDynasties.some(d => e.sideB!.includes(d)))
+                    ).length;
+
+                    if (eventCount === 0) return null;
+
+                    return (
+                      <a
+                        href="#"
+                        onClick={(ev) => {
+                          ev.preventDefault();
+                          setTimelineDynastyFilters([...matchDynasties]);
+                          setActiveTab('timeline');
+                        }}
+                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded shadow-sm transition-colors duration-200"
+                      >
+                        View {eventCount} event{eventCount !== 1 ? 's' : ''}
+                      </a>
+                    );
+                  })()}
                 </div>
             </div>
 
@@ -3894,7 +3970,7 @@ export default function Home() {
         )}
 
         {activeTab === 'timeline' && (
-          <TimelineTab isAuthenticated={isAuthenticated} />
+          <TimelineTab isAuthenticated={isAuthenticated} defaultDynastyFilters={timelineDynastyFilters} />
         )}
       </div>
 

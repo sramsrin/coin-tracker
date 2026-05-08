@@ -54,7 +54,7 @@ function getEraLabel(year: number): string {
   return '1900+';
 }
 
-export default function TimelineTab({ isAuthenticated }: { isAuthenticated: boolean }) {
+export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: { isAuthenticated: boolean; defaultDynastyFilters?: string[] }) {
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -63,6 +63,15 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
   const [formData, setFormData] = useState<Omit<TimelineEntry, 'id'>>(EMPTY_ENTRY);
   const [saving, setSaving] = useState(false);
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
+  const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
+
+  // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
+  useEffect(() => {
+    if (defaultDynastyFilters && defaultDynastyFilters.length > 0) {
+      setMultiDynastyFilter(defaultDynastyFilters);
+      setDynastyFilter('__multi__');
+    }
+  }, [defaultDynastyFilters]);
 
   useEffect(() => {
     fetchEntries();
@@ -94,7 +103,13 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
   const filtered = useMemo(() => {
     let result = entries;
 
-    if (dynastyFilter !== 'all') {
+    if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
+      result = result.filter((e) =>
+        multiDynastyFilter.includes(e.dynasty) ||
+        (e.sideA && multiDynastyFilter.some(d => e.sideA!.includes(d))) ||
+        (e.sideB && multiDynastyFilter.some(d => e.sideB!.includes(d)))
+      );
+    } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
       result = result.filter((e) =>
         e.dynasty === dynastyFilter ||
         e.sideA?.includes(dynastyFilter) ||
@@ -120,7 +135,7 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
     }
 
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
-  }, [entries, search, dynastyFilter]);
+  }, [entries, search, dynastyFilter, multiDynastyFilter]);
 
   const groupedByEra = useMemo(() => {
     const groups: { era: string; entries: TimelineEntry[] }[] = [];
@@ -270,16 +285,35 @@ export default function TimelineTab({ isAuthenticated }: { isAuthenticated: bool
           </div>
 
           {/* Dynasty filter */}
-          <select
-            value={dynastyFilter}
-            onChange={(e) => setDynastyFilter(e.target.value)}
-            className="px-3 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-          >
-            <option value="all">All Dynasties</option>
-            {dynasties.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1">
+            <select
+              value={dynastyFilter}
+              onChange={(e) => {
+                setDynastyFilter(e.target.value);
+                if (e.target.value !== '__multi__') {
+                  setMultiDynastyFilter([]);
+                }
+              }}
+              className="px-3 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            >
+              <option value="all">All Dynasties</option>
+              {dynastyFilter === '__multi__' && (
+                <option value="__multi__">Filtered ({multiDynastyFilter.length} {multiDynastyFilter.length === 1 ? 'dynasty' : 'dynasties'})</option>
+              )}
+              {dynasties.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            {dynastyFilter !== 'all' && (
+              <button
+                onClick={() => { setDynastyFilter('all'); setMultiDynastyFilter([]); }}
+                className="px-2 py-2 text-xs text-pink-600 hover:text-pink-800 font-medium"
+                title="Clear filter"
+              >
+                ✕
+              </button>
+            )}
+          </div>
 
           {isAuthenticated && (
             <button
