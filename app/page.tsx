@@ -436,6 +436,9 @@ export default function Home() {
   const [showAddCoinForm, setShowAddCoinForm] = useState(false);
   const [addCoinInTransit, setAddCoinInTransit] = useState(false);
   const [isHighlighting, setIsHighlighting] = useState(false);
+  const [highlightedCoinId, setHighlightedCoinId] = useState<string | null>(null);
+  const [linkCopiedToast, setLinkCopiedToast] = useState(false);
+  const pendingCoinIdRef = useRef<string | null>(null);
   const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
   const [lotDescription, setLotDescription] = useState('');
   const [lotDescriptionInitial, setLotDescriptionInitial] = useState('');
@@ -493,9 +496,17 @@ export default function Home() {
     const sectionParam = params.get('section');
     const subsectionParam = params.get('subsection');
     const stateParam = params.get('state');
+    const coinParam = params.get('coin');
 
-    if (tabParam === 'collection' || tabParam === 'map' || tabParam === 'targets') {
+    if (coinParam) {
+      // Coin deep link: defer navigation until coins load
+      pendingCoinIdRef.current = coinParam;
+      setActiveTab('collection');
+    } else if (tabParam === 'collection' || tabParam === 'map' || tabParam === 'targets') {
       setActiveTab(tabParam);
+    } else if (sectionParam || subsectionParam || stateParam) {
+      // Auto-switch to collection tab when section/subsection/state specified without explicit tab
+      setActiveTab('collection');
     }
     if (sectionParam) {
       setSelectedSection(sectionParam);
@@ -525,6 +536,40 @@ export default function Home() {
     fetchRecentBlogs();
   }, []);
 
+  // Deep link to a specific coin once coins have loaded
+  useEffect(() => {
+    if (coins.length === 0 || !pendingCoinIdRef.current) return;
+    const coinId = pendingCoinIdRef.current;
+    pendingCoinIdRef.current = null;
+
+    const targetCoin = coins.find(c => c.id === coinId);
+    if (!targetCoin) return;
+
+    // Set filters so the coin's section/subsection/state are visible
+    setSelectedSection(targetCoin.section);
+    if (targetCoin.section === 'British India Princely States') setMapMode('princely');
+    else if (targetCoin.section === 'European Trading Companies') setMapMode('european');
+    else if (targetCoin.section === 'British India Presidencies') setMapMode('presidencies');
+    setSelectedSubsection(targetCoin.subsection);
+    if (targetCoin.subsubsection) setSelectedState(targetCoin.subsubsection);
+    setActiveTab('collection');
+    setGroupBySection(true);
+    setHighlightedCoinId(coinId);
+
+    // Scroll to the coin after the DOM updates
+    setTimeout(() => {
+      const el = document.getElementById(`coin-${coinId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('coin-highlight');
+        setTimeout(() => {
+          el.classList.remove('coin-highlight');
+          setHighlightedCoinId(null);
+        }, 2500);
+      }
+    }, 300);
+  }, [coins]);
+
   // Sync state to URL query parameters
   useEffect(() => {
     const params = new URLSearchParams();
@@ -533,11 +578,12 @@ export default function Home() {
     if (selectedSubsection) params.set('subsection', selectedSubsection);
     if (selectedState) params.set('state', selectedState);
     if (!groupBySection) params.set('view', 'all');
+    if (highlightedCoinId) params.set('coin', highlightedCoinId);
 
     const query = params.toString();
     const newUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
     window.history.replaceState(null, '', newUrl);
-  }, [activeTab, selectedSection, selectedSubsection, selectedState, groupBySection]);
+  }, [activeTab, selectedSection, selectedSubsection, selectedState, groupBySection, highlightedCoinId]);
 
   // Fetch text note when selection changes (with auto-save)
   useEffect(() => {
@@ -1334,6 +1380,14 @@ export default function Home() {
     } catch (error) {
       console.error('Error adding coin:', error);
     }
+  };
+
+  const handleCopyCoinLink = (coinId: string) => {
+    const url = `${window.location.origin}/?coin=${coinId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopiedToast(true);
+      setTimeout(() => setLinkCopiedToast(false), 2000);
+    });
   };
 
   const handleEditClick = (coin: Coin) => {
@@ -2220,7 +2274,7 @@ export default function Home() {
                                   </thead>
                                   <tbody>
                                     {stateCoins.map((coin) => (
-                                      <tr key={coin.id} className="border-t border-gray-200 hover:bg-pink-25">
+                                      <tr key={coin.id} id={`coin-${coin.id}`} className="border-t border-gray-200 hover:bg-pink-25 scroll-mt-24">
                                         <td
                                           className={`px-3 py-2 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                                           onClick={() => isAuthenticated && handleEditClick(coin)}
@@ -2245,7 +2299,7 @@ export default function Home() {
                                           </span>
                                         </td>
                                         <td className="px-3 py-2 text-xs">
-                                          <div className="flex gap-1">
+                                          <div className="flex gap-1 items-center">
                                             {coin.image1Url && (
                                               <a href={coin.image1Url} target="_blank" rel="noopener noreferrer">
                                                 <img src={coin.image1Url} alt="Obverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
@@ -2261,6 +2315,15 @@ export default function Home() {
                                                 <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-purple-200 hover:border-purple-400 transition" />
                                               </a>
                                             )}
+                                            <button
+                                              onClick={() => handleCopyCoinLink(coin.id)}
+                                              title="Copy link to this coin"
+                                              className="ml-1 p-1 rounded hover:bg-purple-100 text-gray-400 hover:text-purple-600 transition"
+                                            >
+                                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                              </svg>
+                                            </button>
                                           </div>
                                         </td>
                                         <td className="px-3 py-2 text-xs text-gray-800 max-w-xs">
@@ -2353,7 +2416,7 @@ export default function Home() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {sortedCoins.map((coin) => (
-                    <tr key={coin.id} className="hover:bg-gray-50">
+                    <tr key={coin.id} id={`coin-${coin.id}`} className="hover:bg-gray-50 scroll-mt-24">
                       <td
                         className={`px-4 py-3 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                         onClick={() => isAuthenticated && handleEditClick(coin)}
@@ -2379,7 +2442,7 @@ export default function Home() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs">
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 items-center">
                           {coin.image1Url && (
                             <a href={coin.image1Url} target="_blank" rel="noopener noreferrer">
                               <img src={coin.image1Url} alt="Obverse" className="h-10 w-10 object-cover rounded border border-gray-200 hover:border-pink-400 transition" />
@@ -2395,6 +2458,15 @@ export default function Home() {
                               <img src={coin.referenceImageUrl} alt="Reference" className="h-10 w-10 object-cover rounded border border-purple-200 hover:border-purple-400 transition" />
                             </a>
                           )}
+                          <button
+                            onClick={() => handleCopyCoinLink(coin.id)}
+                            title="Copy link to this coin"
+                            className="ml-1 p-1 rounded hover:bg-purple-100 text-gray-400 hover:text-purple-600 transition"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                          </button>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-800 max-w-xs">
@@ -3889,6 +3961,13 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Link copied toast */}
+      {linkCopiedToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg animate-fade-in">
+          Link copied!
+        </div>
+      )}
     </main>
   );
 }
