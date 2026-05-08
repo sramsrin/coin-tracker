@@ -13,7 +13,7 @@ interface TimelineEntry {
   source: string;
   sourceUrl?: string;
   verified: boolean;
-  dynasty: string;
+  dynasty: string[];
   people?: string[];
   sideA?: string;
   sideB?: string;
@@ -31,7 +31,7 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   source: '',
   sourceUrl: '',
   verified: false,
-  dynasty: '',
+  dynasty: [],
   people: [],
 };
 
@@ -95,7 +95,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const dynasties = useMemo(() => {
     const set = new Set<string>();
     entries.forEach((e) => {
-      if (e.dynasty) set.add(e.dynasty);
+      if (e.dynasty) e.dynasty.forEach((d) => set.add(d));
     });
     return Array.from(set).sort();
   }, [entries]);
@@ -105,13 +105,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
       result = result.filter((e) =>
-        multiDynastyFilter.includes(e.dynasty) ||
+        e.dynasty.some(d => multiDynastyFilter.includes(d)) ||
         (e.sideA && multiDynastyFilter.some(d => e.sideA!.includes(d))) ||
         (e.sideB && multiDynastyFilter.some(d => e.sideB!.includes(d)))
       );
     } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
       result = result.filter((e) =>
-        e.dynasty === dynastyFilter ||
+        e.dynasty.includes(dynastyFilter) ||
         e.sideA?.includes(dynastyFilter) ||
         e.sideB?.includes(dynastyFilter)
       );
@@ -125,7 +125,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         e.description.toLowerCase().includes(q) ||
         e.source.toLowerCase().includes(q) ||
         e.time.toLowerCase().includes(q) ||
-        e.dynasty.toLowerCase().includes(q) ||
+        e.dynasty.some(d => d.toLowerCase().includes(q)) ||
         (e.sideA && e.sideA.toLowerCase().includes(q)) ||
         (e.sideB && e.sideB.toLowerCase().includes(q)) ||
         (e.victor && e.victor.toLowerCase().includes(q)) ||
@@ -182,7 +182,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       source: entry.source,
       sourceUrl: entry.sourceUrl || '',
       verified: entry.verified,
-      dynasty: entry.dynasty,
+      dynasty: entry.dynasty || [],
       people: entry.people || [],
       sideA: entry.sideA || '',
       sideB: entry.sideB || '',
@@ -417,12 +417,16 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       </div>
                     </div>
 
-                    {/* Dynasty badge */}
-                    <div className="mt-2">
-                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
-                        {entry.dynasty}
-                      </span>
-                    </div>
+                    {/* Dynasty badges */}
+                    {entry.dynasty.length > 0 && (
+                      <div className="mt-2 flex gap-1 flex-wrap">
+                        {entry.dynasty.map((d, i) => (
+                          <span key={i} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Description */}
                     <p className="text-xs text-gray-600 mt-2 leading-relaxed">{entry.description}</p>
@@ -507,22 +511,55 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   />
                 </div>
 
-                {/* Dynasty */}
+                {/* Dynasties */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Dynasty / Kingdom</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Dynasties / Kingdoms</label>
+                  {/* Selected dynasty chips */}
+                  <div className="flex gap-1 flex-wrap mb-2">
+                    {(formData.dynasty || []).map((d, i) => (
+                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                        {d}
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, dynasty: formData.dynasty.filter((_, j) => j !== i) })}
+                          className="text-amber-500 hover:text-amber-800 font-bold"
+                        >
+                          &times;
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  {/* Add dynasty input with suggestions */}
                   <input
                     type="text"
-                    value={formData.dynasty}
-                    onChange={(e) => setFormData({ ...formData, dynasty: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    placeholder="e.g. Chola Empire"
+                    placeholder="Type to add dynasty..."
                     list="dynasty-suggestions"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = (e.target as HTMLInputElement).value.trim();
+                        if (val && !formData.dynasty.includes(val)) {
+                          setFormData({ ...formData, dynasty: [...formData.dynasty, val] });
+                        }
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }}
+                    onChange={(e) => {
+                      // Auto-add if the value exactly matches a suggestion (datalist selection)
+                      const val = e.target.value.trim();
+                      if (val && dynasties.includes(val) && !formData.dynasty.includes(val)) {
+                        setFormData({ ...formData, dynasty: [...formData.dynasty, val] });
+                        e.target.value = '';
+                      }
+                    }}
                   />
                   <datalist id="dynasty-suggestions">
-                    {dynasties.map((d) => (
+                    {dynasties.filter(d => !formData.dynasty.includes(d)).map((d) => (
                       <option key={d} value={d} />
                     ))}
                   </datalist>
+                  <p className="text-[10px] text-gray-400 mt-1">Select from suggestions or type and press Enter</p>
                 </div>
 
                 {/* Time */}

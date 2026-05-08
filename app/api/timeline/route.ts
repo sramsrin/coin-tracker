@@ -14,7 +14,7 @@ interface TimelineEntry {
   source: string;
   sourceUrl?: string;
   verified: boolean;
-  dynasty: string;
+  dynasty: string[];
   people?: string[];
   sideA?: string;
   sideB?: string;
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       source: body.source?.trim() || '',
       ...(body.sourceUrl?.trim() && { sourceUrl: body.sourceUrl.trim() }),
       verified: body.verified || false,
-      dynasty: body.dynasty?.trim() || '',
+      dynasty: Array.isArray(body.dynasty) ? body.dynasty.map((d: string) => d.trim()).filter(Boolean) : (body.dynasty?.trim() ? [body.dynasty.trim()] : []),
       ...(body.people?.length && { people: body.people }),
       ...(body.sideA?.trim() && { sideA: body.sideA.trim() }),
       ...(body.sideB?.trim() && { sideB: body.sideB.trim() }),

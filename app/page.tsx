@@ -442,7 +442,7 @@ export default function Home() {
   const [linkCopiedToast, setLinkCopiedToast] = useState(false);
   const pendingCoinIdRef = useRef<string | null>(null);
   const [recentBlogUrls, setRecentBlogUrls] = useState<string[]>([]);
-  const [timelineEntries, setTimelineEntries] = useState<{ id: string; dynasty: string; sideA?: string; sideB?: string }[]>([]);
+  const [timelineEntries, setTimelineEntries] = useState<{ id: string; dynasty: string[]; sideA?: string; sideB?: string }[]>([]);
   const [timelineDynastyFilters, setTimelineDynastyFilters] = useState<string[]>([]);
   const [lotDescription, setLotDescription] = useState('');
   const [lotDescriptionInitial, setLotDescriptionInitial] = useState('');
@@ -2938,9 +2938,9 @@ export default function Home() {
 
                     if (matchDynasties.length === 0) return null;
 
-                    // Count timeline events matching these dynasties (primary dynasty or battle sides)
+                    // Count timeline events matching these dynasties (primary dynasties or battle sides)
                     const eventCount = timelineEntries.filter(e =>
-                      matchDynasties.includes(e.dynasty) ||
+                      e.dynasty.some(d => matchDynasties.includes(d)) ||
                       (e.sideA && matchDynasties.some(d => e.sideA!.includes(d))) ||
                       (e.sideB && matchDynasties.some(d => e.sideB!.includes(d)))
                     ).length;
