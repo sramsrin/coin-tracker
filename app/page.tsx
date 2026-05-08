@@ -2,6 +2,7 @@
 // Test commit - responsive design updates
 
 import { useState, useEffect, useRef } from 'react';
+import TimelineTab from './components/TimelineTab';
 
 // Single Blog Card Component
 function BlogCard({ url }: { url: string }) {
@@ -396,7 +397,7 @@ export default function Home() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deletePasswordError, setDeletePasswordError] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<Coin>>({});
-  const [activeTab, setActiveTab] = useState<'collection' | 'map' | 'targets'>('map');
+  const [activeTab, setActiveTab] = useState<'collection' | 'map' | 'targets' | 'timeline'>('map');
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [selectedSubsection, setSelectedSubsection] = useState<string | null>(null);
   const [colorMappings, setColorMappings] = useState<{state: string, color: string}[]>([]);
@@ -502,7 +503,7 @@ export default function Home() {
       // Coin deep link: defer navigation until coins load
       pendingCoinIdRef.current = coinParam;
       setActiveTab('collection');
-    } else if (tabParam === 'collection' || tabParam === 'map' || tabParam === 'targets') {
+    } else if (tabParam === 'collection' || tabParam === 'map' || tabParam === 'targets' || tabParam === 'timeline') {
       setActiveTab(tabParam);
     } else if (sectionParam || subsectionParam || stateParam) {
       // Auto-switch to collection tab when section/subsection/state specified without explicit tab
@@ -1684,6 +1685,16 @@ export default function Home() {
                 }`}
               >
                 📊 Collection
+              </button>
+              <button
+                onClick={() => setActiveTab('timeline')}
+                className={`px-3 sm:px-4 py-2 rounded-lg font-semibold transition text-xs sm:text-sm ${
+                  activeTab === 'timeline'
+                    ? 'bg-pink-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-pink-50'
+                }`}
+              >
+                📜 Timeline
               </button>
             </div>
           </div>
@@ -3959,6 +3970,10 @@ export default function Home() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'timeline' && (
+          <TimelineTab isAuthenticated={isAuthenticated} />
         )}
       </div>
 
