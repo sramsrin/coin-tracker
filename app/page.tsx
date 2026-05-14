@@ -3738,22 +3738,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Tamil Kingdoms Map */}
-            {selectedSection === 'Tamil Kingdoms' && (
-              <div className="mb-6">
-                <div className="rounded-lg overflow-hidden border-2 border-purple-200 shadow-md">
-                  <iframe
-                    src="https://www.google.com/maps/d/u/2/embed?mid=1RMi18_m3sFpCHFgrRiMySxuSW787ZWQ&ehbc=2E312F"
-                    width="100%"
-                    height="480"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            )}
-
             {/* Other Sections Mode (no map, just subsections) */}
             {selectedSection && selectedSection !== 'British India Princely States' && selectedSection !== 'European Trading Companies' && selectedSection !== 'British India Presidencies' && selectedSection !== 'Indeterminate' && (
               <div className="mb-6">
@@ -3786,6 +3770,22 @@ export default function Home() {
                       </button>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* Tamil Kingdoms Map - below subsections */}
+            {selectedSection === 'Tamil Kingdoms' && (
+              <div className="mb-6">
+                <div className="rounded-lg overflow-hidden border-2 border-purple-200 shadow-md">
+                  <iframe
+                    src="https://www.google.com/maps/d/u/2/embed?mid=1RMi18_m3sFpCHFgrRiMySxuSW787ZWQ&ehbc=2E312F"
+                    width="100%"
+                    height="480"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                  />
                 </div>
               </div>
             )}
