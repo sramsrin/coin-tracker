@@ -47,6 +47,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Bulk replace all color mappings
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    if (!Array.isArray(body.mappings)) {
+      return NextResponse.json({ error: 'mappings array required' }, { status: 400 });
+    }
+    await kv.set(MAP_POINTS_KEY, body.mappings);
+    return NextResponse.json({ success: true, count: body.mappings.length });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to bulk update' }, { status: 500 });
+  }
+}
+
 // DELETE - Remove a color mapping
 export async function DELETE(request: NextRequest) {
   try {
