@@ -1019,12 +1019,9 @@ export default function Home() {
         return;
       }
 
-      // Annexed district colors (Arcot, Madurai, Sivagangai, Tanjore) - turn white when highlighted
+      // Annexed district colors (Arcot) - turn white when highlighted
       const annexedColors = [
         {r:0,g:190,b:180}, {r:0,g:140,b:130},                          // Arcot
-        {r:220,g:120,b:50}, {r:170,g:85,b:30}, {r:160,g:80,b:30},     // Madurai
-        {r:50,g:140,b:220}, {r:30,g:100,b:170}, {r:30,g:90,b:160},    // Ramnad/Sivagangai
-        {r:255,g:50,b:120}, {r:200,g:35,b:90}, {r:155,g:25,b:65},     // Tanjore
       ];
 
       const imageData = ctx.getImageData(0, 0, presidenciesMapCanvas.width, presidenciesMapCanvas.height);
