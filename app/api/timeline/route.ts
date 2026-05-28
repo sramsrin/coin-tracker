@@ -20,6 +20,7 @@ interface TimelineEntry {
   sideB?: string;
   victor?: string;
   partOf?: string;
+  region?: 'south-india' | 'north-india' | 'us';
 }
 
 async function readEntries(): Promise<TimelineEntry[]> {
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       ...(body.sideB?.trim() && { sideB: body.sideB.trim() }),
       ...(body.victor?.trim() && { victor: body.victor.trim() }),
       ...(body.partOf?.trim() && { partOf: body.partOf.trim() }),
+      ...(body.region && { region: body.region }),
     };
 
     entries.push(newEntry);

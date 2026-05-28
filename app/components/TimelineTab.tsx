@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
+type Region = 'south-india' | 'north-india' | 'us';
+
 interface TimelineEntry {
   id: string;
   name: string;
@@ -19,7 +21,20 @@ interface TimelineEntry {
   sideB?: string;
   victor?: string;
   partOf?: string;
-  southIndia?: boolean;
+  southIndia?: boolean; // legacy field
+  region?: Region;
+}
+
+const REGION_LABELS: Record<Region, string> = {
+  'south-india': 'South India',
+  'north-india': 'North India',
+  'us': 'US',
+};
+
+function getEntryRegion(e: TimelineEntry): Region {
+  if (e.region) return e.region;
+  // Legacy: entries without region field use southIndia boolean
+  return e.southIndia === false ? 'north-india' : 'south-india';
 }
 
 const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
@@ -34,6 +49,7 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   verified: false,
   dynasty: [],
   people: [],
+  region: 'south-india',
 };
 
 function getEraLabel(year: number): string {
@@ -66,7 +82,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [southIndiaOnly, setSouthIndiaOnly] = useState(true);
+  const [regionFilter, setRegionFilter] = useState<Region | 'all'>('all');
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -106,9 +122,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const filtered = useMemo(() => {
     let result = entries;
 
-    // South India filter (entries without the field default to true)
-    if (southIndiaOnly) {
-      result = result.filter((e) => e.southIndia !== false);
+    // Region filter
+    if (regionFilter !== 'all') {
+      result = result.filter((e) => getEntryRegion(e) === regionFilter);
     }
 
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
@@ -143,7 +159,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     }
 
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
-  }, [entries, search, dynastyFilter, multiDynastyFilter, southIndiaOnly]);
+  }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
 
   const groupedByEra = useMemo(() => {
     const groups: { era: string; entries: TimelineEntry[] }[] = [];
@@ -196,6 +212,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       sideB: entry.sideB || '',
       victor: entry.victor || '',
       partOf: entry.partOf || '',
+      region: getEntryRegion(entry),
     });
   }
 
@@ -323,18 +340,22 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
             )}
           </div>
 
-          {/* South India toggle */}
-          <button
-            onClick={() => setSouthIndiaOnly(!southIndiaOnly)}
-            className={`px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap border ${
-              southIndiaOnly
-                ? 'bg-purple-100 text-purple-700 border-purple-300'
-                : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
-            }`}
-            title={southIndiaOnly ? 'Showing South India events only. Click to show all.' : 'Showing all events. Click to filter to South India.'}
-          >
-            {southIndiaOnly ? 'South India' : 'All Regions'}
-          </button>
+          {/* Region filter */}
+          <div className="flex rounded-lg border border-purple-200 overflow-hidden">
+            {(['all', 'south-india', 'north-india', 'us'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRegionFilter(r)}
+                className={`px-2.5 py-2 text-xs font-medium transition whitespace-nowrap ${
+                  regionFilter === r
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {r === 'all' ? 'All' : REGION_LABELS[r]}
+              </button>
+            ))}
+          </div>
 
           {isAuthenticated && (
             <button
@@ -394,6 +415,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         )}
                         <h3 className="font-semibold text-gray-800 text-sm">{entry.name}</h3>
                         <span className="text-xs text-gray-400">{entry.time}</span>
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${
+                          getEntryRegion(entry) === 'south-india' ? 'bg-blue-50 text-blue-600' :
+                          getEntryRegion(entry) === 'north-india' ? 'bg-orange-50 text-orange-600' :
+                          'bg-emerald-50 text-emerald-600'
+                        }`}>
+                          {REGION_LABELS[getEntryRegion(entry)]}
+                        </span>
                         <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${expandedId === entry.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -686,6 +714,20 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       placeholder="https://..."
                     />
                   </div>
+                </div>
+
+                {/* Region */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Region</label>
+                  <select
+                    value={formData.region || 'south-india'}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value as Region })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  >
+                    <option value="south-india">South India</option>
+                    <option value="north-india">North India</option>
+                    <option value="us">US</option>
+                  </select>
                 </div>
 
                 {/* Verified */}
