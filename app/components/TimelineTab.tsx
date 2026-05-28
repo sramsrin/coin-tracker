@@ -27,7 +27,7 @@ interface TimelineEntry {
 
 const REGION_LABELS: Record<Region, string> = {
   'south-india': 'South India',
-  'north-india': 'North India',
+  'north-india': 'Broader India',
   'us': 'US',
 };
 
@@ -725,7 +725,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
                   >
                     <option value="south-india">South India</option>
-                    <option value="north-india">North India</option>
+                    <option value="north-india">Broader India</option>
                     <option value="us">US</option>
                   </select>
                 </div>
