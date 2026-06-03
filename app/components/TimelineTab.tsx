@@ -79,6 +79,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState<Omit<TimelineEntry, 'id'>>(EMPTY_ENTRY);
   const [saving, setSaving] = useState(false);
+  const [peopleText, setPeopleText] = useState('');
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -214,11 +215,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       partOf: entry.partOf || '',
       region: getEntryRegion(entry),
     });
+    setPeopleText((entry.people || []).join(', '));
   }
 
   function openAdd() {
     setEditingEntry(null);
     setFormData({ ...EMPTY_ENTRY, people: [] });
+    setPeopleText('');
     setShowAddForm(true);
   }
 
@@ -230,11 +233,12 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   async function handleSave() {
     setSaving(true);
     try {
+      const parsedPeople = peopleText.split(',').map((s) => s.trim()).filter(Boolean);
       const payload = {
         ...formData,
         timeStart: Number(formData.timeStart) || 0,
         timeEnd: formData.timeEnd ? Number(formData.timeEnd) : null,
-        people: formData.people?.length ? formData.people : undefined,
+        people: parsedPeople.length ? parsedPeople : undefined,
       };
 
       if (editingEntry) {
@@ -678,16 +682,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <label className="block text-xs font-medium text-gray-600 mb-1">People Involved (comma-separated)</label>
                   <input
                     type="text"
-                    value={(formData.people || []).join(', ')}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        people: e.target.value
-                          .split(',')
-                          .map((s) => s.trim())
-                          .filter(Boolean),
-                      })
-                    }
+                    value={peopleText}
+                    onChange={(e) => setPeopleText(e.target.value)}
+                    onBlur={() => {
+                      const parsed = peopleText.split(',').map((s) => s.trim()).filter(Boolean);
+                      setFormData({ ...formData, people: parsed });
+                      setPeopleText(parsed.join(', '));
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
                     placeholder="Rajaraja Cholan, Rajendra Chola"
                   />
