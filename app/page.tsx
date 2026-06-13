@@ -568,13 +568,8 @@ export default function Home() {
       const el = document.getElementById(`coin-${coinId}`);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('coin-highlight');
-        setTimeout(() => {
-          el.classList.remove('coin-highlight');
-          setHighlightedCoinId(null);
-        }, 2500);
       }
-    }, 300);
+    }, 500);
   }, [coins]);
 
   // Sync state to URL query parameters
@@ -2288,7 +2283,7 @@ export default function Home() {
                                   </thead>
                                   <tbody>
                                     {stateCoins.map((coin) => (
-                                      <tr key={coin.id} id={`coin-${coin.id}`} className="border-t border-gray-200 hover:bg-pink-25 scroll-mt-24">
+                                      <tr key={coin.id} id={`coin-${coin.id}`} className={`border-t border-gray-200 hover:bg-pink-25 scroll-mt-24 ${highlightedCoinId === coin.id ? 'coin-highlight' : ''}`}>
                                         <td
                                           className={`px-3 py-2 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                                           onClick={() => isAuthenticated && handleEditClick(coin)}
@@ -2430,7 +2425,7 @@ export default function Home() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {sortedCoins.map((coin) => (
-                    <tr key={coin.id} id={`coin-${coin.id}`} className="hover:bg-gray-50 scroll-mt-24">
+                    <tr key={coin.id} id={`coin-${coin.id}`} className={`hover:bg-gray-50 scroll-mt-24 ${highlightedCoinId === coin.id ? 'coin-highlight' : ''}`}>
                       <td
                         className={`px-4 py-3 text-xs text-gray-800 font-medium ${isAuthenticated ? 'cursor-pointer text-blue-600 hover:text-blue-800 hover:underline' : ''}`}
                         onClick={() => isAuthenticated && handleEditClick(coin)}

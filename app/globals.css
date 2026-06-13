@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @keyframes coin-highlight {
-  0% { background-color: rgba(168, 85, 247, 0.25); box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5); }
-  50% { background-color: rgba(236, 72, 153, 0.2); box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.4); }
-  100% { background-color: transparent; box-shadow: none; }
+  0% { background-color: rgba(168, 85, 247, 0.3); box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.5); }
+  50% { background-color: rgba(236, 72, 153, 0.25); box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.4); }
+  100% { background-color: rgba(236, 72, 153, 0.12); box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.3); }
 }
 
 .coin-highlight {
