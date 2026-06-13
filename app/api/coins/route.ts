@@ -24,6 +24,34 @@ interface Coin {
   secondarySubsection?: string;
 }
 
+// Auto-compute secondary classification from existing coins in the same subsection
+function inferSecondary(coin: Partial<Coin>, allCoins: Coin[]): { secondarySection?: string; secondarySubsection?: string } {
+  // If secondary is already explicitly set, keep it
+  if (coin.secondarySection) return {};
+
+  const section = coin.section || '';
+  const subsection = coin.subsection || '';
+  const subsubsection = coin.subsubsection || '';
+
+  // First try to match on (section, subsection, subsubsection) for more specific mapping
+  const candidates = subsubsection
+    ? allCoins.filter(c => c.section === section && c.subsection === subsection && c.subsubsection === subsubsection && c.secondarySection)
+    : [];
+
+  // Fall back to (section, subsection) if no subsubsection match
+  const pool = candidates.length > 0
+    ? candidates
+    : allCoins.filter(c => c.section === section && c.subsection === subsection && c.secondarySection);
+
+  if (pool.length === 0) return {};
+
+  // Use the most common secondary among matching coins
+  const secondarySection = pool[0].secondarySection!;
+  const secondarySubsection = pool[0].secondarySubsection || '';
+
+  return { secondarySection, secondarySubsection };
+}
+
 // Helper function to read coins from KV
 async function readCoins(): Promise<Coin[]> {
   try {
@@ -79,6 +107,13 @@ export async function POST(request: NextRequest) {
       ...(body.secondarySubsection?.trim() && { secondarySubsection: body.secondarySubsection.trim() }),
     };
 
+    // Auto-compute secondary from existing coins if not explicitly provided
+    const inferred = inferSecondary(newCoin, coins);
+    if (inferred.secondarySection) {
+      newCoin.secondarySection = inferred.secondarySection;
+      newCoin.secondarySubsection = inferred.secondarySubsection;
+    }
+
     coins.push(newCoin);
     await writeCoins(coins);
 
@@ -130,6 +165,16 @@ export async function PUT(request: NextRequest) {
       ...coins[coinIndex],
       ...trimmedBody,
     };
+
+    // Auto-compute secondary if the section/subsection changed and no secondary was explicitly provided
+    if ((trimmedBody.section || trimmedBody.subsection) && !trimmedBody.secondarySection) {
+      const otherCoins = coins.filter((_, i) => i !== coinIndex);
+      const inferred = inferSecondary(coins[coinIndex], otherCoins);
+      if (inferred.secondarySection) {
+        coins[coinIndex].secondarySection = inferred.secondarySection;
+        coins[coinIndex].secondarySubsection = inferred.secondarySubsection;
+      }
+    }
 
     await writeCoins(coins);
 
