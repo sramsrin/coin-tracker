@@ -2896,7 +2896,7 @@ export default function Home() {
                                 }
                               }
                               if (subsubsection) {
-                                if (section === 'British India Princely States') {
+                                if (section === 'British India Princely States' || section === 'British India Presidencies') {
                                   setSelectedState(subsubsection);
                                 } else if (section === 'European Trading Companies') {
                                   setSelectedEuropeanPower(subsubsection);
@@ -3506,6 +3506,7 @@ export default function Home() {
                       key={subsection}
                       onClick={() => {
                         setSelectedPresidency(selectedPresidency === subsection ? null : subsection);
+                        setSelectedState(null);
                       }}
                       className={`px-4 py-3 rounded-lg transition text-left ${
                         selectedPresidency === subsection
@@ -3520,6 +3521,49 @@ export default function Home() {
                 })}
               </div>
             </div>
+
+            {/* Presidency Subsubsection Selector */}
+            {selectedPresidency && (() => {
+              const subsubsections = Array.from(new Set(
+                coins
+                  .filter(c => c.section === 'British India Presidencies' && c.subsection === selectedPresidency)
+                  .map(c => c.subsubsection)
+                  .filter(Boolean)
+              )).sort();
+              if (subsubsections.length === 0) return null;
+              return (
+                <div className="mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
+                    Select Type - {selectedPresidency}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {subsubsections.map(sub => {
+                      const subCoins = coins.filter(
+                        c => c.section === 'British India Presidencies' && c.subsection === selectedPresidency && c.subsubsection === sub
+                      );
+                      return (
+                        <button
+                          key={sub}
+                          onClick={() => {
+                            setSelectedState(selectedState === sub ? null : sub);
+                          }}
+                          className={`px-4 py-3 rounded-lg transition text-left ${
+                            selectedState === sub
+                              ? 'bg-purple-600 text-white shadow-lg'
+                              : 'bg-white hover:bg-purple-50 text-gray-700 border-2 border-gray-200'
+                          }`}
+                        >
+                          <div className="text-sm font-semibold">{sub}</div>
+                          <div className={`text-xs ${selectedState === sub ? 'text-purple-200' : 'text-gray-400'}`}>
+                            {subCoins.length} coin{subCoins.length !== 1 ? 's' : ''}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Presidencies Map Section */}
             <div className="mb-6">
