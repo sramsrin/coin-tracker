@@ -2074,15 +2074,14 @@ export default function Home() {
                         {sortSubsections(section, Object.keys(groupedCoins[section]), groupedCoins[section]).map((subsection) => {
                           const agencyKey = `${section}-${subsection}`;
                           const isExpanded = expandedAgencies.has(agencyKey);
-                          const isPrincelyStates = section === 'British India Princely States';
                           const subsubsections = Object.keys(groupedCoins[section][subsection]);
-                          const hasMultipleStates = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'Other');
+                          const hasSubsubsections = subsubsections.length > 1 || (subsubsections.length === 1 && subsubsections[0] !== 'All');
                           const agencyCoins = Object.values(groupedCoins[section][subsection]).reduce((s, coins) => s + coins.length, 0);
 
                           return (
                             <li key={subsection}>
                               <div className="flex items-center">
-                                {isPrincelyStates && hasMultipleStates && (
+                                {hasSubsubsections && (
                                   <button
                                     onClick={() => toggleAgency(agencyKey)}
                                     className="mr-1 text-pink-600 hover:text-pink-800 focus:outline-none"
@@ -2101,10 +2100,10 @@ export default function Home() {
                                   </span>
                                 </a>
                               </div>
-                              {isPrincelyStates && hasMultipleStates && isExpanded && (
+                              {hasSubsubsections && isExpanded && (
                                 <ul className="ml-6 mt-1 space-y-1">
                                   {Object.keys(groupedCoins[section][subsection]).sort().map((subsubsection) => {
-                                    if (subsubsection === 'Other') return null;
+                                    if (subsubsection === 'All') return null;
                                     const stateCoins = groupedCoins[section][subsection][subsubsection].length;
                                     return (
                                       <li key={subsubsection}>
