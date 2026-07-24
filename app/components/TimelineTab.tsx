@@ -64,10 +64,20 @@ function getEraLabel(year: number): string {
   if (year < 1600) return '1500s';
   if (year < 1650) return '1600-1649';
   if (year < 1700) return '1650-1699';
-  if (year < 1750) return '1700-1749';
-  if (year < 1800) return '1750-1799';
-  if (year < 1850) return '1800-1849';
-  if (year < 1900) return '1850-1899';
+  if (year < 1710) return '1700-1709';
+  if (year < 1720) return '1710-1719';
+  if (year < 1730) return '1720-1729';
+  if (year < 1740) return '1730-1739';
+  if (year < 1750) return '1740-1749';
+  if (year < 1760) return '1750-1759';
+  if (year < 1770) return '1760-1769';
+  if (year < 1780) return '1770-1779';
+  if (year < 1790) return '1780-1789';
+  if (year < 1800) return '1790-1799';
+  if (year < 1810) return '1800-1809';
+  if (year < 1820) return '1810-1819';
+  if (year < 1830) return '1820-1829';
+  if (year < 1900) return '1830-1899';
   return '1900+';
 }
 
