@@ -585,7 +585,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     </div>
 
                     {/* Expanded content for standalone/parent events */}
-                    {!hasChildren && expandedSubEvents.has(entry.id) && (
+                    {((!hasChildren && expandedSubEvents.has(entry.id)) || (hasChildren && isParentExpanded)) && (
                       <div className="px-3 pb-3 border-t border-gray-100 pt-2">
                         {/* Place */}
                         <div className="text-xs text-gray-500 mb-2">{entry.place}</div>
