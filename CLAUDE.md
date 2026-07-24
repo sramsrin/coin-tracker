@@ -3,6 +3,16 @@
 ## Overview
 Next.js 14 single-page application for cataloging a coin collection focused on British India, Princely States, and European trading companies. Combines a coin inventory, interactive historical maps, and a dynasty/events timeline. Built for the "Ram & Dhruvan Coin Collection".
 
+## Startup Workflow
+
+**Every time Claude opens, ask the user to specify the purpose of their work:**
+
+- **(a) Add features to the coin catalogue** – Continue working in `/LavenderCoinApp` folder
+- **(b) Work on the book on Yusuf Khan** – Change working directory to `/YusufKhanBook` folder
+- **(c) Build tools that help with the book** – Change working directory to `/YusufKhanBook` folder
+
+If the user selects **(b)** or **(c)**, immediately change the working directory to the YusufKhanBook folder using bash before proceeding with any other work.
+
 ## Deployment & Infrastructure
 
 | Component | Detail |
@@ -127,7 +137,17 @@ interface Coin {
 ### Tabs
 - **Map (Explore)** - Three interactive canvas maps with pixel-level highlighting. Uses HTML5 Canvas to color-match regions and highlight/dim areas.
 - **Collection** - Coin table with grouping by section→subsection→subsubsection, sorting, filtering, add/edit/delete forms.
-- **Timeline** - Historical events with era grouping, dynasty/region filtering, battle support.
+- **Timeline** - Historical events with era grouping, dynasty/region filtering, battle support, and nested sub-events.
+
+### Timeline Nested Events
+Timeline events support parent-child relationships via the `partOf` field. Instead of storing display text, `partOf` now stores the **parent event ID**, creating a true hierarchy:
+- **Parent events** show a sub-event count badge and can be expanded to reveal child events
+- **Sub-events** are indented, colored distinctly (gray background), and only visible when parent is expanded
+- **Search and filters** work across the hierarchy: searching a parent includes its children; searching a child includes the parent
+- **Form** uses a dropdown to select parent events from the list of existing events (preventing self-selection)
+- **Visual hierarchy** includes: timeline dot changes color for events with children (purple-500), distinct border styling, and indentation/nesting layout
+- **Independent expansion**: Multiple parents can be expanded simultaneously, and sub-event details can be expanded independently
+- **Backward compatibility**: Events with text in `partOf` field (from before implementation) are treated as standalone; users can update them via the edit form
 
 ### URL State Sync
 Tab, section, subsection, and coin ID are synced to URL query params (`?tab=map&section=...&coin=coinId`), enabling deep linking. Uses `window.history.replaceState()`.

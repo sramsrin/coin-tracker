@@ -82,7 +82,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [peopleText, setPeopleText] = useState('');
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
+  const [expandedSubEvents, setExpandedSubEvents] = useState<Set<string>>(new Set());
   const [regionFilter, setRegionFilter] = useState<Region | 'all'>('all');
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
@@ -111,6 +112,26 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     }
   }
 
+  const toggleParent = (parentId: string) => {
+    const newExpanded = new Set(expandedParents);
+    if (newExpanded.has(parentId)) {
+      newExpanded.delete(parentId);
+    } else {
+      newExpanded.add(parentId);
+    }
+    setExpandedParents(newExpanded);
+  };
+
+  const toggleSubEvent = (subEventId: string) => {
+    const newExpanded = new Set(expandedSubEvents);
+    if (newExpanded.has(subEventId)) {
+      newExpanded.delete(subEventId);
+    } else {
+      newExpanded.add(subEventId);
+    }
+    setExpandedSubEvents(newExpanded);
+  };
+
   // Get unique dynasties for filter dropdown
   const dynasties = useMemo(() => {
     const set = new Set<string>();
@@ -119,6 +140,38 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     });
     return Array.from(set).sort();
   }, [entries]);
+
+  // Build hierarchy: separate parent events from sub-events
+  const { parentEvents, childrenMap } = useMemo(() => {
+    const parents: TimelineEntry[] = [];
+    const childrenByParent = new Map<string, TimelineEntry[]>();
+
+    entries.forEach(entry => {
+      if (entry.partOf && entries.some(e => e.id === entry.partOf)) {
+        // This is a sub-event (partOf points to valid parent ID)
+        if (!childrenByParent.has(entry.partOf)) {
+          childrenByParent.set(entry.partOf, []);
+        }
+        childrenByParent.get(entry.partOf)!.push(entry);
+      } else {
+        // This is a parent event or standalone event
+        parents.push(entry);
+      }
+    });
+
+    // Sort children within each parent by timeStart
+    childrenByParent.forEach(children => {
+      children.sort((a, b) => a.timeStart - b.timeStart);
+    });
+
+    return { parentEvents: parents, childrenMap: childrenByParent };
+  }, [entries]);
+
+  const getParentEventName = (parentId: string | undefined): string | null => {
+    if (!parentId) return null;
+    const parent = entries.find(e => e.id === parentId);
+    return parent ? parent.name : null;
+  };
 
   const filtered = useMemo(() => {
     let result = entries;
@@ -144,21 +197,42 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter((e) =>
-        e.name.toLowerCase().includes(q) ||
-        e.place.toLowerCase().includes(q) ||
-        e.description.toLowerCase().includes(q) ||
-        e.source.toLowerCase().includes(q) ||
-        e.time.toLowerCase().includes(q) ||
-        e.dynasty.some(d => d.toLowerCase().includes(q)) ||
-        (e.sideA && e.sideA.toLowerCase().includes(q)) ||
-        (e.sideB && e.sideB.toLowerCase().includes(q)) ||
-        (e.victor && e.victor.toLowerCase().includes(q)) ||
-        (e.partOf && e.partOf.toLowerCase().includes(q)) ||
-        (e.people && e.people.some((p) => p.toLowerCase().includes(q)))
-      );
+      const matchingIds = new Set<string>();
+
+      // Check all entries (parents and children)
+      entries.forEach(e => {
+        const matches =
+          e.name.toLowerCase().includes(q) ||
+          e.place.toLowerCase().includes(q) ||
+          e.description.toLowerCase().includes(q) ||
+          e.source.toLowerCase().includes(q) ||
+          e.time.toLowerCase().includes(q) ||
+          e.dynasty.some(d => d.toLowerCase().includes(q)) ||
+          (e.sideA && e.sideA.toLowerCase().includes(q)) ||
+          (e.sideB && e.sideB.toLowerCase().includes(q)) ||
+          (e.victor && e.victor.toLowerCase().includes(q)) ||
+          (e.people && e.people.some((p) => p.toLowerCase().includes(q)));
+
+        if (matches) {
+          matchingIds.add(e.id);
+
+          // If parent matches, include all children
+          if (childrenMap.has(e.id)) {
+            childrenMap.get(e.id)!.forEach(child => matchingIds.add(child.id));
+          }
+
+          // If child matches, include parent
+          if (e.partOf) {
+            matchingIds.add(e.partOf);
+          }
+        }
+      });
+
+      result = result.filter(e => matchingIds.has(e.id));
     }
 
+    // Final result: only parent events (children rendered under them)
+    result = result.filter(e => !e.partOf || !entries.some(parent => parent.id === e.partOf));
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
   }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
 
@@ -372,7 +446,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         </div>
 
         <div className="text-xs text-gray-500 mt-2">
-          Showing {filtered.length} of {entries.length} events
+          Showing {filtered.length} event{filtered.length !== 1 ? 's' : ''}
+          ({Array.from(childrenMap.values()).flat().length} sub-events)
+          of {entries.length} total
         </div>
       </div>
 
@@ -395,43 +471,67 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
             {eraEntries.map((entry) => {
               const battle = isBattle(entry);
+              const hasChildren = childrenMap.has(entry.id);
+              const childEvents = childrenMap.get(entry.id) || [];
+              const isParentExpanded = expandedParents.has(entry.id);
+
               return (
                 <div key={entry.id} className="relative ml-12 mb-3">
-                  {/* Connector dot */}
+                  {/* Timeline connector dot */}
                   <div className={`absolute -left-[2.15rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-white z-10 ${
-                    battle ? 'bg-red-400' : 'bg-purple-300'
+                    battle ? 'bg-red-400' :
+                    hasChildren ? 'bg-purple-500' :
+                    'bg-purple-300'
                   }`} />
 
-                  {/* Card */}
+                  {/* Parent Event Card */}
                   <div
                     className={`border-l-4 ${
-                      entry.verified ? 'border-l-green-500' : battle ? 'border-l-red-400' : 'border-l-purple-400'
+                      entry.verified ? 'border-l-green-500' :
+                      battle ? 'border-l-red-400' :
+                      'border-l-purple-400'
                     } bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
-                    onClick={() => setExpandedId(expandedId === entry.id ? null : entry.id)}
+                    onClick={() => {
+                      if (hasChildren) {
+                        toggleParent(entry.id);
+                      } else {
+                        toggleSubEvent(entry.id);
+                      }
+                    }}
                   >
-                    {/* Collapsed header - always visible */}
+                    {/* Parent header (always visible) */}
                     <div className="flex items-center justify-between gap-2 p-3">
                       <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
                         {battle && (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700 flex-shrink-0">
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
                             Battle
+                          </span>
+                        )}
+                        {hasChildren && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-700">
+                            {childEvents.length} sub-event{childEvents.length !== 1 ? 's' : ''}
                           </span>
                         )}
                         <h3 className="font-semibold text-gray-800 text-sm">{entry.name}</h3>
                         <span className="text-xs text-gray-400">{entry.time}</span>
-                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${
+                        {/* Region badge */}
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
                           getEntryRegion(entry) === 'south-india' ? 'bg-blue-50 text-blue-600' :
                           getEntryRegion(entry) === 'north-india' ? 'bg-orange-50 text-orange-600' :
                           'bg-emerald-50 text-emerald-600'
                         }`}>
                           {REGION_LABELS[getEntryRegion(entry)]}
                         </span>
-                        <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${expandedId === entry.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        {/* Chevron */}
+                        <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${
+                          (hasChildren && isParentExpanded) || (!hasChildren && expandedSubEvents.has(entry.id)) ? 'rotate-180' : ''
+                        }`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
 
-                      <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {isAuthenticated && (
                           <button
                             onClick={() => handleVerifiedToggle(entry)}
@@ -468,8 +568,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       </div>
                     </div>
 
-                    {/* Expanded content */}
-                    {expandedId === entry.id && (
+                    {/* Expanded content for standalone/parent events */}
+                    {!hasChildren && expandedSubEvents.has(entry.id) && (
                       <div className="px-3 pb-3 border-t border-gray-100 pt-2">
                         {/* Place */}
                         <div className="text-xs text-gray-500 mb-2">{entry.place}</div>
@@ -503,11 +603,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                           </div>
                         )}
 
-                        {/* Part of */}
-                        {entry.partOf && (
-                          <div className="mt-1.5 text-[10px] text-purple-600">Part of: {entry.partOf}</div>
-                        )}
-
                         {/* People */}
                         {entry.people && entry.people.length > 0 && (
                           <div className="flex gap-1 mt-2 flex-wrap">
@@ -537,6 +632,149 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       </div>
                     )}
                   </div>
+
+                  {/* Sub-events (indented, only shown when parent expanded) */}
+                  {hasChildren && isParentExpanded && (
+                    <div className="ml-6 mt-2 space-y-2 border-l-2 border-purple-200 pl-3">
+                      {childEvents.map((child) => {
+                        const childBattle = isBattle(child);
+                        const isChildExpanded = expandedSubEvents.has(child.id);
+
+                        return (
+                          <div
+                            key={child.id}
+                            className={`border-l-4 ${
+                              child.verified ? 'border-l-green-500' :
+                              childBattle ? 'border-l-red-400' :
+                              'border-l-purple-300'
+                            } bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSubEvent(child.id);
+                            }}
+                          >
+                            {/* Sub-event header */}
+                            <div className="flex items-center justify-between gap-2 p-2.5">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                {childBattle && (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+                                    Battle
+                                  </span>
+                                )}
+                                <h4 className="font-medium text-gray-700 text-sm">{child.name}</h4>
+                                <span className="text-xs text-gray-400">{child.time}</span>
+                                <svg className={`w-3 h-3 text-gray-400 transition-transform ${isChildExpanded ? 'rotate-180' : ''}`}
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </div>
+
+                              {/* Action buttons */}
+                              <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                {isAuthenticated && (
+                                  <button
+                                    onClick={() => handleVerifiedToggle(child)}
+                                    title={child.verified ? 'Mark unverified' : 'Mark verified'}
+                                    className={`w-5 h-5 rounded border flex items-center justify-center transition ${
+                                      child.verified
+                                        ? 'bg-green-500 border-green-500 text-white'
+                                        : 'border-gray-300 text-transparent hover:border-green-400'
+                                    }`}
+                                  >
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </button>
+                                )}
+                                {!isAuthenticated && child.verified && (
+                                  <span className="text-green-500" title="Verified">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </span>
+                                )}
+                                {isAuthenticated && (
+                                  <button
+                                    onClick={() => openEdit(child)}
+                                    className="text-gray-400 hover:text-pink-600 transition"
+                                    title="Edit"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Sub-event expanded content */}
+                            {isChildExpanded && (
+                              <div className="px-2.5 pb-2.5 border-t border-gray-200 pt-2">
+                                {/* Place */}
+                                <div className="text-xs text-gray-500 mb-2">{child.place}</div>
+
+                                {/* Dynasty badges */}
+                                {child.dynasty.length > 0 && (
+                                  <div className="flex gap-1 flex-wrap mb-2">
+                                    {child.dynasty.map((d, i) => (
+                                      <span key={i} className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700">
+                                        {d}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Description */}
+                                <p className="text-xs text-gray-600 leading-relaxed">{child.description}</p>
+
+                                {/* Battle details */}
+                                {childBattle && (
+                                  <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
+                                    {child.sideA && (
+                                      <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{child.sideA}</span></div>
+                                    )}
+                                    {child.sideB && (
+                                      <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{child.sideB}</span></div>
+                                    )}
+                                    {child.victor && (
+                                      <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{child.victor}</span></div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* People */}
+                                {child.people && child.people.length > 0 && (
+                                  <div className="flex gap-1 mt-2 flex-wrap">
+                                    {child.people.map((p, i) => (
+                                      <span key={i} className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{p}</span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Source */}
+                                <div className="mt-2 text-[10px] text-gray-400">
+                                  Source:{' '}
+                                  {child.sourceUrl ? (
+                                    <a
+                                      href={child.sourceUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-pink-500 hover:text-pink-700 underline"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      {child.source}
+                                    </a>
+                                  ) : (
+                                    child.source
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -776,13 +1014,27 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Part Of</label>
-                      <input
-                        type="text"
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Parent Event (optional)
+                      </label>
+                      <select
                         value={formData.partOf || ''}
-                        onChange={(e) => setFormData({ ...formData, partOf: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, partOf: e.target.value || undefined })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                      />
+                      >
+                        <option value="">None (standalone event)</option>
+                        {parentEvents
+                          .filter(e => e.id !== editingEntry?.id) // Prevent self-selection
+                          .sort((a, b) => a.timeStart - b.timeStart)
+                          .map(e => (
+                            <option key={e.id} value={e.id}>
+                              {e.name} ({e.time})
+                            </option>
+                          ))}
+                      </select>
+                      <p className="text-[10px] text-gray-400 mt-1">
+                        Make this a sub-event by selecting a parent event
+                      </p>
                     </div>
                   </div>
                 </div>
