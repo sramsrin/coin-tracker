@@ -1034,27 +1034,29 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         Parent Events (optional - can select multiple)
                       </label>
                       {/* Display selected parents as chips */}
-                      <div className="flex gap-1 flex-wrap mb-2">
-                        {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).map((parentId) => {
-                          const parent = parentEvents.find(e => e.id === parentId);
-                          return parent ? (
-                            <span key={parentId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
-                              {parent.name}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const current = Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : []);
-                                  const updated = current.filter(id => id !== parentId);
-                                  setFormData({ ...formData, partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated });
-                                }}
-                                className="text-pink-500 hover:text-pink-800 font-bold"
-                              >
-                                ×
-                              </button>
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
+                      {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).length > 0 && (
+                        <div className="flex gap-1 flex-wrap mb-2">
+                          {(Array.isArray(formData.partOf) ? formData.partOf : [formData.partOf]).map((parentId) => {
+                            const parent = entries.find(e => e.id === parentId);
+                            return parent ? (
+                              <span key={parentId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
+                                {parent.name}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : []);
+                                    const updated = current.filter(id => id !== parentId);
+                                    setFormData({ ...formData, partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated });
+                                  }}
+                                  className="text-pink-500 hover:text-pink-800 font-bold ml-1"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                       {/* Parent selection dropdown */}
                       <select
                         multiple
@@ -1064,10 +1066,10 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                           setFormData({ ...formData, partOf: selected.length === 0 ? undefined : selected.length === 1 ? selected[0] : selected });
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        size={5}
+                        size={Math.min(entries.length, 6)}
                       >
-                        {parentEvents
-                          .filter(e => e.id !== editingEntry?.id) // Prevent self-selection
+                        {entries
+                          .filter(e => e.id !== editingEntry?.id && (!Array.isArray(e.partOf) && e.partOf ? !entries.some(parent => parent.id === e.partOf) : true)) // Prevent self-selection and show non-sub-events
                           .sort((a, b) => a.timeStart - b.timeStart)
                           .map(e => (
                             <option key={e.id} value={e.id}>
