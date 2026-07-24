@@ -26,7 +26,7 @@ interface TimelineEntry {
 }
 
 const REGION_LABELS: Record<Region, string> = {
-  'south-india': 'South India',
+  'south-india': 'Tamilakam',
   'north-india': 'Broader India',
   'us': 'US',
 };
