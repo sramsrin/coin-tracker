@@ -20,7 +20,7 @@ interface TimelineEntry {
   sideA?: string;
   sideB?: string;
   victor?: string;
-  partOf?: string;
+  partOf?: string | string[]; // supports single parent (string) or multiple parents (array)
   southIndia?: boolean; // legacy field
   region?: Region;
 }
@@ -141,18 +141,30 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     return Array.from(set).sort();
   }, [entries]);
 
-  // Build hierarchy: separate parent events from sub-events
+  // Build hierarchy: separate parent events from sub-events (supports multiple parents)
   const { parentEvents, childrenMap } = useMemo(() => {
     const parents: TimelineEntry[] = [];
     const childrenByParent = new Map<string, TimelineEntry[]>();
 
     entries.forEach(entry => {
-      if (entry.partOf && entries.some(e => e.id === entry.partOf)) {
-        // This is a sub-event (partOf points to valid parent ID)
-        if (!childrenByParent.has(entry.partOf)) {
-          childrenByParent.set(entry.partOf, []);
-        }
-        childrenByParent.get(entry.partOf)!.push(entry);
+      // Normalize partOf to always be an array for consistent handling
+      const parentIds = Array.isArray(entry.partOf)
+        ? entry.partOf
+        : (entry.partOf ? [entry.partOf] : []);
+
+      // Check if any of the parent IDs are valid (exist in entries)
+      const hasValidParent = parentIds.some(pId => entries.some(e => e.id === pId));
+
+      if (hasValidParent) {
+        // This is a sub-event - add it to each valid parent's children list
+        parentIds.forEach(parentId => {
+          if (entries.some(e => e.id === parentId)) {
+            if (!childrenByParent.has(parentId)) {
+              childrenByParent.set(parentId, []);
+            }
+            childrenByParent.get(parentId)!.push(entry);
+          }
+        });
       } else {
         // This is a parent event or standalone event
         parents.push(entry);
@@ -221,10 +233,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
             childrenMap.get(e.id)!.forEach(child => matchingIds.add(child.id));
           }
 
-          // If child matches, include parent
-          if (e.partOf) {
-            matchingIds.add(e.partOf);
-          }
+          // If child matches, include all parents (supports multiple parents)
+          const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
+          parentIds.forEach(pId => matchingIds.add(pId));
         }
       });
 
@@ -232,7 +243,12 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     }
 
     // Final result: only parent events (children rendered under them)
-    result = result.filter(e => !e.partOf || !entries.some(parent => parent.id === e.partOf));
+    // An event is a sub-event if it has any valid parents
+    result = result.filter(e => {
+      const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
+      const hasValidParent = parentIds.some(pId => entries.some(parent => parent.id === pId));
+      return !hasValidParent;
+    });
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
   }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
 
@@ -1015,14 +1031,41 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Parent Event (optional)
+                        Parent Events (optional - can select multiple)
                       </label>
+                      {/* Display selected parents as chips */}
+                      <div className="flex gap-1 flex-wrap mb-2">
+                        {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).map((parentId) => {
+                          const parent = parentEvents.find(e => e.id === parentId);
+                          return parent ? (
+                            <span key={parentId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
+                              {parent.name}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : []);
+                                  const updated = current.filter(id => id !== parentId);
+                                  setFormData({ ...formData, partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated });
+                                }}
+                                className="text-pink-500 hover:text-pink-800 font-bold"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ) : null;
+                        })}
+                      </div>
+                      {/* Parent selection dropdown */}
                       <select
-                        value={formData.partOf || ''}
-                        onChange={(e) => setFormData({ ...formData, partOf: e.target.value || undefined })}
+                        multiple
+                        value={Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])}
+                        onChange={(e) => {
+                          const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                          setFormData({ ...formData, partOf: selected.length === 0 ? undefined : selected.length === 1 ? selected[0] : selected });
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        size={5}
                       >
-                        <option value="">None (standalone event)</option>
                         {parentEvents
                           .filter(e => e.id !== editingEntry?.id) // Prevent self-selection
                           .sort((a, b) => a.timeStart - b.timeStart)
@@ -1033,7 +1076,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                           ))}
                       </select>
                       <p className="text-[10px] text-gray-400 mt-1">
-                        Make this a sub-event by selecting a parent event
+                        Hold Ctrl/Cmd to select multiple parents. Event will appear under all selected parents.
                       </p>
                     </div>
                   </div>
