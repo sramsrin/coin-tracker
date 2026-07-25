@@ -525,11 +525,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     {/* Parent header (always visible) */}
                     <div className="flex items-center justify-between gap-2 p-3">
                       <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
-                        {battle && (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
-                            Battle
-                          </span>
-                        )}
                         {hasChildren && (
                           <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-700">
                             {childEvents.length} sub-event{childEvents.length !== 1 ? 's' : ''}
@@ -679,11 +674,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                             {/* Sub-event header */}
                             <div className="flex items-center justify-between gap-2 p-2.5">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
-                                {childBattle && (
-                                  <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
-                                    Battle
-                                  </span>
-                                )}
                                 <h4 className="font-medium text-gray-700 text-sm">{child.name}</h4>
                                 <span className="text-xs text-gray-400">{child.time}</span>
                                 <svg className={`w-3 h-3 text-gray-400 transition-transform ${isChildExpanded ? 'rotate-180' : ''}`}
