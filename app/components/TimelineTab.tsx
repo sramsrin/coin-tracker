@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
-type Region = 'south-india' | 'north-india' | 'us';
+type Region = 'south-india' | 'related-events';
 
 interface TimelineEntry {
   id: string;
@@ -27,14 +27,19 @@ interface TimelineEntry {
 
 const REGION_LABELS: Record<Region, string> = {
   'south-india': 'Tamilakam',
-  'north-india': 'Broader India',
-  'us': 'US',
+  'related-events': 'Related Events',
 };
 
 function getEntryRegion(e: TimelineEntry): Region {
-  if (e.region) return e.region;
+  if (e.region) {
+    // Map legacy regions to new unified region
+    if (e.region === 'north-india' || e.region === 'us') {
+      return 'related-events';
+    }
+    return e.region;
+  }
   // Legacy: entries without region field use southIndia boolean
-  return e.southIndia === false ? 'north-india' : 'south-india';
+  return e.southIndia === false ? 'related-events' : 'south-india';
 }
 
 const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
@@ -443,7 +448,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
           {/* Region filter */}
           <div className="flex rounded-lg border border-purple-200 overflow-hidden">
-            {(['all', 'south-india', 'north-india', 'us'] as const).map((r) => (
+            {(['all', 'south-india', 'related-events'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRegionFilter(r)}
