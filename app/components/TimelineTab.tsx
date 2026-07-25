@@ -33,7 +33,7 @@ const REGION_LABELS: Record<Region, string> = {
 function getEntryRegion(e: TimelineEntry): Region {
   if (e.region) {
     // Map legacy regions to new unified region
-    if (e.region === 'north-india' || e.region === 'us') {
+    if ((e.region as string) === 'north-india' || (e.region as string) === 'us') {
       return 'related-events';
     }
     return e.region;
