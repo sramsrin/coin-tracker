@@ -96,7 +96,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedSubEvents, setExpandedSubEvents] = useState<Set<string>>(new Set());
-  const [regionFilter, setRegionFilter] = useState<Region | 'all'>('all');
+  const [regionFilter, setRegionFilter] = useState<Region | 'all'>('south-india');
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
