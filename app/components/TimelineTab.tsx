@@ -540,8 +540,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         {/* Region badge */}
                         <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
                           getEntryRegion(entry) === 'south-india' ? 'bg-blue-50 text-blue-600' :
-                          getEntryRegion(entry) === 'north-india' ? 'bg-orange-50 text-orange-600' :
-                          'bg-emerald-50 text-emerald-600'
+                          'bg-orange-50 text-orange-600'
                         }`}>
                           {REGION_LABELS[getEntryRegion(entry)]}
                         </span>
