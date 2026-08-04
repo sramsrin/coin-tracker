@@ -29,6 +29,7 @@ interface TimelineEntry {
 interface Theme {
   id: string;
   bookPart: BookPart;
+  title: string;
   text: string;
   source?: string;
   sourceUrl?: string;
@@ -123,10 +124,11 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedSubEvents, setExpandedSubEvents] = useState<Set<string>>(new Set());
+  const [expandedThemes, setExpandedThemes] = useState<Set<string>>(new Set());
   const [regionFilter, setRegionFilter] = useState<Region | 'all'>('south-india');
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [showAddThemeForm, setShowAddThemeForm] = useState(false);
-  const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', text: '', source: '', sourceUrl: '' });
+  const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; title: string; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', title: '', text: '', source: '', sourceUrl: '' });
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -181,6 +183,16 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       newExpanded.add(subEventId);
     }
     setExpandedSubEvents(newExpanded);
+  };
+
+  const toggleTheme = (themeId: string) => {
+    const newExpanded = new Set(expandedThemes);
+    if (newExpanded.has(themeId)) {
+      newExpanded.delete(themeId);
+    } else {
+      newExpanded.add(themeId);
+    }
+    setExpandedThemes(newExpanded);
   };
 
   // Get unique dynasties for filter dropdown
@@ -428,20 +440,20 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   // Theme management functions
   function openAddTheme(bookPart: BookPart) {
     setEditingTheme(null);
-    setThemeFormData({ bookPart, text: '', source: '', sourceUrl: '' });
+    setThemeFormData({ bookPart, title: '', text: '', source: '', sourceUrl: '' });
     setShowAddThemeForm(true);
   }
 
   function openEditTheme(theme: Theme) {
     setEditingTheme(theme);
-    setThemeFormData({ bookPart: theme.bookPart, text: theme.text, source: theme.source || '', sourceUrl: theme.sourceUrl || '' });
+    setThemeFormData({ bookPart: theme.bookPart, title: theme.title, text: theme.text, source: theme.source || '', sourceUrl: theme.sourceUrl || '' });
     setShowAddThemeForm(true);
   }
 
   function closeThemeModal() {
     setEditingTheme(null);
     setShowAddThemeForm(false);
-    setThemeFormData({ bookPart: 'part-1', text: '', source: '', sourceUrl: '' });
+    setThemeFormData({ bookPart: 'part-1', title: '', text: '', source: '', sourceUrl: '' });
   }
 
   async function handleSaveTheme() {
@@ -914,38 +926,73 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                 <div className="flex-1 space-y-2">
                   <div className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Themes</div>
 
-                  {partThemes.map((theme) => (
-                    <div
-                      key={theme.id}
-                      className="bg-yellow-100 border-l-4 border-yellow-400 shadow-md p-3 rounded cursor-pointer hover:shadow-lg transition transform hover:-rotate-1"
-                      style={{
-                        boxShadow: '2px 2px 4px rgba(0,0,0,0.1)',
-                      }}
-                      onClick={() => isAuthenticated && openEditTheme(theme)}
-                    >
-                      <div className="text-sm text-gray-800 whitespace-pre-wrap">{theme.text}</div>
+                  {partThemes.map((theme) => {
+                    const isExpanded = expandedThemes.has(theme.id);
+                    return (
+                      <div
+                        key={theme.id}
+                        className="bg-yellow-100 border-l-4 border-yellow-400 shadow-md rounded cursor-pointer hover:shadow-lg transition transform hover:-rotate-1"
+                        style={{
+                          boxShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                        }}
+                        onClick={() => toggleTheme(theme.id)}
+                      >
+                        {/* Header - always visible */}
+                        <div className="flex items-center justify-between gap-2 p-3">
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="font-semibold text-sm text-gray-800">{theme.title}</div>
+                            <svg className={`w-3 h-3 text-gray-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
 
-                      {/* Source */}
-                      {theme.source && (
-                        <div className="mt-2 pt-2 border-t border-yellow-300 text-[10px] text-gray-500">
-                          Source:{' '}
-                          {theme.sourceUrl ? (
-                            <a
-                              href={theme.sourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-yellow-700 hover:text-yellow-900 underline"
-                              onClick={(e) => e.stopPropagation()}
+                          {/* Edit button */}
+                          {isAuthenticated && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditTheme(theme);
+                              }}
+                              className="text-gray-400 hover:text-yellow-700 transition flex-shrink-0"
+                              title="Edit"
                             >
-                              {theme.source}
-                            </a>
-                          ) : (
-                            theme.source
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
                           )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        {/* Expanded content */}
+                        {isExpanded && (
+                          <div className="px-3 pb-3 border-t border-yellow-300 pt-2">
+                            <div className="text-sm text-gray-800 whitespace-pre-wrap">{theme.text}</div>
+
+                            {/* Source */}
+                            {theme.source && (
+                              <div className="mt-2 pt-2 border-t border-yellow-300 text-[10px] text-gray-500">
+                                Source:{' '}
+                                {theme.sourceUrl ? (
+                                  <a
+                                    href={theme.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-yellow-700 hover:text-yellow-900 underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {theme.source}
+                                  </a>
+                                ) : (
+                                  theme.source
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
 
                   {/* Add theme button */}
                   {isAuthenticated && (
@@ -1309,6 +1356,18 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   </select>
                 </div>
 
+                {/* Theme Title */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Theme Title</label>
+                  <input
+                    type="text"
+                    value={themeFormData.title}
+                    onChange={(e) => setThemeFormData({ ...themeFormData, title: e.target.value })}
+                    placeholder="Short title for this theme..."
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                  />
+                </div>
+
                 {/* Theme Text */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Theme Description</label>
@@ -1316,7 +1375,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     value={themeFormData.text}
                     onChange={(e) => setThemeFormData({ ...themeFormData, text: e.target.value })}
                     rows={5}
-                    placeholder="Enter a theme or topic you'll write about in this part..."
+                    placeholder="Enter a detailed description of this theme..."
                     className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
                   />
                 </div>
@@ -1367,7 +1426,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   </button>
                   <button
                     onClick={handleSaveTheme}
-                    disabled={saving || !themeFormData.text.trim()}
+                    disabled={saving || !themeFormData.title.trim()}
                     className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium transition disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save'}

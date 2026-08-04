@@ -8,6 +8,7 @@ type BookPart = 'before-part-1' | 'part-1' | 'part-2' | 'part-3' | 'part-4' | 'a
 interface Theme {
   id: string;
   bookPart: BookPart;
+  title: string;
   text: string;
   source?: string;
   sourceUrl?: string;
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
     const newTheme: Theme = {
       id: Date.now().toString(),
       bookPart: body.bookPart,
+      title: body.title?.trim() || '',
       text: body.text?.trim() || '',
       ...(body.source?.trim() && { source: body.source.trim() }),
       ...(body.sourceUrl?.trim() && { sourceUrl: body.sourceUrl.trim() }),
@@ -94,6 +96,7 @@ export async function PUT(request: NextRequest) {
 
     themes[themeIndex] = {
       ...themes[themeIndex],
+      title: body.title?.trim() || themes[themeIndex].title,
       text: body.text?.trim() || themes[themeIndex].text,
       bookPart: body.bookPart || themes[themeIndex].bookPart,
       ...(body.source !== undefined && { source: body.source?.trim() || undefined }),
