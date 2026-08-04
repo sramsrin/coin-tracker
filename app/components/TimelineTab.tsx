@@ -26,7 +26,7 @@ interface TimelineEntry {
 }
 
 const REGION_LABELS: Record<Region, string> = {
-  'south-india': 'Tamilakam',
+  'south-india': 'Carnatic Lost',
   'related-events': 'Related Events',
 };
 
@@ -512,11 +512,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                 <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`}>
                   <div className="w-2.5 h-2.5 rounded-full bg-white" />
                 </div>
-                <div className="ml-12">
-                  <div className={`inline-block px-4 py-2 ${config.color} text-white rounded-lg shadow-md`}>
-                    <div className="font-bold text-sm">{config.title}</div>
-                    <div className="text-xs opacity-90 mt-0.5">{config.subtitle}</div>
-                  </div>
+                <div className={`w-full px-4 py-3 ${config.color} text-white shadow-md`}>
+                  <div className="font-bold text-base">{config.title}</div>
+                  <div className="text-sm opacity-90 mt-0.5">{config.subtitle}</div>
                 </div>
               </div>
 
