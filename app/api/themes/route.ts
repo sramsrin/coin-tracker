@@ -9,6 +9,8 @@ interface Theme {
   id: string;
   bookPart: BookPart;
   text: string;
+  source?: string;
+  sourceUrl?: string;
   createdAt: number;
 }
 
@@ -49,6 +51,8 @@ export async function POST(request: NextRequest) {
       id: Date.now().toString(),
       bookPart: body.bookPart,
       text: body.text?.trim() || '',
+      ...(body.source?.trim() && { source: body.source.trim() }),
+      ...(body.sourceUrl?.trim() && { sourceUrl: body.sourceUrl.trim() }),
       createdAt: Date.now(),
     };
 
@@ -92,6 +96,8 @@ export async function PUT(request: NextRequest) {
       ...themes[themeIndex],
       text: body.text?.trim() || themes[themeIndex].text,
       bookPart: body.bookPart || themes[themeIndex].bookPart,
+      ...(body.source !== undefined && { source: body.source?.trim() || undefined }),
+      ...(body.sourceUrl !== undefined && { sourceUrl: body.sourceUrl?.trim() || undefined }),
     };
 
     await writeThemes(themes);

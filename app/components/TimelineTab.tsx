@@ -30,6 +30,8 @@ interface Theme {
   id: string;
   bookPart: BookPart;
   text: string;
+  source?: string;
+  sourceUrl?: string;
   createdAt: number;
 }
 
@@ -124,7 +126,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [regionFilter, setRegionFilter] = useState<Region | 'all'>('south-india');
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [showAddThemeForm, setShowAddThemeForm] = useState(false);
-  const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; text: string }>({ bookPart: 'part-1', text: '' });
+  const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', text: '', source: '', sourceUrl: '' });
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -426,20 +428,20 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   // Theme management functions
   function openAddTheme(bookPart: BookPart) {
     setEditingTheme(null);
-    setThemeFormData({ bookPart, text: '' });
+    setThemeFormData({ bookPart, text: '', source: '', sourceUrl: '' });
     setShowAddThemeForm(true);
   }
 
   function openEditTheme(theme: Theme) {
     setEditingTheme(theme);
-    setThemeFormData({ bookPart: theme.bookPart, text: theme.text });
+    setThemeFormData({ bookPart: theme.bookPart, text: theme.text, source: theme.source || '', sourceUrl: theme.sourceUrl || '' });
     setShowAddThemeForm(true);
   }
 
   function closeThemeModal() {
     setEditingTheme(null);
     setShowAddThemeForm(false);
-    setThemeFormData({ bookPart: 'part-1', text: '' });
+    setThemeFormData({ bookPart: 'part-1', text: '', source: '', sourceUrl: '' });
   }
 
   async function handleSaveTheme() {
@@ -922,6 +924,26 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       onClick={() => isAuthenticated && openEditTheme(theme)}
                     >
                       <div className="text-sm text-gray-800 whitespace-pre-wrap">{theme.text}</div>
+
+                      {/* Source */}
+                      {theme.source && (
+                        <div className="mt-2 pt-2 border-t border-yellow-300 text-[10px] text-gray-500">
+                          Source:{' '}
+                          {theme.sourceUrl ? (
+                            <a
+                              href={theme.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-yellow-700 hover:text-yellow-900 underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {theme.source}
+                            </a>
+                          ) : (
+                            theme.source
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
 
@@ -1297,6 +1319,30 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     placeholder="Enter a theme or topic you'll write about in this part..."
                     className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
                   />
+                </div>
+
+                {/* Source */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Source</label>
+                    <input
+                      type="text"
+                      value={themeFormData.source || ''}
+                      onChange={(e) => setThemeFormData({ ...themeFormData, source: e.target.value })}
+                      placeholder="Book, article, etc."
+                      className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Source URL</label>
+                    <input
+                      type="url"
+                      value={themeFormData.sourceUrl || ''}
+                      onChange={(e) => setThemeFormData({ ...themeFormData, sourceUrl: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
