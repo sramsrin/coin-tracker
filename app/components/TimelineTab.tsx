@@ -379,6 +379,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         timeStart: Number(formData.timeStart) || 0,
         timeEnd: formData.timeEnd ? Number(formData.timeEnd) : null,
         people: parsedPeople.length ? parsedPeople : undefined,
+        partOf: formData.partOf === undefined ? null : formData.partOf, // explicitly send null to clear
       };
 
       if (editingEntry) {

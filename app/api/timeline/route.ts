@@ -127,6 +127,11 @@ export async function PUT(request: NextRequest) {
       ...trimmedBody,
     };
 
+    // Delete partOf field if it's null (user wants to remove parent)
+    if (body.partOf === null) {
+      delete entries[entryIndex].partOf;
+    }
+
     await writeEntries(entries);
 
     return NextResponse.json(entries[entryIndex]);
