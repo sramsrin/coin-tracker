@@ -582,27 +582,31 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         </div>
       </div>
 
-      {/* Timeline with Themes - Two Column Layout */}
-      <div className="flex gap-4 mt-2">
-        {/* Left Column - Timeline Events (75%) */}
-        <div className="relative flex-[3]">
-          {/* Vertical line */}
-          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
+      {/* Timeline with Themes */}
+      <div className="relative mt-2">
+        {groupedByBookPart.map(({ part, entries: partEntries }) => {
+          const config = BOOK_PART_CONFIG[part];
+          const partThemes = themes.filter(t => t.bookPart === part);
 
-          {groupedByBookPart.map(({ part, entries: partEntries }) => {
-            const config = BOOK_PART_CONFIG[part];
-            return (
-              <div key={part} id={`section-${part}`}>
-                {/* Book Part marker */}
-                <div className="relative mb-6 mt-8 first:mt-0">
-                  <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`}>
-                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                  </div>
-                  <div className={`w-full px-4 py-3 ${config.color} text-white shadow-md`}>
-                    <div className="font-bold text-base">{config.title}</div>
-                    <div className="text-sm opacity-90 mt-0.5">{config.subtitle}</div>
-                  </div>
+          return (
+            <div key={part} id={`section-${part}`} className="mb-8">
+              {/* Book Part Header (Full Width) */}
+              <div className="relative mb-6 mt-8 first:mt-0">
+                <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
                 </div>
+                <div className={`w-full px-4 py-3 ${config.color} text-white shadow-md`}>
+                  <div className="font-bold text-base">{config.title}</div>
+                  <div className="text-sm opacity-90 mt-0.5">{config.subtitle}</div>
+                </div>
+              </div>
+
+              {/* Two Column Layout: Events (75%) + Themes (25%) */}
+              <div className="flex gap-4">
+                {/* Left: Timeline Events */}
+                <div className="relative flex-[3]">
+                  {/* Vertical line connecting events in this section */}
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
               {partEntries.map((entry) => {
               const battle = isBattle(entry);
@@ -902,39 +906,18 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                 </div>
               );
             })}
-            </div>
-          );
-        })}
+                </div>
 
-          {filtered.length === 0 && !loading && (
-            <div className="text-center text-gray-500 py-12">
-              {search ? `No events matching "${search}"` : 'No timeline events yet'}
-            </div>
-          )}
-        </div>
+                {/* Right: Themes for this part */}
+                <div className="flex-1 space-y-2">
+                  <div className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Themes</div>
 
-        {/* Right Column - Themes (25%) */}
-        <div className="flex-1 space-y-4 sticky top-0 h-fit">
-          <div className="text-sm font-bold text-gray-700 mb-2">Themes</div>
-
-          {(['before-part-1', 'part-1', 'part-2', 'part-3', 'part-4', 'after-part-4'] as const).map((part) => {
-            const config = BOOK_PART_CONFIG[part];
-            const partThemes = themes.filter(t => t.bookPart === part);
-
-            return (
-              <div key={part} className="mb-6">
-                {/* Part label */}
-                <div className="text-xs font-medium text-gray-500 mb-2">{config.subtitle}</div>
-
-                {/* Themes for this part */}
-                <div className="space-y-2">
                   {partThemes.map((theme) => (
                     <div
                       key={theme.id}
                       className="bg-yellow-100 border-l-4 border-yellow-400 shadow-md p-3 rounded cursor-pointer hover:shadow-lg transition transform hover:-rotate-1"
                       style={{
                         boxShadow: '2px 2px 4px rgba(0,0,0,0.1)',
-                        fontFamily: '"Indie Flower", cursive',
                       }}
                       onClick={() => isAuthenticated && openEditTheme(theme)}
                     >
@@ -953,9 +936,15 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   )}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
+
+        {filtered.length === 0 && !loading && (
+          <div className="text-center text-gray-500 py-12">
+            {search ? `No events matching "${search}"` : 'No timeline events yet'}
+          </div>
+        )}
       </div>
 
       {/* Edit / Add Modal */}
