@@ -1162,9 +1162,20 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
                 {/* Parent Events */}
                 <div className="border-t pt-3 mt-2">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Parent Events (optional - can select multiple)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-gray-600">
+                      Parent Events (optional - can select multiple)
+                    </label>
+                    {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, partOf: undefined })}
+                        className="text-xs text-pink-600 hover:text-pink-800 font-medium"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
                   {/* Display selected parents as chips */}
                   {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).length > 0 && (
                     <div className="flex gap-1 flex-wrap mb-2">
