@@ -57,30 +57,48 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   region: 'south-india',
 };
 
-function getEraLabel(year: number): string {
-  if (year < 0) return `${Math.abs(year)} BC`;
-  if (year < 900) return `~${year} AD`;
-  if (year < 1000) return '900s AD';
-  if (year < 1100) return '1000s';
-  if (year < 1200) return '1100s';
-  if (year < 1300) return '1200s';
-  if (year < 1400) return '1300s';
-  if (year < 1500) return '1400s';
-  if (year < 1600) return '1500s';
-  if (year < 1650) return '1600-1649';
-  if (year < 1700) return '1650-1699';
-  if (year < 1740) return '1700-1739';
-  if (year < 1750) return '1740-1749';
-  if (year < 1760) return '1750-1759';
-  if (year < 1770) return '1760-1769';
-  if (year < 1780) return '1770-1779';
-  if (year < 1790) return '1780-1789';
-  if (year < 1800) return '1790-1799';
-  if (year < 1810) return '1800-1809';
-  if (year < 1820) return '1810-1819';
-  if (year < 1830) return '1820-1829';
-  if (year < 1900) return '1830-1899';
-  return '1900+';
+type BookPart = 'before-part-1' | 'part-1' | 'part-2' | 'part-3' | 'part-4' | 'after-part-4';
+
+const BOOK_PART_CONFIG: Record<BookPart, { title: string; subtitle: string; color: string }> = {
+  'before-part-1': {
+    title: 'Before Part 1',
+    subtitle: 'Before 1690',
+    color: 'bg-gray-600',
+  },
+  'part-1': {
+    title: 'Part 1: Masters of Tamil Nadu',
+    subtitle: '1690-1740',
+    color: 'bg-emerald-600',
+  },
+  'part-2': {
+    title: 'Part 2: Pawns in Battle Between Powerful External Forces',
+    subtitle: '1740-1754',
+    color: 'bg-blue-600',
+  },
+  'part-3': {
+    title: 'Part 3: Paupers Drowning in Debt',
+    subtitle: '1754-1787',
+    color: 'bg-amber-600',
+  },
+  'part-4': {
+    title: 'Part 4: Phantom Rulers Before the British Completely Took Over Carnatic',
+    subtitle: '1787-1807',
+    color: 'bg-rose-600',
+  },
+  'after-part-4': {
+    title: 'After Part 4',
+    subtitle: 'After 1807',
+    color: 'bg-purple-600',
+  },
+};
+
+function getBookPart(year: number): BookPart {
+  if (year < 1690) return 'before-part-1';
+  if (year < 1740) return 'part-1';
+  if (year < 1754) return 'part-2';
+  if (year < 1787) return 'part-3';
+  if (year < 1807) return 'part-4';
+  return 'after-part-4';
 }
 
 export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: { isAuthenticated: boolean; defaultDynastyFilters?: string[] }) {
@@ -264,14 +282,14 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
   }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
 
-  const groupedByEra = useMemo(() => {
-    const groups: { era: string; entries: TimelineEntry[] }[] = [];
-    let currentEra = '';
+  const groupedByBookPart = useMemo(() => {
+    const groups: { part: BookPart; entries: TimelineEntry[] }[] = [];
+    let currentPart: BookPart | null = null;
     for (const entry of filtered) {
-      const era = getEraLabel(entry.timeStart);
-      if (era !== currentEra) {
-        currentEra = era;
-        groups.push({ era, entries: [entry] });
+      const part = getBookPart(entry.timeStart);
+      if (part !== currentPart) {
+        currentPart = part;
+        groups.push({ part, entries: [entry] });
       } else {
         groups[groups.length - 1].entries.push(entry);
       }
@@ -485,19 +503,24 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         {/* Vertical line */}
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
-        {groupedByEra.map(({ era, entries: eraEntries }) => (
-          <div key={era}>
-            {/* Era marker */}
-            <div className="relative flex items-center mb-3 mt-6 first:mt-0">
-              <div className="absolute left-2 w-5 h-5 rounded-full bg-pink-600 flex items-center justify-center z-10">
-                <div className="w-2 h-2 rounded-full bg-white" />
+        {groupedByBookPart.map(({ part, entries: partEntries }) => {
+          const config = BOOK_PART_CONFIG[part];
+          return (
+            <div key={part}>
+              {/* Book Part marker */}
+              <div className="relative mb-6 mt-8 first:mt-0">
+                <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`}>
+                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                </div>
+                <div className="ml-12">
+                  <div className={`inline-block px-4 py-2 ${config.color} text-white rounded-lg shadow-md`}>
+                    <div className="font-bold text-sm">{config.title}</div>
+                    <div className="text-xs opacity-90 mt-0.5">{config.subtitle}</div>
+                  </div>
+                </div>
               </div>
-              <div className="ml-12 px-3 py-1 bg-pink-600 text-white text-xs font-bold rounded-full shadow">
-                {era}
-              </div>
-            </div>
 
-            {eraEntries.map((entry) => {
+              {partEntries.map((entry) => {
               const battle = isBattle(entry);
               const hasChildren = childrenMap.has(entry.id);
               const childEvents = childrenMap.get(entry.id) || [];
@@ -795,8 +818,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                 </div>
               );
             })}
-          </div>
-        ))}
+            </div>
+          );
+        })}
 
         {filtered.length === 0 && !loading && (
           <div className="text-center text-gray-500 py-12">
