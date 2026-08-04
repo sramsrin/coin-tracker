@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 
 type Region = 'south-india' | 'related-events';
+type BookPart = 'before-part-1' | 'part-1' | 'part-2' | 'part-3' | 'part-4' | 'after-part-4';
 
 interface TimelineEntry {
   id: string;
@@ -23,6 +24,13 @@ interface TimelineEntry {
   partOf?: string | string[]; // supports single parent (string) or multiple parents (array)
   southIndia?: boolean; // legacy field
   region?: Region;
+}
+
+interface Theme {
+  id: string;
+  bookPart: BookPart;
+  text: string;
+  createdAt: number;
 }
 
 const REGION_LABELS: Record<Region, string> = {
@@ -56,8 +64,6 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
   people: [],
   region: 'south-india',
 };
-
-type BookPart = 'before-part-1' | 'part-1' | 'part-2' | 'part-3' | 'part-4' | 'after-part-4';
 
 const BOOK_PART_CONFIG: Record<BookPart, { title: string; subtitle: string; color: string }> = {
   'before-part-1': {
@@ -103,6 +109,7 @@ function getBookPart(year: number): BookPart {
 
 export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: { isAuthenticated: boolean; defaultDynastyFilters?: string[] }) {
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
+  const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [editingEntry, setEditingEntry] = useState<TimelineEntry | null>(null);
@@ -115,6 +122,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedSubEvents, setExpandedSubEvents] = useState<Set<string>>(new Set());
   const [regionFilter, setRegionFilter] = useState<Region | 'all'>('south-india');
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
+  const [showAddThemeForm, setShowAddThemeForm] = useState(false);
+  const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; text: string }>({ bookPart: 'part-1', text: '' });
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -125,18 +135,27 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   }, [defaultDynastyFilters]);
 
   useEffect(() => {
-    fetchEntries();
+    fetchData();
   }, []);
 
-  async function fetchEntries() {
+  async function fetchData() {
     try {
-      const res = await fetch('/api/timeline');
-      if (res.ok) {
-        const data = await res.json();
+      const [entriesRes, themesRes] = await Promise.all([
+        fetch('/api/timeline'),
+        fetch('/api/themes'),
+      ]);
+
+      if (entriesRes.ok) {
+        const data = await entriesRes.json();
         setEntries(data);
       }
+
+      if (themesRes.ok) {
+        const data = await themesRes.json();
+        setThemes(data);
+      }
     } catch (err) {
-      console.error('Failed to fetch timeline entries:', err);
+      console.error('Failed to fetch data:', err);
     } finally {
       setLoading(false);
     }
@@ -404,6 +423,71 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     }
   }
 
+  // Theme management functions
+  function openAddTheme(bookPart: BookPart) {
+    setEditingTheme(null);
+    setThemeFormData({ bookPart, text: '' });
+    setShowAddThemeForm(true);
+  }
+
+  function openEditTheme(theme: Theme) {
+    setEditingTheme(theme);
+    setThemeFormData({ bookPart: theme.bookPart, text: theme.text });
+    setShowAddThemeForm(true);
+  }
+
+  function closeThemeModal() {
+    setEditingTheme(null);
+    setShowAddThemeForm(false);
+    setThemeFormData({ bookPart: 'part-1', text: '' });
+  }
+
+  async function handleSaveTheme() {
+    setSaving(true);
+    try {
+      if (editingTheme) {
+        const res = await fetch(`/api/themes?id=${editingTheme.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(themeFormData),
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setThemes((prev) =>
+            prev.map((t) => (t.id === editingTheme.id ? updated : t))
+          );
+        }
+      } else {
+        const res = await fetch('/api/themes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(themeFormData),
+        });
+        if (res.ok) {
+          const newTheme = await res.json();
+          setThemes((prev) => [...prev, newTheme]);
+        }
+      }
+      closeThemeModal();
+    } catch (err) {
+      console.error('Failed to save theme:', err);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteTheme() {
+    if (!editingTheme) return;
+    if (!confirm('Delete this theme?')) return;
+    try {
+      await fetch(`/api/themes?id=${editingTheme.id}`, { method: 'DELETE' });
+      setThemes((prev) => prev.filter((t) => t.id !== editingTheme.id));
+      closeThemeModal();
+    } catch (err) {
+      console.error('Failed to delete theme:', err);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -498,25 +582,27 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="relative mt-2">
-        {/* Vertical line */}
-        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
+      {/* Timeline with Themes - Two Column Layout */}
+      <div className="flex gap-4 mt-2">
+        {/* Left Column - Timeline Events (75%) */}
+        <div className="relative flex-[3]">
+          {/* Vertical line */}
+          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
-        {groupedByBookPart.map(({ part, entries: partEntries }) => {
-          const config = BOOK_PART_CONFIG[part];
-          return (
-            <div key={part}>
-              {/* Book Part marker */}
-              <div className="relative mb-6 mt-8 first:mt-0">
-                <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`}>
-                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
+          {groupedByBookPart.map(({ part, entries: partEntries }) => {
+            const config = BOOK_PART_CONFIG[part];
+            return (
+              <div key={part} id={`section-${part}`}>
+                {/* Book Part marker */}
+                <div className="relative mb-6 mt-8 first:mt-0">
+                  <div className={`absolute left-2 w-6 h-6 rounded-full ${config.color} flex items-center justify-center z-10 shadow-lg`}>
+                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                  </div>
+                  <div className={`w-full px-4 py-3 ${config.color} text-white shadow-md`}>
+                    <div className="font-bold text-base">{config.title}</div>
+                    <div className="text-sm opacity-90 mt-0.5">{config.subtitle}</div>
+                  </div>
                 </div>
-                <div className={`w-full px-4 py-3 ${config.color} text-white shadow-md`}>
-                  <div className="font-bold text-base">{config.title}</div>
-                  <div className="text-sm opacity-90 mt-0.5">{config.subtitle}</div>
-                </div>
-              </div>
 
               {partEntries.map((entry) => {
               const battle = isBattle(entry);
@@ -820,11 +906,56 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
           );
         })}
 
-        {filtered.length === 0 && !loading && (
-          <div className="text-center text-gray-500 py-12">
-            {search ? `No events matching "${search}"` : 'No timeline events yet'}
-          </div>
-        )}
+          {filtered.length === 0 && !loading && (
+            <div className="text-center text-gray-500 py-12">
+              {search ? `No events matching "${search}"` : 'No timeline events yet'}
+            </div>
+          )}
+        </div>
+
+        {/* Right Column - Themes (25%) */}
+        <div className="flex-1 space-y-4 sticky top-0 h-fit">
+          <div className="text-sm font-bold text-gray-700 mb-2">Themes</div>
+
+          {(['before-part-1', 'part-1', 'part-2', 'part-3', 'part-4', 'after-part-4'] as const).map((part) => {
+            const config = BOOK_PART_CONFIG[part];
+            const partThemes = themes.filter(t => t.bookPart === part);
+
+            return (
+              <div key={part} className="mb-6">
+                {/* Part label */}
+                <div className="text-xs font-medium text-gray-500 mb-2">{config.subtitle}</div>
+
+                {/* Themes for this part */}
+                <div className="space-y-2">
+                  {partThemes.map((theme) => (
+                    <div
+                      key={theme.id}
+                      className="bg-yellow-100 border-l-4 border-yellow-400 shadow-md p-3 rounded cursor-pointer hover:shadow-lg transition transform hover:-rotate-1"
+                      style={{
+                        boxShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                        fontFamily: '"Indie Flower", cursive',
+                      }}
+                      onClick={() => isAuthenticated && openEditTheme(theme)}
+                    >
+                      <div className="text-sm text-gray-800 whitespace-pre-wrap">{theme.text}</div>
+                    </div>
+                  ))}
+
+                  {/* Add theme button */}
+                  {isAuthenticated && (
+                    <button
+                      onClick={() => openAddTheme(part)}
+                      className="w-full py-2 px-3 bg-yellow-50 hover:bg-yellow-100 border-2 border-dashed border-yellow-300 rounded text-xs text-yellow-700 font-medium transition"
+                    >
+                      + Add Theme
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Edit / Add Modal */}
@@ -1131,6 +1262,78 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     onClick={handleSave}
                     disabled={saving || !formData.name.trim()}
                     className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md text-sm font-medium transition disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Theme Modal */}
+      {showAddThemeForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-yellow-50 rounded-xl shadow-2xl w-full max-w-md border-4 border-yellow-300">
+            <div className="p-5">
+              <h2 className="text-lg font-bold text-gray-800 mb-4">
+                {editingTheme ? 'Edit Theme' : 'Add Theme'}
+              </h2>
+
+              <div className="space-y-3">
+                {/* Book Part */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Book Part</label>
+                  <select
+                    value={themeFormData.bookPart}
+                    onChange={(e) => setThemeFormData({ ...themeFormData, bookPart: e.target.value as BookPart })}
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                  >
+                    {(['before-part-1', 'part-1', 'part-2', 'part-3', 'part-4', 'after-part-4'] as const).map((part) => (
+                      <option key={part} value={part}>
+                        {BOOK_PART_CONFIG[part].title} ({BOOK_PART_CONFIG[part].subtitle})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Theme Text */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Theme Description</label>
+                  <textarea
+                    value={themeFormData.text}
+                    onChange={(e) => setThemeFormData({ ...themeFormData, text: e.target.value })}
+                    rows={5}
+                    placeholder="Enter a theme or topic you'll write about in this part..."
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-between mt-5">
+                <div>
+                  {editingTheme && (
+                    <button
+                      onClick={handleDeleteTheme}
+                      className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md text-sm font-medium transition"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={closeThemeModal}
+                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md text-sm font-medium transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveTheme}
+                    disabled={saving || !themeFormData.text.trim()}
+                    className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium transition disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save'}
                   </button>
