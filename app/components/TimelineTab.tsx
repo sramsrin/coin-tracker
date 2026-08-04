@@ -18,9 +18,6 @@ interface TimelineEntry {
   verified: boolean;
   dynasty: string[];
   people?: string[];
-  sideA?: string;
-  sideB?: string;
-  victor?: string;
   partOf?: string | string[]; // supports single parent (string) or multiple parents (array)
   southIndia?: boolean; // legacy field
   region?: Region;
@@ -258,15 +255,11 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
       result = result.filter((e) =>
-        e.dynasty.some(d => multiDynastyFilter.includes(d)) ||
-        (e.sideA && multiDynastyFilter.some(d => e.sideA!.includes(d))) ||
-        (e.sideB && multiDynastyFilter.some(d => e.sideB!.includes(d)))
+        e.dynasty.some(d => multiDynastyFilter.includes(d))
       );
     } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
       result = result.filter((e) =>
-        e.dynasty.includes(dynastyFilter) ||
-        e.sideA?.includes(dynastyFilter) ||
-        e.sideB?.includes(dynastyFilter)
+        e.dynasty.includes(dynastyFilter)
       );
     }
 
@@ -283,9 +276,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
           e.source.toLowerCase().includes(q) ||
           e.time.toLowerCase().includes(q) ||
           e.dynasty.some(d => d.toLowerCase().includes(q)) ||
-          (e.sideA && e.sideA.toLowerCase().includes(q)) ||
-          (e.sideB && e.sideB.toLowerCase().includes(q)) ||
-          (e.victor && e.victor.toLowerCase().includes(q)) ||
           (e.people && e.people.some((p) => p.toLowerCase().includes(q)));
 
         if (matches) {
@@ -362,9 +352,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       verified: entry.verified,
       dynasty: entry.dynasty || [],
       people: entry.people || [],
-      sideA: entry.sideA || '',
-      sideB: entry.sideB || '',
-      victor: entry.victor || '',
       partOf: entry.partOf || '',
       region: getEntryRegion(entry),
     });
@@ -512,7 +499,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     );
   }
 
-  const isBattle = (e: TimelineEntry) => !!(e.sideA || e.sideB);
   const showModal = editingEntry !== null || showAddForm;
 
   return (
@@ -625,7 +611,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
               {partEntries.map((entry) => {
-              const battle = isBattle(entry);
               const hasChildren = childrenMap.has(entry.id);
               const childEvents = childrenMap.get(entry.id) || [];
               const isParentExpanded = expandedParents.has(entry.id);
@@ -634,17 +619,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                 <div key={entry.id} className="relative ml-12 mb-3">
                   {/* Timeline connector dot */}
                   <div className={`absolute -left-[2.15rem] top-3 w-2.5 h-2.5 rounded-full border-2 border-white z-10 ${
-                    battle ? 'bg-red-400' :
-                    hasChildren ? 'bg-purple-500' :
-                    'bg-purple-300'
+                    hasChildren ? 'bg-purple-500' : 'bg-purple-300'
                   }`} />
 
                   {/* Parent Event Card */}
                   <div
                     className={`border-l-4 ${
-                      entry.verified ? 'border-l-green-500' :
-                      battle ? 'border-l-red-400' :
-                      'border-l-purple-400'
+                      entry.verified ? 'border-l-green-500' : 'border-l-purple-400'
                     } bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
                     onClick={() => {
                       if (hasChildren) {
@@ -737,21 +718,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         {/* Description */}
                         <p className="text-xs text-gray-600 leading-relaxed">{entry.description}</p>
 
-                        {/* Battle details */}
-                        {battle && (
-                          <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
-                            {entry.sideA && (
-                              <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{entry.sideA}</span></div>
-                            )}
-                            {entry.sideB && (
-                              <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{entry.sideB}</span></div>
-                            )}
-                            {entry.victor && (
-                              <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{entry.victor}</span></div>
-                            )}
-                          </div>
-                        )}
-
                         {/* People */}
                         {entry.people && entry.people.length > 0 && (
                           <div className="flex gap-1 mt-2 flex-wrap">
@@ -786,16 +752,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   {hasChildren && isParentExpanded && (
                     <div className="ml-6 mt-2 space-y-2 border-l-2 border-purple-200 pl-3">
                       {childEvents.map((child) => {
-                        const childBattle = isBattle(child);
                         const isChildExpanded = expandedSubEvents.has(child.id);
 
                         return (
                           <div
                             key={child.id}
                             className={`border-l-4 ${
-                              child.verified ? 'border-l-green-500' :
-                              childBattle ? 'border-l-red-400' :
-                              'border-l-purple-300'
+                              child.verified ? 'border-l-green-500' : 'border-l-purple-300'
                             } bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -870,21 +833,6 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
                                 {/* Description */}
                                 <p className="text-xs text-gray-600 leading-relaxed">{child.description}</p>
-
-                                {/* Battle details */}
-                                {childBattle && (
-                                  <div className="mt-2 p-2 bg-red-50 rounded-md text-xs space-y-1">
-                                    {child.sideA && (
-                                      <div><span className="text-gray-500">Side A:</span> <span className="text-gray-700">{child.sideA}</span></div>
-                                    )}
-                                    {child.sideB && (
-                                      <div><span className="text-gray-500">Side B:</span> <span className="text-gray-700">{child.sideB}</span></div>
-                                    )}
-                                    {child.victor && (
-                                      <div><span className="text-gray-500">Victor:</span> <span className="font-semibold text-gray-800">{child.victor}</span></div>
-                                    )}
-                                  </div>
-                                )}
 
                                 {/* People */}
                                 {child.people && child.people.length > 0 && (
@@ -1212,92 +1160,58 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <span className="text-sm text-gray-700">Verified</span>
                 </label>
 
-                {/* Battle fields */}
+                {/* Parent Events */}
                 <div className="border-t pt-3 mt-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2">Battle Details (optional)</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Side A (dynasty)</label>
-                      <input
-                        type="text"
-                        value={formData.sideA || ''}
-                        onChange={(e) => setFormData({ ...formData, sideA: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                      />
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Parent Events (optional - can select multiple)
+                  </label>
+                  {/* Display selected parents as chips */}
+                  {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).length > 0 && (
+                    <div className="flex gap-1 flex-wrap mb-2">
+                      {(Array.isArray(formData.partOf) ? formData.partOf : [formData.partOf]).map((parentId) => {
+                        const parent = entries.find(e => e.id === parentId);
+                        return parent ? (
+                          <span key={parentId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
+                            {parent.name}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : []);
+                                const updated = current.filter(id => id !== parentId);
+                                setFormData({ ...formData, partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated });
+                              }}
+                              className="text-pink-500 hover:text-pink-800 font-bold ml-1"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ) : null;
+                      })}
                     </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Side B (dynasty)</label>
-                      <input
-                        type="text"
-                        value={formData.sideB || ''}
-                        onChange={(e) => setFormData({ ...formData, sideB: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Victor</label>
-                      <input
-                        type="text"
-                        value={formData.victor || ''}
-                        onChange={(e) => setFormData({ ...formData, victor: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Parent Events (optional - can select multiple)
-                      </label>
-                      {/* Display selected parents as chips */}
-                      {(Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])).length > 0 && (
-                        <div className="flex gap-1 flex-wrap mb-2">
-                          {(Array.isArray(formData.partOf) ? formData.partOf : [formData.partOf]).map((parentId) => {
-                            const parent = entries.find(e => e.id === parentId);
-                            return parent ? (
-                              <span key={parentId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">
-                                {parent.name}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const current = Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : []);
-                                    const updated = current.filter(id => id !== parentId);
-                                    setFormData({ ...formData, partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated });
-                                  }}
-                                  className="text-pink-500 hover:text-pink-800 font-bold ml-1"
-                                >
-                                  ×
-                                </button>
-                              </span>
-                            ) : null;
-                          })}
-                        </div>
-                      )}
-                      {/* Parent selection dropdown */}
-                      <select
-                        multiple
-                        value={Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])}
-                        onChange={(e) => {
-                          const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-                          setFormData({ ...formData, partOf: selected.length === 0 ? undefined : selected.length === 1 ? selected[0] : selected });
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        size={Math.min(entries.length, 6)}
-                      >
-                        {entries
-                          .filter(e => e.id !== editingEntry?.id && (!Array.isArray(e.partOf) && e.partOf ? !entries.some(parent => parent.id === e.partOf) : true)) // Prevent self-selection and show non-sub-events
-                          .sort((a, b) => a.timeStart - b.timeStart)
-                          .map(e => (
-                            <option key={e.id} value={e.id}>
-                              {e.name} ({e.time})
-                            </option>
-                          ))}
-                      </select>
-                      <p className="text-[10px] text-gray-400 mt-1">
-                        Hold Ctrl/Cmd to select multiple parents. Event will appear under all selected parents.
-                      </p>
-                    </div>
-                  </div>
+                  )}
+                  {/* Parent selection dropdown */}
+                  <select
+                    multiple
+                    value={Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])}
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                      setFormData({ ...formData, partOf: selected.length === 0 ? undefined : selected.length === 1 ? selected[0] : selected });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    size={Math.min(entries.length, 6)}
+                  >
+                    {entries
+                      .filter(e => e.id !== editingEntry?.id && (!Array.isArray(e.partOf) && e.partOf ? !entries.some(parent => parent.id === e.partOf) : true)) // Prevent self-selection and show non-sub-events
+                      .sort((a, b) => a.timeStart - b.timeStart)
+                      .map(e => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} ({e.time})
+                        </option>
+                      ))}
+                  </select>
+                  <p className="text-[10px] text-gray-400 mt-1">
+                    Hold Ctrl/Cmd to select multiple parents. Event will appear under all selected parents.
+                  </p>
                 </div>
               </div>
 
