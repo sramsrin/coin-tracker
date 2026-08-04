@@ -8,7 +8,7 @@ type BookPart = 'before-part-1' | 'part-1' | 'part-2' | 'part-3' | 'part-4' | 'a
 interface Theme {
   id: string;
   bookPart: BookPart;
-  title: string;
+  title?: string; // Optional for backward compatibility
   text: string;
   source?: string;
   sourceUrl?: string;

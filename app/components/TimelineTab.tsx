@@ -29,7 +29,7 @@ interface TimelineEntry {
 interface Theme {
   id: string;
   bookPart: BookPart;
-  title: string;
+  title?: string; // Optional for backward compatibility with old themes
   text: string;
   source?: string;
   sourceUrl?: string;
@@ -446,7 +446,9 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
   function openEditTheme(theme: Theme) {
     setEditingTheme(theme);
-    setThemeFormData({ bookPart: theme.bookPart, title: theme.title, text: theme.text, source: theme.source || '', sourceUrl: theme.sourceUrl || '' });
+    // Handle backward compatibility for themes without title field
+    const title = theme.title || theme.text.substring(0, 50) || '';
+    setThemeFormData({ bookPart: theme.bookPart, title, text: theme.text, source: theme.source || '', sourceUrl: theme.sourceUrl || '' });
     setShowAddThemeForm(true);
   }
 
@@ -928,6 +930,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
                   {partThemes.map((theme) => {
                     const isExpanded = expandedThemes.has(theme.id);
+                    // Handle backward compatibility for themes without title
+                    const displayTitle = theme.title || theme.text.substring(0, 50) + (theme.text.length > 50 ? '...' : '');
                     return (
                       <div
                         key={theme.id}
@@ -940,7 +944,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         {/* Header - always visible */}
                         <div className="flex items-center justify-between gap-2 p-3">
                           <div className="flex items-center gap-2 flex-1">
-                            <div className="font-semibold text-sm text-gray-800">{theme.title}</div>
+                            <div className="font-semibold text-sm text-gray-800">{displayTitle}</div>
                             <svg className={`w-3 h-3 text-gray-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
