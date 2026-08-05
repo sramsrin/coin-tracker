@@ -253,39 +253,15 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       result = result.filter((e) => getEntryRegion(e) === regionFilter);
     }
 
-    // Dynasty filter - include parents if they OR their children match
+    // Dynasty filter - only show events tagged with the dynasty
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
-      const matchingIds = new Set<string>();
-
-      entries.forEach(e => {
-        const matches = e.dynasty.some(d => multiDynastyFilter.includes(d));
-
-        if (matches) {
-          matchingIds.add(e.id);
-
-          // If this is a child, include all its parents
-          const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
-          parentIds.forEach(pId => matchingIds.add(pId));
-        }
-      });
-
-      result = result.filter(e => matchingIds.has(e.id));
+      result = result.filter((e) =>
+        e.dynasty.some(d => multiDynastyFilter.includes(d))
+      );
     } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
-      const matchingIds = new Set<string>();
-
-      entries.forEach(e => {
-        const matches = e.dynasty.includes(dynastyFilter);
-
-        if (matches) {
-          matchingIds.add(e.id);
-
-          // If this is a child, include all its parents
-          const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
-          parentIds.forEach(pId => matchingIds.add(pId));
-        }
-      });
-
-      result = result.filter(e => matchingIds.has(e.id));
+      result = result.filter((e) =>
+        e.dynasty.includes(dynastyFilter)
+      );
     }
 
     if (search.trim()) {
@@ -320,12 +296,21 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       result = result.filter(e => matchingIds.has(e.id));
     }
 
-    // Final result: only parent events (children rendered under them)
-    // An event is a sub-event if it has any valid parents
+    // Final result: separate parent events from sub-events
+    // Only hide a sub-event if its parent is ALSO in the filtered result
+    // (so sub-events whose parents are filtered out appear as standalone events)
     result = result.filter(e => {
       const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
       const hasValidParent = parentIds.some(pId => entries.some(parent => parent.id === pId));
-      return !hasValidParent;
+
+      if (!hasValidParent) {
+        // Not a sub-event, always include
+        return true;
+      }
+
+      // This is a sub-event - only exclude it if at least one parent is in the result
+      const hasParentInResult = parentIds.some(pId => result.some(r => r.id === pId));
+      return !hasParentInResult;
     });
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
   }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
