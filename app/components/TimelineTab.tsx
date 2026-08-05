@@ -612,8 +612,23 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
               {partEntries.map((entry) => {
-              const hasChildren = childrenMap.has(entry.id);
-              const childEvents = childrenMap.get(entry.id) || [];
+              // Filter children based on current dynasty and region filters
+              const allChildEvents = childrenMap.get(entry.id) || [];
+              const childEvents = allChildEvents.filter(child => {
+                // Apply region filter
+                if (regionFilter !== 'all' && getEntryRegion(child) !== regionFilter) {
+                  return false;
+                }
+
+                // Apply dynasty filter
+                if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
+                  return child.dynasty.some(d => multiDynastyFilter.includes(d));
+                } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
+                  return child.dynasty.includes(dynastyFilter);
+                }
+                return true; // No filters, include all children
+              });
+              const hasChildren = childEvents.length > 0; // Based on filtered children
               const isParentExpanded = expandedParents.has(entry.id);
 
               return (
