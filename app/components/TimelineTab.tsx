@@ -34,8 +34,8 @@ interface Theme {
 }
 
 const REGION_LABELS: Record<Region, string> = {
-  'south-india': 'Carnatic Lost',
-  'related-events': 'Related Events',
+  'south-india': 'Carnatic',
+  'related-events': 'Related',
 };
 
 function getEntryRegion(e: TimelineEntry): Region {
