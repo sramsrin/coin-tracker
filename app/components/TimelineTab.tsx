@@ -34,8 +34,8 @@ interface Theme {
 }
 
 const REGION_LABELS: Record<Region, string> = {
-  'south-india': 'Carnatic',
-  'related-events': 'Related',
+  'south-india': 'Main',
+  'related-events': 'Other',
 };
 
 function getEntryRegion(e: TimelineEntry): Region {
@@ -602,12 +602,12 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
           </div>
 
           {/* Region filter */}
-          <div className="flex rounded-lg border border-purple-200 overflow-hidden">
+          <div className="flex rounded-lg border border-purple-200 overflow-hidden shrink-0">
             {(['south-india', 'related-events'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRegionFilter(r)}
-                className={`px-2.5 py-2 text-xs font-medium transition whitespace-nowrap ${
+                className={`px-3 py-2 text-xs font-medium transition whitespace-nowrap ${
                   regionFilter === r
                     ? 'bg-purple-100 text-purple-700'
                     : 'bg-white text-gray-500 hover:bg-gray-50'
