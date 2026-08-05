@@ -253,14 +253,39 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       result = result.filter((e) => getEntryRegion(e) === regionFilter);
     }
 
+    // Dynasty filter - include parents if they OR their children match
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
-      result = result.filter((e) =>
-        e.dynasty.some(d => multiDynastyFilter.includes(d))
-      );
+      const matchingIds = new Set<string>();
+
+      entries.forEach(e => {
+        const matches = e.dynasty.some(d => multiDynastyFilter.includes(d));
+
+        if (matches) {
+          matchingIds.add(e.id);
+
+          // If this is a child, include all its parents
+          const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
+          parentIds.forEach(pId => matchingIds.add(pId));
+        }
+      });
+
+      result = result.filter(e => matchingIds.has(e.id));
     } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
-      result = result.filter((e) =>
-        e.dynasty.includes(dynastyFilter)
-      );
+      const matchingIds = new Set<string>();
+
+      entries.forEach(e => {
+        const matches = e.dynasty.includes(dynastyFilter);
+
+        if (matches) {
+          matchingIds.add(e.id);
+
+          // If this is a child, include all its parents
+          const parentIds = Array.isArray(e.partOf) ? e.partOf : (e.partOf ? [e.partOf] : []);
+          parentIds.forEach(pId => matchingIds.add(pId));
+        }
+      });
+
+      result = result.filter(e => matchingIds.has(e.id));
     }
 
     if (search.trim()) {
