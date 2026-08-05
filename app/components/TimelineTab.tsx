@@ -1221,9 +1221,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     onChange={(e) => setFormData({ ...formData, region: e.target.value as Region })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
                   >
-                    <option value="south-india">South India</option>
-                    <option value="north-india">Broader India</option>
-                    <option value="us">US</option>
+                    <option value="south-india">{REGION_LABELS['south-india']}</option>
+                    <option value="related-events">{REGION_LABELS['related-events']}</option>
                   </select>
                 </div>
 
