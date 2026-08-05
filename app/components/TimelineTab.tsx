@@ -119,10 +119,11 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [peopleText, setPeopleText] = useState('');
   const [dynastyFilter, setDynastyFilter] = useState<string>('all');
   const [multiDynastyFilter, setMultiDynastyFilter] = useState<string[]>([]);
+  const [peopleFilter, setPeopleFilter] = useState<string>('all');
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedSubEvents, setExpandedSubEvents] = useState<Set<string>>(new Set());
   const [expandedThemes, setExpandedThemes] = useState<Set<string>>(new Set());
-  const [regionFilter, setRegionFilter] = useState<Region | 'all'>('south-india');
+  const [regionFilter, setRegionFilter] = useState<Region>('south-india');
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [showAddThemeForm, setShowAddThemeForm] = useState(false);
   const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; title: string; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', title: '', text: '', source: '', sourceUrl: '' });
@@ -192,11 +193,22 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     setExpandedThemes(newExpanded);
   };
 
-  // Get unique dynasties for filter dropdown
+  // Get unique dynasties for filter dropdown (only from Carnatic Lost / south-india region)
   const dynasties = useMemo(() => {
     const set = new Set<string>();
     entries.forEach((e) => {
-      if (e.dynasty) e.dynasty.forEach((d) => set.add(d));
+      if (getEntryRegion(e) === 'south-india' && e.dynasty) {
+        e.dynasty.forEach((d) => set.add(d));
+      }
+    });
+    return Array.from(set).sort();
+  }, [entries]);
+
+  // Get unique people for filter dropdown
+  const people = useMemo(() => {
+    const set = new Set<string>();
+    entries.forEach((e) => {
+      if (e.people) e.people.forEach((p) => set.add(p));
     });
     return Array.from(set).sort();
   }, [entries]);
@@ -248,10 +260,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const filtered = useMemo(() => {
     let result = entries;
 
-    // Region filter
-    if (regionFilter !== 'all') {
-      result = result.filter((e) => getEntryRegion(e) === regionFilter);
-    }
+    // Region filter (always applied - default is south-india)
+    result = result.filter((e) => getEntryRegion(e) === regionFilter);
 
     // Dynasty filter - only show events tagged with the dynasty
     if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
@@ -261,6 +271,13 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
     } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
       result = result.filter((e) =>
         e.dynasty.includes(dynastyFilter)
+      );
+    }
+
+    // People filter - only show events with selected person
+    if (peopleFilter !== 'all') {
+      result = result.filter((e) =>
+        e.people && e.people.includes(peopleFilter)
       );
     }
 
@@ -313,7 +330,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       return !hasParentInResult;
     });
     return [...result].sort((a, b) => a.timeStart - b.timeStart);
-  }, [entries, search, dynastyFilter, multiDynastyFilter, regionFilter]);
+  }, [entries, search, dynastyFilter, multiDynastyFilter, peopleFilter, regionFilter, childrenMap]);
 
   const groupedByBookPart = useMemo(() => {
     const groups: { part: BookPart; entries: TimelineEntry[] }[] = [];
@@ -561,9 +578,32 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
             )}
           </div>
 
+          {/* People filter */}
+          <div className="flex items-center gap-1">
+            <select
+              value={peopleFilter}
+              onChange={(e) => setPeopleFilter(e.target.value)}
+              className="px-3 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            >
+              <option value="all">All People</option>
+              {people.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            {peopleFilter !== 'all' && (
+              <button
+                onClick={() => setPeopleFilter('all')}
+                className="px-2 py-2 text-xs text-pink-600 hover:text-pink-800 font-medium"
+                title="Clear filter"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
           {/* Region filter */}
           <div className="flex rounded-lg border border-purple-200 overflow-hidden">
-            {(['all', 'south-india', 'related-events'] as const).map((r) => (
+            {(['south-india', 'related-events'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRegionFilter(r)}
@@ -573,7 +613,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                     : 'bg-white text-gray-500 hover:bg-gray-50'
                 }`}
               >
-                {r === 'all' ? 'All' : REGION_LABELS[r]}
+                {REGION_LABELS[r]}
               </button>
             ))}
           </div>
@@ -622,21 +662,33 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                   <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
 
               {partEntries.map((entry) => {
-              // Filter children based on current dynasty and region filters
+              // Filter children based on current dynasty, region, and people filters
               const allChildEvents = childrenMap.get(entry.id) || [];
               const childEvents = allChildEvents.filter(child => {
                 // Apply region filter
-                if (regionFilter !== 'all' && getEntryRegion(child) !== regionFilter) {
+                if (getEntryRegion(child) !== regionFilter) {
                   return false;
                 }
 
                 // Apply dynasty filter
                 if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
-                  return child.dynasty.some(d => multiDynastyFilter.includes(d));
+                  if (!child.dynasty.some(d => multiDynastyFilter.includes(d))) {
+                    return false;
+                  }
                 } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
-                  return child.dynasty.includes(dynastyFilter);
+                  if (!child.dynasty.includes(dynastyFilter)) {
+                    return false;
+                  }
                 }
-                return true; // No filters, include all children
+
+                // Apply people filter
+                if (peopleFilter !== 'all') {
+                  if (!child.people || !child.people.includes(peopleFilter)) {
+                    return false;
+                  }
+                }
+
+                return true; // Passes all filters
               });
               const hasChildren = childEvents.length > 0; // Based on filtered children
               const isParentExpanded = expandedParents.has(entry.id);
