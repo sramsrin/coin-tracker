@@ -1043,17 +1043,17 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       if (e.key === 'Enter') {
                         e.preventDefault();
                         const val = (e.target as HTMLInputElement).value.trim();
-                        if (val && !formData.dynasty.includes(val)) {
-                          setFormData({ ...formData, dynasty: [...formData.dynasty, val] });
+                        if (val && !(formData.dynasty || []).includes(val)) {
+                          setFormData({ ...formData, dynasty: [...(formData.dynasty || []), val] });
                         }
                         (e.target as HTMLInputElement).value = '';
                       }
                     }}
-                    onChange={(e) => {
-                      // Auto-add if the value exactly matches a suggestion (datalist selection)
+                    onBlur={(e) => {
+                      // Auto-add on blur if the value exactly matches a suggestion
                       const val = e.target.value.trim();
-                      if (val && dynasties.includes(val) && !formData.dynasty.includes(val)) {
-                        setFormData({ ...formData, dynasty: [...formData.dynasty, val] });
+                      if (val && dynasties.includes(val) && !(formData.dynasty || []).includes(val)) {
+                        setFormData({ ...formData, dynasty: [...(formData.dynasty || []), val] });
                         e.target.value = '';
                       }
                     }}
