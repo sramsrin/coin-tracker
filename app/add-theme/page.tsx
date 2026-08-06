@@ -3,10 +3,29 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface Theme {
+  id: string;
+  bookPart: string;
+  title?: string;
+  text: string;
+  source?: string;
+  sourceUrl?: string;
+}
+
+const BOOK_PART_LABELS: Record<string, string> = {
+  'before-part-1': 'Before Part 1 (Before 1690)',
+  'part-1': 'Part 1: Masters of Tamil Nadu (1690-1740)',
+  'part-2': 'Part 2: Pawns in Battle (1740-1754)',
+  'part-3': 'Part 3: Paupers Drowning in Debt (1754-1787)',
+  'part-4': 'Part 4: Phantom Rulers (1787-1807)',
+  'after-part-4': 'After Part 4 (After 1807)',
+};
+
 export default function AddThemePage() {
   const [jsonInput, setJsonInput] = useState('');
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addedTheme, setAddedTheme] = useState<Theme | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +63,7 @@ export default function AddThemePage() {
       if (response.ok) {
         const created = await response.json();
         setStatus(`✓ Theme added successfully! ID: ${created.id}`);
+        setAddedTheme(created);
         setJsonInput('');
       } else {
         const error = await response.json();
@@ -134,6 +154,71 @@ export default function AddThemePage() {
               </div>
             )}
           </form>
+
+          {addedTheme && (
+            <div className="mt-6 border-t pt-6">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="font-semibold text-lg">Added Theme Preview</h2>
+                <button
+                  onClick={() => setAddedTheme(null)}
+                  className="text-gray-500 hover:text-gray-700 text-sm"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5 shadow-sm">
+                {/* Book Part Badge */}
+                <div className="mb-3">
+                  <span className="inline-block px-3 py-1 bg-amber-600 text-white rounded-full text-xs font-semibold">
+                    {BOOK_PART_LABELS[addedTheme.bookPart] || addedTheme.bookPart}
+                  </span>
+                </div>
+
+                {/* Title */}
+                {addedTheme.title && (
+                  <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                    {addedTheme.title}
+                  </h3>
+                )}
+
+                {/* Text Content */}
+                <div className="text-gray-700 text-sm leading-relaxed italic">
+                  {addedTheme.text}
+                </div>
+
+                {/* Source */}
+                {addedTheme.source && (
+                  <div className="mt-3 pt-3 border-t border-amber-200 text-xs text-gray-600">
+                    <strong>Source:</strong>{' '}
+                    {addedTheme.sourceUrl ? (
+                      <a
+                        href={addedTheme.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {addedTheme.source}
+                      </a>
+                    ) : (
+                      addedTheme.source
+                    )}
+                  </div>
+                )}
+
+                {/* View in Timeline Link */}
+                <div className="mt-3 pt-3 border-t border-amber-200">
+                  <a
+                    href="/?tab=timeline"
+                    className="text-sm text-blue-600 hover:underline font-medium"
+                  >
+                    View in Timeline →
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
           <div className="mt-8 pt-6 border-t space-y-4">
             <h2 className="font-semibold text-lg">How to Use with ChatGPT/Gemini</h2>

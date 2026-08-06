@@ -3,10 +3,30 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface TimelineEvent {
+  id: string;
+  name: string;
+  time: string;
+  timeStart: number;
+  timeEnd: number | null;
+  place: string;
+  description: string;
+  source: string;
+  sourceUrl?: string;
+  verified: boolean;
+  dynasty: string[];
+  people?: string[];
+  sideA?: string;
+  sideB?: string;
+  victor?: string;
+  region?: string;
+}
+
 export default function AddEventPage() {
   const [jsonInput, setJsonInput] = useState('');
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addedEvent, setAddedEvent] = useState<TimelineEvent | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +68,7 @@ export default function AddEventPage() {
       if (response.ok) {
         const created = await response.json();
         setStatus(`✓ Event added successfully! ID: ${created.id}`);
+        setAddedEvent(created);
         setJsonInput('');
       } else {
         const error = await response.json();
@@ -143,6 +164,110 @@ export default function AddEventPage() {
               </div>
             )}
           </form>
+
+          {addedEvent && (
+            <div className="mt-6 border-t pt-6">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="font-semibold text-lg">Added Event Preview</h2>
+                <button
+                  onClick={() => setAddedEvent(null)}
+                  className="text-gray-500 hover:text-gray-700 text-sm"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                {/* Event Header */}
+                <div className="flex items-start gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-3 h-3 rounded-full bg-purple-500 mt-1" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900">{addedEvent.name}</h3>
+                    <div className="flex gap-3 text-sm text-gray-600 mt-1">
+                      <span className="font-medium">{addedEvent.time}</span>
+                      {addedEvent.place && <span>• {addedEvent.place}</span>}
+                      {addedEvent.verified && (
+                        <span className="text-green-600 font-medium">✓ Verified</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="mt-3 ml-6 text-gray-700 text-sm leading-relaxed">
+                  {addedEvent.description}
+                </div>
+
+                {/* Dynasty Tags */}
+                {addedEvent.dynasty && addedEvent.dynasty.length > 0 && (
+                  <div className="mt-3 ml-6 flex flex-wrap gap-2">
+                    {addedEvent.dynasty.map((d, i) => (
+                      <span
+                        key={i}
+                        className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium"
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* People */}
+                {addedEvent.people && addedEvent.people.length > 0 && (
+                  <div className="mt-2 ml-6 text-xs text-gray-600">
+                    <strong>People:</strong> {addedEvent.people.join(', ')}
+                  </div>
+                )}
+
+                {/* Battle Info */}
+                {(addedEvent.sideA || addedEvent.sideB) && (
+                  <div className="mt-2 ml-6 text-xs text-gray-600">
+                    <strong>Battle:</strong> {addedEvent.sideA} vs {addedEvent.sideB}
+                    {addedEvent.victor && ` • Victor: ${addedEvent.victor}`}
+                  </div>
+                )}
+
+                {/* Source */}
+                {addedEvent.source && (
+                  <div className="mt-2 ml-6 text-xs text-gray-500 italic">
+                    <strong>Source:</strong>{' '}
+                    {addedEvent.sourceUrl ? (
+                      <a
+                        href={addedEvent.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {addedEvent.source}
+                      </a>
+                    ) : (
+                      addedEvent.source
+                    )}
+                  </div>
+                )}
+
+                {/* Region */}
+                {addedEvent.region && (
+                  <div className="mt-2 ml-6 text-xs text-gray-500">
+                    <strong>Region:</strong> {addedEvent.region}
+                  </div>
+                )}
+
+                {/* View in Timeline Link */}
+                <div className="mt-4 ml-6 pt-3 border-t border-gray-200">
+                  <a
+                    href={`/?tab=timeline&highlight=${addedEvent.id}`}
+                    className="text-sm text-blue-600 hover:underline font-medium"
+                  >
+                    View in Timeline →
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
           <div className="mt-8 pt-6 border-t space-y-4">
             <h2 className="font-semibold text-lg">How to Use with ChatGPT/Gemini</h2>
