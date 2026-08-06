@@ -1,6 +1,33 @@
 import { NextResponse } from 'next/server';
+import { kv } from '@vercel/kv';
+
+interface TimelineEntry {
+  id: string;
+  name: string;
+  dynasty: string[];
+  [key: string]: any;
+}
 
 export async function GET() {
+  // Fetch existing timeline entries to extract dynasty names
+  let existingDynasties: string[] = [];
+  try {
+    const entries = await kv.get<TimelineEntry[]>('timeline_entries');
+    if (entries && entries.length > 0) {
+      const dynastySet = new Set<string>();
+      entries.forEach(entry => {
+        if (Array.isArray(entry.dynasty)) {
+          entry.dynasty.forEach(d => dynastySet.add(d));
+        } else if (typeof entry.dynasty === 'string' && entry.dynasty) {
+          dynastySet.add(entry.dynasty);
+        }
+      });
+      existingDynasties = Array.from(dynastySet).sort();
+    }
+  } catch (error) {
+    console.error('Failed to fetch existing dynasties:', error);
+  }
+
   const schema = {
     title: 'Lavender Coin Timeline & Theme Schema',
     version: '1.0.0',
@@ -10,8 +37,16 @@ export async function GET() {
         'Follow the style guide strictly - keep descriptions concise and factual',
         'Always include required fields, omit optional fields if not applicable',
         'Use the exact field names shown in the schemas',
+        'IMPORTANT: For dynasty names, use the EXACT names from the existingDynastyNames list below',
         'Return only valid JSON, no additional commentary',
       ],
+    },
+
+    existingDynastyNames: {
+      description: 'Use these EXACT dynasty names for consistency. Do not invent new names.',
+      instruction: 'Always check this list first. If the dynasty you need is here, use the exact spelling and capitalization.',
+      names: existingDynasties,
+      count: existingDynasties.length,
     },
 
     schemas: {
@@ -107,13 +142,17 @@ export async function GET() {
             type: 'string | array of strings',
             required: false,
             description: 'Dynasty, kingdom, or political entity involved. Can be single string or array',
-            format: 'Use consistent naming. Check existing events for standard names.',
-            examples: [
-              'British East India Company',
-              ['British East India Company', 'French East India Company'],
-              ['Marathas', 'Mughal Empire'],
-              'Nawab of Carnatic',
-            ],
+            IMPORTANT: `Use EXACT names from existingDynastyNames list above. Current count: ${existingDynasties.length} dynasties.`,
+            instruction: 'Check existingDynastyNames first. Match spelling and capitalization exactly.',
+            examples: existingDynasties.length > 0
+              ? existingDynasties.slice(0, 10)
+              : [
+                  'British East India Company',
+                  'French East India Company',
+                  'Marathas',
+                  'Mughal Empire',
+                  'Nawab of Carnatic',
+                ],
             default: [],
           },
 
@@ -147,6 +186,7 @@ export async function GET() {
             type: 'string',
             required: false,
             description: 'For battles: first party in the conflict',
+            instruction: 'Should match a dynasty name from existingDynastyNames',
             examples: ['British East India Company', 'Marathas'],
           },
 
@@ -154,13 +194,15 @@ export async function GET() {
             type: 'string',
             required: false,
             description: 'For battles: opposing party in the conflict',
+            instruction: 'Should match a dynasty name from existingDynastyNames',
             examples: ['Bengal Nawabs', 'Mysore'],
           },
 
           victor: {
             type: 'string',
             required: false,
-            description: 'For battles: the winning side (should match sideA or sideB)',
+            description: 'For battles: the winning side (should match sideA or sideB exactly)',
+            instruction: 'Must be identical to either sideA or sideB value',
             examples: ['British East India Company'],
           },
 
@@ -244,7 +286,9 @@ export async function GET() {
         place: 'Paris, France',
         description: 'Britain and France agree to neutrality in India despite European conflicts.',
         source: 'Cambridge History of India, Vol. 5',
-        dynasty: ['British East India Company', 'French East India Company'],
+        dynasty: existingDynasties.includes('British East India Company')
+          ? ['British East India Company', 'French East India Company']
+          : ['British East India Company', 'French East India Company'],
         region: 'south-india',
       },
 
@@ -288,7 +332,9 @@ export async function GET() {
       addEventURL: 'https://coin-tracker-snowy.vercel.app/add-event',
       addThemeURL: 'https://coin-tracker-snowy.vercel.app/add-theme',
       instructions: [
+        'Read this entire schema carefully, especially the existingDynastyNames list',
         'Generate JSON matching the schema above',
+        'Use exact dynasty names from the list - do not create new variations',
         'Copy the JSON output',
         'Paste into the add-event or add-theme page',
         'Submit to add to the timeline',
