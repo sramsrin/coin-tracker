@@ -267,7 +267,6 @@ export default function AddEventPage() {
               </div>
             </div>
           )}
-        </div>
 
           <div className="mt-8 pt-6 border-t space-y-4">
             <h2 className="font-semibold text-lg">How to Use with ChatGPT/Gemini</h2>
