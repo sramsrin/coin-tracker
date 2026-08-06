@@ -17,6 +17,27 @@ export default function AddEventPage() {
       // Parse JSON to validate it
       const eventData = JSON.parse(jsonInput);
 
+      // Validate required fields
+      const errors: string[] = [];
+      if (!eventData.name || eventData.name.trim() === '') {
+        errors.push('name is required and cannot be empty');
+      }
+      if (!eventData.time || eventData.time.trim() === '') {
+        errors.push('time is required and cannot be empty');
+      }
+      if (!eventData.timeStart || eventData.timeStart === 0) {
+        errors.push('timeStart is required and must be a valid year (not 0)');
+      }
+      if (!eventData.description || eventData.description.trim() === '') {
+        errors.push('description is required and cannot be empty');
+      }
+
+      if (errors.length > 0) {
+        setStatus(`✗ Validation failed:\n${errors.map(e => `• ${e}`).join('\n')}`);
+        setIsSubmitting(false);
+        return;
+      }
+
       // Submit to API
       const response = await fetch('/api/timeline', {
         method: 'POST',

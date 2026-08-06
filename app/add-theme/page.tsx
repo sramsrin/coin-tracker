@@ -17,6 +17,23 @@ export default function AddThemePage() {
       // Parse JSON to validate it
       const themeData = JSON.parse(jsonInput);
 
+      // Validate required fields
+      const errors: string[] = [];
+      if (!themeData.bookPart) {
+        errors.push('bookPart is required');
+      } else if (!['before-part-1', 'part-1', 'part-2', 'part-3', 'part-4', 'after-part-4'].includes(themeData.bookPart)) {
+        errors.push('bookPart must be one of: before-part-1, part-1, part-2, part-3, part-4, after-part-4');
+      }
+      if (!themeData.text || themeData.text.trim() === '') {
+        errors.push('text is required and cannot be empty');
+      }
+
+      if (errors.length > 0) {
+        setStatus(`✗ Validation failed:\n${errors.map(e => `• ${e}`).join('\n')}`);
+        setIsSubmitting(false);
+        return;
+      }
+
       // Submit to API
       const response = await fetch('/api/themes', {
         method: 'POST',
