@@ -57,8 +57,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const entries = await readEntries();
 
+    const timestamp = Date.now().toString();
     const newEntry: TimelineEntry = {
-      id: Date.now().toString(),
+      id: timestamp,
       name: body.name?.trim() || '',
       time: body.time?.trim() || '',
       timeStart: Number(body.timeStart) || 0,
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       ...(body.victor?.trim() && { victor: body.victor.trim() }),
       ...(body.partOf?.trim() && { partOf: body.partOf.trim() }),
       ...(body.region && { region: body.region }),
-      sortOrder: body.sortOrder !== undefined ? Number(body.sortOrder) : Number(newEntry.id),
+      sortOrder: body.sortOrder !== undefined ? Number(body.sortOrder) : Number(timestamp),
     };
 
     entries.push(newEntry);
