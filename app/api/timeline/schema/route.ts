@@ -85,11 +85,11 @@ export async function GET() {
           bookPart: {
             type: 'string',
             values: {
-              'before-part-1': 'Before 1690',
-              'part-1': '1690-1740: Masters of Tamil Nadu',
-              'part-2': '1740-1754: Pawns in Battle',
-              'part-3': '1754-1787: Drowning in Debt',
-              'part-4': '1787-1807: Phantom Rulers',
+              'before-part-1': 'Before 1700',
+              'part-1': '1700-1740: Masters of Carnatic',
+              'part-2': '1740-1754: Pawns of Carnatic',
+              'part-3': '1754-1787: Paupers of Carnatic',
+              'part-4': '1787-1807: Phantoms of Carnatic',
               'after-part-4': 'After 1807',
             },
           },

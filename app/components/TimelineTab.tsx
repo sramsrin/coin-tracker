@@ -68,26 +68,26 @@ const EMPTY_ENTRY: Omit<TimelineEntry, 'id'> = {
 const BOOK_PART_CONFIG: Record<BookPart, { title: string; subtitle: string; color: string }> = {
   'before-part-1': {
     title: 'Before Part 1',
-    subtitle: 'Before 1690',
+    subtitle: 'Before 1700',
     color: 'bg-gray-600',
   },
   'part-1': {
-    title: 'Part 1: Masters of Tamil Nadu',
-    subtitle: '1690-1740',
+    title: 'Part 1: Masters of Carnatic',
+    subtitle: '1700-1740',
     color: 'bg-emerald-600',
   },
   'part-2': {
-    title: 'Part 2: Pawns in Battle Between Powerful External Forces',
+    title: 'Part 2: Pawns of Carnatic',
     subtitle: '1740-1754',
     color: 'bg-blue-600',
   },
   'part-3': {
-    title: 'Part 3: Paupers Drowning in Debt',
+    title: 'Part 3: Paupers of Carnatic',
     subtitle: '1754-1787',
     color: 'bg-amber-600',
   },
   'part-4': {
-    title: 'Part 4: Phantom Rulers Before the British Completely Took Over Carnatic',
+    title: 'Part 4: Phantoms of Carnatic',
     subtitle: '1787-1807',
     color: 'bg-rose-600',
   },
@@ -99,7 +99,7 @@ const BOOK_PART_CONFIG: Record<BookPart, { title: string; subtitle: string; colo
 };
 
 function getBookPart(year: number): BookPart {
-  if (year < 1690) return 'before-part-1';
+  if (year < 1700) return 'before-part-1';
   if (year < 1740) return 'part-1';
   if (year < 1754) return 'part-2';
   if (year < 1787) return 'part-3';
@@ -938,6 +938,114 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                                     child.source
                                   )}
                                 </div>
+
+                                {/* Grandchildren (3rd level) - only shown when child is expanded */}
+                                {(() => {
+                                  const grandchildren = (childrenMap.get(child.id) || []).filter(grandchild => {
+                                    // Apply same filters as children
+                                    if (getEntryRegion(grandchild) !== regionFilter) return false;
+                                    if (dynastyFilter === '__multi__' && multiDynastyFilter.length > 0) {
+                                      if (!grandchild.dynasty.some(d => multiDynastyFilter.includes(d))) return false;
+                                    } else if (dynastyFilter !== 'all' && dynastyFilter !== '__multi__') {
+                                      if (!grandchild.dynasty.includes(dynastyFilter)) return false;
+                                    }
+                                    if (peopleFilter !== 'all') {
+                                      if (!grandchild.people || !grandchild.people.includes(peopleFilter)) return false;
+                                    }
+                                    return true;
+                                  });
+
+                                  if (grandchildren.length === 0) return null;
+
+                                  return (
+                                    <div className="mt-3 ml-2 space-y-2 border-l-2 border-gray-300 pl-2">
+                                      {grandchildren.map((grandchild) => {
+                                        const isGrandchildExpanded = expandedSubEvents.has(grandchild.id);
+                                        return (
+                                          <div
+                                            key={grandchild.id}
+                                            className="border-l-4 border-l-gray-400 bg-white rounded shadow-sm hover:shadow transition cursor-pointer text-xs"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              toggleSubEvent(grandchild.id);
+                                            }}
+                                          >
+                                            {/* Grandchild header */}
+                                            <div className="flex items-center justify-between gap-2 p-2">
+                                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                <h5 className="font-medium text-gray-600 text-xs">{grandchild.name}</h5>
+                                                <span className="text-[10px] text-gray-400">{grandchild.time}</span>
+                                                <svg className={`w-2.5 h-2.5 text-gray-400 transition-transform ${isGrandchildExpanded ? 'rotate-180' : ''}`}
+                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                              </div>
+                                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                                {isAuthenticated && (
+                                                  <button
+                                                    onClick={() => handleVerifiedToggle(grandchild)}
+                                                    className={`w-4 h-4 rounded border flex items-center justify-center ${
+                                                      grandchild.verified
+                                                        ? 'bg-green-500 border-green-500 text-white'
+                                                        : 'border-gray-300 hover:border-green-400'
+                                                    }`}
+                                                  >
+                                                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                                {isAuthenticated && (
+                                                  <button
+                                                    onClick={() => openEdit(grandchild)}
+                                                    className="text-gray-400 hover:text-pink-600"
+                                                  >
+                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            {/* Grandchild expanded content */}
+                                            {isGrandchildExpanded && (
+                                              <div className="px-2 pb-2 border-t border-gray-200 pt-2">
+                                                <div className="text-[10px] text-gray-500 mb-1">{grandchild.place}</div>
+                                                {grandchild.dynasty.length > 0 && (
+                                                  <div className="flex gap-1 flex-wrap mb-1">
+                                                    {grandchild.dynasty.map((d, i) => (
+                                                      <span key={i} className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-50 text-amber-600">
+                                                        {d}
+                                                      </span>
+                                                    ))}
+                                                  </div>
+                                                )}
+                                                <p className="text-[10px] text-gray-600 leading-relaxed">{grandchild.description}</p>
+                                                {grandchild.people && grandchild.people.length > 0 && (
+                                                  <div className="flex gap-1 mt-1 flex-wrap">
+                                                    {grandchild.people.map((p, i) => (
+                                                      <span key={i} className="px-1 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px]">{p}</span>
+                                                    ))}
+                                                  </div>
+                                                )}
+                                                <div className="mt-1 text-[9px] text-gray-400">
+                                                  Source: {grandchild.sourceUrl ? (
+                                                    <a href={grandchild.sourceUrl} target="_blank" rel="noopener noreferrer"
+                                                       className="text-pink-500 hover:text-pink-700 underline"
+                                                       onClick={(e) => e.stopPropagation()}>
+                                                      {grandchild.source}
+                                                    </a>
+                                                  ) : grandchild.source}
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })()}
                               </div>
                             )}
                           </div>
