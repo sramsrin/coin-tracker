@@ -21,6 +21,7 @@ interface TimelineEntry {
   partOf?: string | string[]; // supports single parent (string) or multiple parents (array)
   southIndia?: boolean; // legacy field
   region?: Region;
+  sortOrder?: number;
 }
 
 interface Theme {
@@ -128,6 +129,8 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [showAddThemeForm, setShowAddThemeForm] = useState(false);
   const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; title: string; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', title: '', text: '', source: '', sourceUrl: '' });
   const [parentSearch, setParentSearch] = useState('');
+  const [draggingEvent, setDraggingEvent] = useState<TimelineEntry | null>(null);
+  const [dragOverEvent, setDragOverEvent] = useState<string | null>(null);
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -244,9 +247,12 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       }
     });
 
-    // Sort children within each parent by timeStart
+    // Sort children within each parent by timeStart, then sortOrder
     childrenByParent.forEach(children => {
-      children.sort((a, b) => a.timeStart - b.timeStart);
+      children.sort((a, b) => {
+        if (a.timeStart !== b.timeStart) return a.timeStart - b.timeStart;
+        return (a.sortOrder || 0) - (b.sortOrder || 0);
+      });
     });
 
     return { parentEvents: parents, childrenMap: childrenByParent };
@@ -330,7 +336,10 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       const hasParentInResult = parentIds.some(pId => result.some(r => r.id === pId));
       return !hasParentInResult;
     });
-    return [...result].sort((a, b) => a.timeStart - b.timeStart);
+    return [...result].sort((a, b) => {
+      if (a.timeStart !== b.timeStart) return a.timeStart - b.timeStart;
+      return (a.sortOrder || 0) - (b.sortOrder || 0);
+    });
   }, [entries, search, dynastyFilter, multiDynastyFilter, peopleFilter, regionFilter, childrenMap]);
 
   const groupedByBookPart = useMemo(() => {
@@ -365,6 +374,77 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
       );
     }
   }
+
+  // Drag and drop handlers for reordering
+  const handleDragStart = (e: React.DragEvent, entry: TimelineEntry) => {
+    setDraggingEvent(entry);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, entry: TimelineEntry) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverEvent(entry.id);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverEvent(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetEntry: TimelineEntry) => {
+    e.preventDefault();
+    setDragOverEvent(null);
+
+    if (!draggingEvent || draggingEvent.id === targetEntry.id) {
+      setDraggingEvent(null);
+      return;
+    }
+
+    // Only allow reordering within the same year
+    if (draggingEvent.timeStart !== targetEntry.timeStart) {
+      setDraggingEvent(null);
+      return;
+    }
+
+    // Get all events with the same timeStart, sorted by current sortOrder
+    const sameYearEvents = entries
+      .filter(e => e.timeStart === draggingEvent.timeStart)
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+    // Find positions
+    const draggedIndex = sameYearEvents.findIndex(e => e.id === draggingEvent.id);
+    const targetIndex = sameYearEvents.findIndex(e => e.id === targetEntry.id);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggingEvent(null);
+      return;
+    }
+
+    // Reorder the array
+    const reordered = [...sameYearEvents];
+    const [removed] = reordered.splice(draggedIndex, 1);
+    reordered.splice(targetIndex, 0, removed);
+
+    // Assign new sortOrder values
+    const updates: Promise<void>[] = [];
+    reordered.forEach((event, index) => {
+      const newSortOrder = (targetEntry.sortOrder || 0) + (index - targetIndex) * 10;
+      updates.push(
+        fetch(`/api/timeline?id=${event.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sortOrder: newSortOrder }),
+        }).then(() => {
+          setEntries(prev =>
+            prev.map(e => e.id === event.id ? { ...e, sortOrder: newSortOrder } : e)
+          );
+        })
+      );
+    });
+
+    await Promise.all(updates);
+    setDraggingEvent(null);
+  };
 
   function openEdit(entry: TimelineEntry) {
     setEditingEntry(entry);
@@ -705,9 +785,18 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
                   {/* Parent Event Card */}
                   <div
+                    draggable={isAuthenticated}
+                    onDragStart={(e) => handleDragStart(e, entry)}
+                    onDragOver={(e) => handleDragOver(e, entry)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, entry)}
                     className={`border-l-4 ${
                       entry.verified ? 'border-l-green-500' : 'border-l-purple-400'
-                    } bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
+                    } bg-white rounded-lg shadow-sm hover:shadow-md transition ${
+                      isAuthenticated ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+                    } ${
+                      dragOverEvent === entry.id ? 'ring-2 ring-pink-400 ring-offset-2' : ''
+                    }`}
                     onClick={() => {
                       if (hasChildren) {
                         toggleParent(entry.id);
@@ -1411,7 +1500,10 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                           }
                           return true;
                         })
-                        .sort((a, b) => a.timeStart - b.timeStart)
+                        .sort((a, b) => {
+                          if (a.timeStart !== b.timeStart) return a.timeStart - b.timeStart;
+                          return (a.sortOrder || 0) - (b.sortOrder || 0);
+                        })
                         .map(e => {
                           const currentParents = Array.isArray(formData.partOf)
                             ? formData.partOf

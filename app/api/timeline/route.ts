@@ -21,6 +21,7 @@ interface TimelineEntry {
   victor?: string;
   partOf?: string;
   region?: 'south-india' | 'north-india' | 'us';
+  sortOrder?: number;
 }
 
 async function readEntries(): Promise<TimelineEntry[]> {
@@ -74,6 +75,7 @@ export async function POST(request: NextRequest) {
       ...(body.victor?.trim() && { victor: body.victor.trim() }),
       ...(body.partOf?.trim() && { partOf: body.partOf.trim() }),
       ...(body.region && { region: body.region }),
+      sortOrder: body.sortOrder !== undefined ? Number(body.sortOrder) : Number(newEntry.id),
     };
 
     entries.push(newEntry);
