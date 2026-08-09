@@ -127,6 +127,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [showAddThemeForm, setShowAddThemeForm] = useState(false);
   const [themeFormData, setThemeFormData] = useState<{ bookPart: BookPart; title: string; text: string; source?: string; sourceUrl?: string }>({ bookPart: 'part-1', title: '', text: '', source: '', sourceUrl: '' });
+  const [parentSearch, setParentSearch] = useState('');
 
   // When defaultDynastyFilters changes (e.g. navigating from Explore tab), apply multi-dynasty filter
   useEffect(() => {
@@ -367,6 +368,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
 
   function openEdit(entry: TimelineEntry) {
     setEditingEntry(entry);
+    setParentSearch('');
     setFormData({
       name: entry.name,
       time: entry.time,
@@ -395,6 +397,7 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
   function closeModal() {
     setEditingEntry(null);
     setShowAddForm(false);
+    setParentSearch('');
   }
 
   async function handleSave() {
@@ -1385,26 +1388,90 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                       })}
                     </div>
                   )}
-                  {/* Parent selection dropdown */}
-                  <select
-                    multiple
-                    value={Array.isArray(formData.partOf) ? formData.partOf : (formData.partOf ? [formData.partOf] : [])}
-                    onChange={(e) => {
-                      const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-                      setFormData({ ...formData, partOf: selected.length === 0 ? undefined : selected.length === 1 ? selected[0] : selected });
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                    size={Math.min(entries.length, 6)}
-                  >
-                    {entries
-                      .filter(e => e.id !== editingEntry?.id && (!Array.isArray(e.partOf) && e.partOf ? !entries.some(parent => parent.id === e.partOf) : true)) // Prevent self-selection and show non-sub-events
-                      .sort((a, b) => a.timeStart - b.timeStart)
-                      .map(e => (
-                        <option key={e.id} value={e.id}>
-                          {e.name} ({e.time})
-                        </option>
-                      ))}
-                  </select>
+                  {/* Parent search and selection */}
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Search events..."
+                      value={parentSearch}
+                      onChange={(e) => setParentSearch(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 mb-2"
+                    />
+                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md">
+                      {entries
+                        .filter(e => {
+                          // Prevent self-selection
+                          if (e.id === editingEntry?.id) return false;
+                          // Search filter
+                          if (parentSearch) {
+                            const searchLower = parentSearch.toLowerCase();
+                            return e.name.toLowerCase().includes(searchLower) ||
+                                   e.time.toLowerCase().includes(searchLower) ||
+                                   e.place.toLowerCase().includes(searchLower);
+                          }
+                          return true;
+                        })
+                        .sort((a, b) => a.timeStart - b.timeStart)
+                        .map(e => {
+                          const currentParents = Array.isArray(formData.partOf)
+                            ? formData.partOf
+                            : (formData.partOf ? [formData.partOf] : []);
+                          const isSelected = currentParents.includes(e.id);
+
+                          return (
+                            <div
+                              key={e.id}
+                              onClick={() => {
+                                const current = Array.isArray(formData.partOf)
+                                  ? formData.partOf
+                                  : (formData.partOf ? [formData.partOf] : []);
+
+                                if (isSelected) {
+                                  // Remove if already selected
+                                  const updated = current.filter(id => id !== e.id);
+                                  setFormData({
+                                    ...formData,
+                                    partOf: updated.length === 0 ? undefined : updated.length === 1 ? updated[0] : updated
+                                  });
+                                } else {
+                                  // Add to selection
+                                  const updated = [...current, e.id];
+                                  setFormData({
+                                    ...formData,
+                                    partOf: updated.length === 1 ? updated[0] : updated
+                                  });
+                                }
+                              }}
+                              className={`px-3 py-2 text-sm cursor-pointer hover:bg-pink-50 border-b border-gray-100 last:border-b-0 ${
+                                isSelected ? 'bg-pink-100 font-medium' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span>{e.name}</span>
+                                <span className="text-xs text-gray-500">{e.time}</span>
+                              </div>
+                              {e.place && (
+                                <div className="text-xs text-gray-500 mt-0.5">{e.place}</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      {entries.filter(e => {
+                        if (e.id === editingEntry?.id) return false;
+                        if (parentSearch) {
+                          const searchLower = parentSearch.toLowerCase();
+                          return e.name.toLowerCase().includes(searchLower) ||
+                                 e.time.toLowerCase().includes(searchLower) ||
+                                 e.place.toLowerCase().includes(searchLower);
+                        }
+                        return true;
+                      }).length === 0 && (
+                        <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                          {parentSearch ? 'No events found' : 'No events available'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <p className="text-[10px] text-gray-400 mt-1">
                     Hold Ctrl/Cmd to select multiple parents. Event will appear under all selected parents.
                   </p>
