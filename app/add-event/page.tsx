@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface TimelineEvent {
@@ -20,6 +20,7 @@ interface TimelineEvent {
   sideB?: string;
   victor?: string;
   region?: string;
+  partOf?: string | string[];
 }
 
 export default function AddEventPage() {
@@ -27,6 +28,18 @@ export default function AddEventPage() {
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addedEvent, setAddedEvent] = useState<TimelineEvent | null>(null);
+  const [allEvents, setAllEvents] = useState<TimelineEvent[]>([]);
+  const [parentSearch, setParentSearch] = useState('');
+  const [selectedParents, setSelectedParents] = useState<string[]>([]);
+  const [savingParents, setSavingParents] = useState(false);
+
+  // Fetch all events for parent selection
+  useEffect(() => {
+    fetch('/api/timeline')
+      .then(res => res.json())
+      .then(data => setAllEvents(data))
+      .catch(err => console.error('Failed to load events:', err));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +82,13 @@ export default function AddEventPage() {
         const created = await response.json();
         setStatus(`✓ Event added successfully! ID: ${created.id}`);
         setAddedEvent(created);
+        setSelectedParents(
+          Array.isArray(created.partOf)
+            ? created.partOf
+            : created.partOf
+            ? [created.partOf]
+            : []
+        );
         setJsonInput('');
       } else {
         const error = await response.json();
@@ -98,6 +118,33 @@ export default function AddEventPage() {
       region: 'south-india',
     };
     setJsonInput(JSON.stringify(example, null, 2));
+  };
+
+  const saveParents = async () => {
+    if (!addedEvent) return;
+
+    setSavingParents(true);
+    try {
+      const response = await fetch(`/api/timeline?id=${addedEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partOf: selectedParents.length === 0 ? null : selectedParents.length === 1 ? selectedParents[0] : selectedParents,
+        }),
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setAddedEvent(updated);
+        setStatus('✓ Parent events saved successfully!');
+      } else {
+        setStatus('✗ Failed to save parent events');
+      }
+    } catch (error) {
+      setStatus(`✗ Error: ${error}`);
+    } finally {
+      setSavingParents(false);
+    }
   };
 
   return (
@@ -264,6 +311,121 @@ export default function AddEventPage() {
                     View in Timeline →
                   </a>
                 </div>
+              </div>
+
+              {/* Parent Event Selection */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-base">Select Parent Events (Optional)</h3>
+                  {selectedParents.length > 0 && (
+                    <button
+                      onClick={() => setSelectedParents([])}
+                      className="text-xs text-pink-600 hover:text-pink-800 font-medium"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+
+                {/* Selected parents as chips */}
+                {selectedParents.length > 0 && (
+                  <div className="flex gap-2 flex-wrap mb-3">
+                    {selectedParents.map((parentId) => {
+                      const parent = allEvents.find((e) => e.id === parentId);
+                      return parent ? (
+                        <span
+                          key={parentId}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700"
+                        >
+                          {parent.name}
+                          <button
+                            onClick={() => setSelectedParents(selectedParents.filter((id) => id !== parentId))}
+                            className="text-pink-500 hover:text-pink-800 font-bold"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+
+                {/* Search and select */}
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Search events..."
+                    value={parentSearch}
+                    onChange={(e) => setParentSearch(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 mb-2"
+                  />
+                  <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md">
+                    {allEvents
+                      .filter((e) => {
+                        if (e.id === addedEvent.id) return false;
+                        if (parentSearch) {
+                          const searchLower = parentSearch.toLowerCase();
+                          return (
+                            e.name.toLowerCase().includes(searchLower) ||
+                            e.time.toLowerCase().includes(searchLower) ||
+                            e.place.toLowerCase().includes(searchLower)
+                          );
+                        }
+                        return true;
+                      })
+                      .sort((a, b) => a.timeStart - b.timeStart)
+                      .map((e) => {
+                        const isSelected = selectedParents.includes(e.id);
+
+                        return (
+                          <div
+                            key={e.id}
+                            onClick={() => {
+                              if (isSelected) {
+                                setSelectedParents(selectedParents.filter((id) => id !== e.id));
+                              } else {
+                                setSelectedParents([...selectedParents, e.id]);
+                              }
+                            }}
+                            className={`px-3 py-2 text-sm cursor-pointer hover:bg-pink-50 border-b border-gray-100 last:border-b-0 ${
+                              isSelected ? 'bg-pink-100 font-medium' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{e.name}</span>
+                              <span className="text-xs text-gray-500">{e.time}</span>
+                            </div>
+                            {e.place && <div className="text-xs text-gray-500 mt-0.5">{e.place}</div>}
+                          </div>
+                        );
+                      })}
+                    {allEvents.filter((e) => {
+                      if (e.id === addedEvent.id) return false;
+                      if (parentSearch) {
+                        const searchLower = parentSearch.toLowerCase();
+                        return (
+                          e.name.toLowerCase().includes(searchLower) ||
+                          e.time.toLowerCase().includes(searchLower) ||
+                          e.place.toLowerCase().includes(searchLower)
+                        );
+                      }
+                      return true;
+                    }).length === 0 && (
+                      <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                        {parentSearch ? 'No events found' : 'No events available'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Save button */}
+                <button
+                  onClick={saveParents}
+                  disabled={savingParents}
+                  className="w-full mt-4 bg-pink-600 text-white rounded px-4 py-2 font-medium hover:bg-pink-700 disabled:bg-gray-400"
+                >
+                  {savingParents ? 'Saving...' : 'Save Parent Events'}
+                </button>
               </div>
             </div>
           )}
