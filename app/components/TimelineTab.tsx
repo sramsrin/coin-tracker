@@ -927,9 +927,27 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                         return (
                           <div
                             key={child.id}
+                            draggable={isAuthenticated}
+                            onDragStart={(e) => {
+                              e.stopPropagation();
+                              handleDragStart(e, child);
+                            }}
+                            onDragOver={(e) => {
+                              e.stopPropagation();
+                              handleDragOver(e, child);
+                            }}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => {
+                              e.stopPropagation();
+                              handleDrop(e, child);
+                            }}
                             className={`border-l-4 ${
                               child.verified ? 'border-l-green-500' : 'border-l-purple-300'
-                            } bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer`}
+                            } bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition ${
+                              isAuthenticated ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+                            } ${
+                              dragOverEvent === child.id ? 'ring-2 ring-pink-400 ring-offset-1' : ''
+                            }`}
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleSubEvent(child.id);
@@ -1056,7 +1074,16 @@ export default function TimelineTab({ isAuthenticated, defaultDynastyFilters }: 
                                         return (
                                           <div
                                             key={grandchild.id}
-                                            className="border-l-4 border-l-gray-400 bg-white rounded shadow-sm hover:shadow transition cursor-pointer text-xs"
+                                            draggable={isAuthenticated}
+                                            onDragStart={(e) => { e.stopPropagation(); handleDragStart(e, grandchild); }}
+                                            onDragOver={(e) => { e.stopPropagation(); handleDragOver(e, grandchild); }}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={(e) => { e.stopPropagation(); handleDrop(e, grandchild); }}
+                                            className={`border-l-4 border-l-gray-400 bg-white rounded shadow-sm hover:shadow transition text-xs ${
+                                              isAuthenticated ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+                                            } ${
+                                              dragOverEvent === grandchild.id ? 'ring-2 ring-pink-400 ring-offset-1' : ''
+                                            }`}
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               toggleSubEvent(grandchild.id);
